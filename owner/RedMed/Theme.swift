@@ -513,7 +513,7 @@ extension OwnerModalChrome where Trailing == Color {
 /// Box radius is shared by owner + scanner cards / CTAs (square-ish, not capsules).
 enum RedMedChrome {
     static let navTitleFont: Font = .system(size: 17, weight: .semibold)
-    /// Help / Edit (RedMed), Help on 911 / Aid / NFC, Back (Preview / scanner / topic).
+    /// Edit (RedMed), Back (Preview / scanner / topic). No Help on Main · 911 · Aid · NFC.
     static let chromeActionSize: CGFloat = 18
     /// Cancel / Save / Done inside owner Help · Edit modals.
     static let modalActionSize: CGFloat = 17

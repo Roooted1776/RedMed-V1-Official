@@ -110,9 +110,7 @@ struct RedMedView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // Big bottom "Help" dock removed from the RedMed user page.
-            // Help remains available via other native chrome on the
-            // 911 / Aid / NFC tabs (not the Edit modal bar).
+            // No Help / Policies chrome on Main · 911 · Aid · NFC · tapper.
         }
         // Owner profile only — never redact the passerby / EMS scanner card.
         .privacySensitive(!isScannerSession)
