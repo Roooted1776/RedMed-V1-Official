@@ -1,32 +1,15 @@
 #!/usr/bin/env node
 /**
- * Assist, Owner, the static site, and the ops database do not *call* an MCP.
- * Ops MCP may live in mcp/ (package name redmed-mcp) — that folder is allowed.
- * Product surfaces must not import or depend on it.
+ * Assist, Owner, the static site, and the ops database do not depend on an MCP.
  *   node scripts/test-product-independence.mjs
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const skip = new Set(['node_modules', 'dist', '.git', 'mcp']);
-/** Paths that may name the ops package without coupling product to it. */
-const allowNeedle = new Set([
-  'docs/mcp.md',
-  'docs/OPS.md',
-  'docs/STRUCTURE.md',
-  'docs/AUDIT-V1-GOLIVE.md',
-  'docs/AUDIT.md',
-  'docs/AUDIT-2026-09-16.md',
-  'AGENTS.md',
-  'README.md',
-  'scripts/upsert-mcp-dns.mjs',
-  'scripts/test-product-independence.mjs',
-  '.github/workflows/upsert-mcp-dns.yml',
-  '.github/workflows/gates.yml',
-]);
-const needles = ['mcp/redmed-mcp', 'from \'../mcp/', 'from \"../mcp/', "require('../mcp/"];
+const skip = new Set(['node_modules', 'dist', '.git']);
+const needles = ['mcp/redmed-mcp', 'redmed-mcp'];
 const roots = [
   'owner',
   'tapper',
@@ -56,7 +39,7 @@ function fail(message) {
 }
 
 if (existsSync(join(root, 'mcp'))) {
-  console.log('OK   mcp/ present (ops-only package)');
+  fail('mcp/ is inside the product tree');
 } else {
   console.log('OK   no mcp/ directory');
 }
@@ -82,12 +65,12 @@ for (const rel of files) {
 }
 
 for (const path of hits) {
-  const rel = relative(root, path).split('\\').join('/');
-  if (allowNeedle.has(rel)) continue;
+  if (path.endsWith('test-product-independence.mjs')) continue;
   const text = readFileSync(path, 'utf8');
   for (const needle of needles) {
-    if (text.includes(needle)) fail(`${rel} couples product to MCP (${needle})`);
+    if (text.includes(needle)) fail(`${path.slice(root.length)} contains ${needle}`);
   }
+  const rel = path.slice(root.length);
   const historicalLedger = rel.endsWith('supabase/migrations/20260926064135_redmed_ops_release_ledger.sql')
     || rel.endsWith('supabase/migrations/20260926155000_drop_mcp_from_release_ledger.sql');
   if (path.includes(`${join('supabase', '')}`) && text.includes("'mcp'") && !historicalLedger) {
@@ -103,8 +86,5 @@ if (drop.includes("'mcp',") || drop.includes(", 'mcp'")) {
   fail('release ledger still allows an mcp gate');
 }
 
-if (failed === 0) {
-  console.log('OK   product, website, and database stay independent of the ops MCP package');
-} else {
-  process.exit(1);
-}
+if (failed === 0) console.log('OK   product, website, database, and structure do not reference the MCP package');
+else process.exit(1);
