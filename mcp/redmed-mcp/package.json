@@ -1,6 +1,6 @@
 {
   "name": "redmed-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "RedMed ops MCP \u2014 Hostinger API + SSH + Supabase status. Product wall: no ICE / #d= / PHI.",
   "type": "module",
   "bin": {
@@ -11,7 +11,7 @@
     "start": "node bin/redmed-mcp.mjs",
     "status": "node bin/redmed-stack-status.mjs",
     "test": "node --test test/*.test.mjs",
-    "check": "node --check bin/redmed-mcp.mjs && node --check bin/redmed-stack-status.mjs && node --check lib/wall.mjs && node --check lib/ops-commands.mjs"
+    "check": "node --check bin/redmed-mcp.mjs && node --check bin/redmed-stack-status.mjs && node --check lib/wall.mjs && node --check lib/ops-commands.mjs && node --check lib/github.mjs"
   },
   "engines": {
     "node": ">=20"

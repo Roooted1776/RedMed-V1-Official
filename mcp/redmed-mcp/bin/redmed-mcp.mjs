@@ -11,11 +11,12 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { wallCheck, redactFragments } from '../lib/wall.mjs';
 import { ACTIONS, UNITS, buildCommand } from '../lib/ops-commands.mjs';
+import { registerGithubTools } from '../lib/github.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// Raw root shell is off by default. Opt in per session only when you are
-// at the keyboard: REDMED_SSH_ALLOW_RAW=1.
-const ALLOW_RAW = process.env.REDMED_SSH_ALLOW_RAW === '1';
+// Raw root shell is ON by default (Max's call, 2026-09-26: full access by
+// design). Set REDMED_SSH_ALLOW_RAW=0 to register only the allow-listed tool.
+const ALLOW_RAW = process.env.REDMED_SSH_ALLOW_RAW !== '0';
 
 const server = new McpServer({
   name: 'redmed-mcp',
@@ -117,10 +118,12 @@ server.tool(
   },
 );
 
+registerGithubTools(server);
+
 if (ALLOW_RAW) {
   server.tool(
     'hostinger_ssh_exec',
-    'RAW shell on the ops VPS (enabled by REDMED_SSH_ALLOW_RAW=1). Runs as REDMED_SSH_USER. Human must review every command. Never for Assist #d= data.',
+    'RAW shell on the ops VPS (default on; disable with REDMED_SSH_ALLOW_RAW=0). Runs as REDMED_SSH_USER. Never for Assist #d= data.',
     {
       command: z.string().max(2000).describe('Shell command to run on the VPS'),
     },

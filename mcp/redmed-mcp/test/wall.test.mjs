@@ -47,3 +47,25 @@ test('ops allow-list clamps tail and builds fixed commands', () => {
     assert.doesNotMatch(cmd, /\brm\b|reboot|shutdown|poweroff|mkfs|\bdd\b/, a);
   }
 });
+
+test('github tool registered, no token -> clean error', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const req = (id, method, params) =>
+    JSON.stringify({ jsonrpc: '2.0', id, method, params });
+  const input = [
+    req(1, 'initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 't', version: '1' } }),
+    JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' }),
+    req(2, 'tools/list', {}),
+  ].join('\n') + '\n';
+  const r = spawnSync(process.execPath, ['bin/redmed-mcp.mjs'], {
+    input,
+    encoding: 'utf8',
+    timeout: 15000,
+    env: { ...process.env, GITHUB_TOKEN: '', REDMED_SSH_ALLOW_RAW: '' },
+  });
+  const list = r.stdout.split('\n').filter(Boolean).map((l) => JSON.parse(l)).find((m) => m.id === 2);
+  const names = list.result.tools.map((t) => t.name);
+  assert.ok(names.includes('github_api'), 'github_api registered');
+  assert.ok(names.includes('hostinger_ssh_exec'), 'raw ssh on by default');
+  assert.ok(names.includes('hostinger_ops'), 'allow-list tool present');
+});

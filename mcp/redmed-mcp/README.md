@@ -1,4 +1,4 @@
-# redmed-mcp v0.3
+# redmed-mcp v0.4
 
 Cursor MCP server for **RedMed ops** (Hostinger API status, SSH exec helper hooks, Supabase project health).
 
@@ -18,10 +18,15 @@ Ops-only Supabase project: `mohxobgyjkcmkqxijgeg` (`RedMed Secure Data`). Keep t
 |------|---------|
 | `redmed_stack_status` | DNS / origin / github.io / Supabase project summary (read-only) |
 | `hostinger_ops` | Allow-listed read-only VPS command: `uptime`, `disk`, `memory`, `docker_ps`, `traefik_ps`, `container_logs`, `unit_status`, `unit_journal`, `failed_logins`, `listening_ports` |
-| `hostinger_ssh_exec` | **Off by default.** Raw shell, only registered when `REDMED_SSH_ALLOW_RAW=1`. Human reviews every command. |
+| `hostinger_ssh_exec` | **Raw shell on the VPS, ON by default** (full access by design). `REDMED_SSH_ALLOW_RAW=0` restricts to the allow-list only. |
+| `github_api` | GitHub REST API as Roooted1776 (repos, issues, PRs, releases). Auth: `GITHUB_TOKEN` env - never commit the token. |
 | `supabase_ops_status` | Project ref + table count (no row reads of medical data) |
 
 Hostinger product MCPs (websites, DNS, VPS power) remain on Cursor’s Hostinger plugin — this package complements them.
+
+## v0.4: gates opened
+
+Raw `hostinger_ssh_exec` is ON by default again (2026-09-26, Max: full access is the intended design). The allow-list tool stays as a convenience. Opt out with `REDMED_SSH_ALLOW_RAW=0`.
 
 ## Security model (v0.3)
 
@@ -37,6 +42,7 @@ Tests: `npm test` (runs in `.github/workflows/gates.yml`).
 ```bash
 cd mcp/redmed-mcp && npm ci
 export HOSTINGER_API_TOKEN=…   # optional for richer status
+export GITHUB_TOKEN=…           # fine-grained PAT for github_api
 export REDMED_SSH_HOST=2.25.249.204
 export REDMED_SSH_KEY=~/.ssh/hostinger_vps
 node bin/redmed-mcp.mjs
