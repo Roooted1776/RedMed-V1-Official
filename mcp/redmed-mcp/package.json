@@ -10,7 +10,7 @@
   "scripts": {
     "start": "node bin/redmed-mcp.mjs",
     "status": "node bin/redmed-stack-status.mjs",
-    "test": "node --test test/",
+    "test": "node --test test/*.test.mjs",
     "check": "node --check bin/redmed-mcp.mjs && node --check bin/redmed-stack-status.mjs && node --check lib/wall.mjs && node --check lib/ops-commands.mjs"
   },
   "engines": {
