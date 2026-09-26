@@ -6,7 +6,7 @@ struct EmergencyView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            PageHelpChrome()
+            PageTopChrome()
             ScrollView {
                 // Short, fixed page (~6 children). LazyVStack would estimate
                 // off-screen height and keep bookkeeping with no benefit.

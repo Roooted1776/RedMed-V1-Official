@@ -757,7 +757,7 @@ struct EditProfileView: View {
     private func presentBlankOverStoredAlert() {
         saveFailedTitle = "Use Erase to Wipe"
         saveFailedMessage =
-            "Edit only clears individual fields (blood type, birth date). Blanking everything and saving does not remove a stored medical ID. Use Help → Erase All User Data."
+            "Edit only clears individual fields (blood type, birth date). Blanking everything and saving does not remove a stored medical ID."
         showSaveFailedAlert = true
     }
 

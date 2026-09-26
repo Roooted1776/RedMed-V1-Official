@@ -31,7 +31,7 @@ struct NFCView: View {
 
     private var ownerBody: some View {
         VStack(spacing: 0) {
-            PageHelpChrome()
+            PageTopChrome()
 
             ScrollView {
                 VStack(spacing: 16) {

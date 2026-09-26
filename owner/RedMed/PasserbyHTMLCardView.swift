@@ -13,7 +13,7 @@ import WebKit
 /// Sets `html.app-preview` and disables WKWebView UIScrollView scrolling so
 /// flex tabbar taps work (fixed + dual-scroll ate RedMed · 911 switches).
 /// Never calls `BiometricAuth` — passerby / Preview tap-to-view stays ungated.
-/// Native chrome is Back + Help only — **no Edit**. Owner Edit lives on the
+/// Native chrome is Back only — **no Edit**, **no Help**. Owner Edit lives on the
 /// RedMed tab, off the YOU-card / tapper header.
 /// Nothing covers this shell (no privacy veil, no Face ID, no native overlay,
 /// no "Before you preview" page). Owner legal consent lives only on the app
@@ -39,7 +39,6 @@ struct PasserbyHTMLCardView: View {
                     dismiss()
                 }
                 Spacer(minLength: 0)
-                OwnerHelpButton()
             }
             .frame(maxWidth: .infinity, minHeight: 44, maxHeight: 44, alignment: .center)
             .padding(.horizontal, RedMedChrome.pagePadX)
@@ -69,7 +68,6 @@ struct PasserbyHTMLCardView: View {
         .background { RedMedPageBackground() }
         .onAppear { TapCardPresentation.setVisible(true) }
         .onDisappear { TapCardPresentation.setVisible(false) }
-        .presentsOwnerHelp()
         .environment(\.isScannerSession, true)
     }
 

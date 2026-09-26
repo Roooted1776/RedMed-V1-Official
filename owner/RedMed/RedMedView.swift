@@ -4,12 +4,12 @@ import SwiftUI
 /// Bundled `tapper.html` is passerby + NFC Preview / Scan only. No WKWebView
 /// on this tab: WebKit parse was the cold-open stall, and a parked embed
 /// under 911 / Aid / NFC kept the compositor hot mid-session.
-/// Owner chrome: Edit on its own row, then logo + name + Linked (no Help dock).
+/// Owner chrome: Edit on its own row, then logo + name + Linked (no Help).
 /// YOU-card header matches passerby / NFC Preview — no Edit on that row.
 /// Face ID is Edit / Save only on this tab (not opening / viewing the YOU
-/// card). 911 / Aid / NFC stay reachable. Scanners keep Back. Help lives
-/// on 911 / Aid / NFC — not on Edit. Fresh install: native setup funnel.
-/// Passerby tapper is unchanged.
+/// card). 911 / Aid / NFC stay reachable. Scanners keep Back. No Help /
+/// Policies chrome on Main · 911 · Aid · NFC. Fresh install: native setup funnel.
+/// Passerby tapper is unchanged aside from no Help link.
 struct RedMedView: View {
     /// Parent keep-alive still passes tab visibility — used for screen wake
     /// (opacity keep-alive does not fire onDisappear on tab switch).

@@ -5,9 +5,9 @@ import SwiftUI
 ///
 /// Permanent product rule (bracelet tap / scanner):
 /// - Owner (`isScannerSession == false`): RedMed · 911 · Aid · NFC (+ Edit chrome on RedMed, not on the YOU-card / Preview header).
-///   Help chrome on every native screen except the Edit modal.
+///   No Help / Policies chrome on Main · 911 · Aid · NFC (policies stay in Before You Continue + hosted `/Document/`).
 /// - Scanner / tap (`isScannerSession == true` or HTML `tapper.html#d=`): RedMed · 911 · Aid
-///   only — **no Edit**, **no NFC**. Help is policies-only (no Settings / Erase / NFC write).
+///   only — **no Edit**, **no NFC**, **no Help**.
 ///
 /// Never gate the NFC tab on `AppConfig.nfcHardwareEnabled` — that flag only
 /// disables CoreNFC sessions inside `NFCBandManager` (`NFCWriter` / `NFCReader`).
@@ -181,7 +181,6 @@ struct ContentView: View {
             .environment(\.isScannerSession, true)
             .presentationBackground(Color.redmedBg)
         }
-        .presentsOwnerHelp()
     }
 
     /// Open the CoreNFC write sheet on the NFC-tab / Write CTA stack.
