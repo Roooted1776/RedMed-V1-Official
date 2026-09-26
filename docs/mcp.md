@@ -58,7 +58,7 @@ No arbitrary SQL. Power actions (reboot/shutdown) are blocked in the shell polic
 
 ## Hosting
 
-- Assist static stays on Hostinger shared hosting for `https://redmed.live/tapper/`. Do not point the apex A record at the VPS.
+- The public site (`portal/`) is served at `https://redmed.live/` with Assist at `https://redmed.live/tapper/`. This MCP stays on `mcp.redmed.live` and does not decode `#d=`.
 - Ops MCP remote: Docker + Traefik on the VPS at `/opt/redmed-mcp`.
   - Health: `https://srv2010795.hstgr.cloud/healthz` and `https://mcp.redmed.live/healthz`
   - MCP path: `https://mcp.redmed.live/mcp`

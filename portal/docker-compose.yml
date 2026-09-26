@@ -1,0 +1,37 @@
+# Public site for redmed.live (account portal + /tapper/ Assist shell).
+# Traefik on the VPS (host network) reaches 127.0.0.1:8090.
+# Ops MCP stays on Host(`mcp.redmed.live`) only.
+
+services:
+  redmed-portal:
+    build: .
+    image: redmed-portal:main
+    container_name: redmed-portal-live
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      PORT: "8090"
+      STATIC_ROOT: /site
+    volumes:
+      - ./server.mjs:/server.mjs:ro
+      - ./site:/site:ro
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.redmed-portal.loadbalancer.server.port=8090
+      - traefik.http.middlewares.redmed-portal-slash.redirectregex.permanent=true
+      - traefik.http.middlewares.redmed-portal-slash.redirectregex.regex=^(https?://[^/]+/redmed)$
+      - traefik.http.middlewares.redmed-portal-slash.redirectregex.replacement=${1}/
+      - traefik.http.middlewares.redmed-portal-strip.stripprefix.prefixes=/redmed
+      - traefik.http.routers.redmed-portal.rule=Host(`srv2010795.hstgr.cloud`) && (Path(`/redmed`) || PathPrefix(`/redmed/`))
+      - traefik.http.routers.redmed-portal.entrypoints=websecure
+      - traefik.http.routers.redmed-portal.tls=true
+      - traefik.http.routers.redmed-portal.tls.certresolver=letsencrypt
+      - traefik.http.routers.redmed-portal.middlewares=redmed-portal-slash,redmed-portal-strip
+      - traefik.http.routers.redmed-portal.priority=100
+      - traefik.http.routers.redmed-portal.service=redmed-portal
+      - traefik.http.routers.redmed-live.rule=Host(`redmed.live`) || Host(`www.redmed.live`)
+      - traefik.http.routers.redmed-live.entrypoints=websecure
+      - traefik.http.routers.redmed-live.tls=true
+      - traefik.http.routers.redmed-live.tls.certresolver=letsencrypt
+      - traefik.http.routers.redmed-live.priority=100
+      - traefik.http.routers.redmed-live.service=redmed-portal

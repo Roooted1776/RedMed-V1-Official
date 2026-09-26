@@ -21,7 +21,7 @@ Ops is separate from the Assist band write path. **Never** put ICE profiles, Ass
 - Hostinger product MCP (`Hostinger-vps`): power, firewall, snapshots — not shell.
 - Confirm before destructive changes (reboot, recreate, firewall wipe, `rm -rf`).
 
-**Do not** point the apex `redmed.live` A record at the VPS. Assist stays on Hostinger static. The ops hostname is `mcp.redmed.live` (DNS-only A → `2.25.249.204`), which Traefik already routes. Until Namecheap nameservers move to Cloudflare, that record lives in the Hostinger DNS zone (`scripts/upsert-mcp-dns-hostinger.mjs`). After the Cloudflare cutover, keep the same grey-cloud A with `scripts/upsert-mcp-dns.mjs`.
+The public website is the VPS portal (`portal/`) on the apex: `https://redmed.live/` is the account site, and `https://redmed.live/tapper/` is the Assist shell copied from `tapper/`. Band `#d=` fragments are forwarded to `/tapper/` in the browser and are not stored. Ops MCP stays on `mcp.redmed.live` only. Publish with `node scripts/sync-portal-on-vps.mjs <repo tar.gz>` on the VPS.
 
 ## Secrets matrix
 
