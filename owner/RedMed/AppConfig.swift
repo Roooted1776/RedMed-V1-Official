@@ -46,7 +46,7 @@ enum AppConfig {
     static let appStoreURL: String? = nil
     /// Unused in Swift (in-app Help is bundled `Document/Document.html`). Connect placeholders
     /// stay in this repo — not jsDelivr `@main` of a second tree.
-    static let supportURL = "https://github.com/Roooted1776/RedMed-V1-Official/blob/main/support/index.html"
+    static let supportURL = "https://github.com/Roooted1776/frisky/blob/main/support/index.html"
 
     /// Owner band NDEF contract (permanent): write only
     /// `medicalCardBaseURL + "#d=" + base64url`. Profile stays in the fragment —
