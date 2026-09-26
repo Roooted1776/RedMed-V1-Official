@@ -25,7 +25,7 @@ Do not add a profile backend. Do not require login to view a tapped card. Do not
 | Location | On as part of Agree (no in-app toggle). When-In-Use on first Find Help / hospital GPS use — not after Face ID. GPS start/stop are Find Help only. Off switch is iOS Settings |
 | Owner tabs | RedMed · 911 · Aid · NFC; scanners / tapper get RedMed · 911 · Aid (no NFC) |
 | NFC Preview + Scan | Preview uses `fullScreenCover(item:)` after pack — no empty-cover race. In-repo CoreNFC parked (`nfcHardwareEnabled = false`, no TAG entitlement, no usage string); restore via `docs/NFC-RESTORE.md`. Portal Tag Reading still required for device Write. Storefront “write from the app” stays off until Write is proven on blank NTAG216 — blank chips + Share honesty until then (`docs/ADVERTISING.md`) |
-| Passerby shell | One file `tapper/index.html`; Xcode copies it to the app bundle as `tapper.html` at build; repo-root `tapper.html` redirects to `/tapper/` |
+| Passerby shell | One file `tapper/index.html`; the iOS repo pins it as `Vendor/tapper/index.html` and copies that to `tapper.html` at build; repo-root `tapper.html` redirects to `/tapper/` |
 | Offline shell | SW cache precaches HTML + pheart / BrandLogo / BrandWordmark |
 | Band URI contract | Write only `medicalCardBaseURL + #d=` base64url; vendor/social/short URLs rejected |
 | AES-GCM on chip | Public client key by design (EMS decrypts with no account) |

@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Keep hosted /Document/ lockstep with the in-app Help source of truth.
-# Source: owner/RedMed/Document/{Document.html,legal-doc.css}
+# Authoring source: Roooted1776/RedMed-iOS owner/RedMed/Document/.
 # Host:   Document/index.html (full policy) + Document.html (thin #hash redirect)
-#         + legal-doc.css
+#         + legal-doc.css. If the iOS tree is not beside this script, the
+#         hosted copy in this repo is what redmed.live serves.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -129,4 +130,8 @@ if grep -qiE 'HIPAA certified|HIPAA-aligned product|HIPAA compliant' docs/SECURI
   exit 1
 fi
 
-echo "OK Document host lockstep with $SRC (index=full, Document.html=redirect; consent $CONSENT)"
+if [[ -f "$SRC/Document.html" ]]; then
+  echo "OK Document host lockstep with $SRC (index=full, Document.html=redirect; consent $CONSENT)"
+else
+  echo "OK hosted Document/index.html (iOS authoring tree not checked out; consent $CONSENT)"
+fi

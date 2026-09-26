@@ -24,7 +24,7 @@ Assist origin stays Hostinger **static** + Cloudflare DNS/SSL (`docs/domain.md`)
 | Agent | Role | How it lands code |
 | --- | --- | --- |
 | **Grok (xAI)** | Owner-side agent. GitHub connector on `Roooted1776`. Reads/writes this repo, opens/merges PRs, keeps `main` current. | Commits via GitHub as `Roooted1776`. Do not invent a separate Grok GitHub user. |
-| **Cursor Agent** | Cloud + local IDE agent. Linux Cloud Agent covers the static Hostinger / **Assist** shell (`tapper/` path) only. MacBook Air / Mini **My Machines** workers (`macbook-air`, `mac-mini`) run tool calls on that Mac for iOS / Xcode — see `docs/DUAL-MAC.md` §0. | PRs from `cursor/*` or `main-*` branches. **Owner** app (`owner/`) is macOS/Xcode, not the Linux Cloud Agent. |
+| **Cursor Agent** | Cloud + local IDE agent. Linux Cloud Agent covers the static Hostinger / **Assist** shell (`tapper/` path) only. MacBook Air / Mini **My Machines** workers (`macbook-air`, `mac-mini`) run tool calls on that Mac for iOS / Xcode — see `docs/DUAL-MAC.md` §0. | PRs from `cursor/*` or `main-*` branches. **Owner** app is `Roooted1776/RedMed-iOS`, macOS/Xcode, not this Linux Cloud Agent. |
 | **Owner (Max)** | Source of truth for product calls. | One clone per Mac of `Roooted1776/RedMed-V1-Official` `main`. |
 
 Grok is in this repo. Treat instructions here as binding when Grok edits RedMed.
@@ -58,15 +58,16 @@ Gmail for automations: Cursor Gmail MCP, not a separate Grok Gmail plugin.
 - Face ID is UI-only. Keychain stays `WhenPasscodeSetThisDeviceOnly` with no biometry ACL.
 - Assist at `https://redmed.live/tapper/` is no-auth, no-ads. `#d=` codec lockstep tests must stay green.
 - SOS = full sound + full light; arms only on SOS toggle or US Crash Detection collision timing — never on band tap alone. Owner phone with RedMed + written band: applinks (Universal Links) claim the tap — no `redmed://band#d=` handoff. No fake band-distance ranging.
-- Band is factory blank NDEF-unlocked NXP NTAG216 — no permanent lock bytes, ever. `scripts/test-nfc-hardware.mjs` (51 checks) must stay green.
+- Band is factory blank NDEF-unlocked NXP NTAG216 — no permanent lock bytes, ever. `Roooted1776/RedMed-iOS` `scripts/test-nfc-hardware.mjs` (51 checks) must stay green.
 - One repo, one branch for shipping: `Roooted1776/RedMed-V1-Official` `main`.
 
 ## NFC hardware contract
 
-`scripts/test-nfc-hardware.mjs` statically enforces the bracelet hardware
-contract on Linux CI (no Xcode needed) — 51 checks, must all pass before
-merge (`pages-deploy.yml` and `ios-build.yml` both run it). Rule detail for
-IDE agents: `.cursor/rules/nfc-hardware.mdc`.
+`Roooted1776/RedMed-iOS` `scripts/test-nfc-hardware.mjs` statically enforces
+the bracelet hardware contract on Linux CI (no Xcode needed) — 51 checks,
+must all pass before that repo merges (`ios-build.yml` runs it). This repo
+does not compile Swift. Rule detail for IDE agents in the iOS repo:
+`.cursor/rules/nfc-hardware.mdc`.
 
 - **Chip**: product band is **NXP NTAG216** only (13.56 MHz, ISO 14443A
   Type 2, NDEF blank unlocked). Never NTAG213/215, MIFARE, LF, or UHF.

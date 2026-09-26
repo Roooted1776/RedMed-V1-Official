@@ -45,8 +45,8 @@ python3 -m http.server 8787
 # Pre-merge gates
 bash scripts/sync-tapper.sh
 node scripts/test-d-codec.mjs
-node scripts/test-nfc-hardware.mjs
 node scripts/test-sw-offline.mjs
+node scripts/test-product-independence.mjs
 
 # Stage + deploy to Hostinger
 bash scripts/stage-site.sh
