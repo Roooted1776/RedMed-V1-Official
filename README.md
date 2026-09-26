@@ -9,6 +9,24 @@ Medical ID band + iPhone app. **No RedMed profile server. No PHI database.**
 
 Canonical git remote: **`Roooted1776/RedMed-V1-Official`** (migrated from `frisky`; history preserved when mirrored). Ship branch: `main`.
 
+## Development control center
+
+Start with [`docs/DEVELOPMENT-PLAN.md`](docs/DEVELOPMENT-PLAN.md) for priorities,
+owners, launch blockers and acceptance criteria. Architecture boundaries are
+recorded in [`docs/adr/001-emergency-path-and-ops.md`](docs/adr/001-emergency-path-and-ops.md);
+the release procedure is [`docs/RELEASE-RUNBOOK.md`](docs/RELEASE-RUNBOOK.md).
+
+```bash
+make setup          # pinned MCP dependencies, no lifecycle scripts
+make check          # local automated gates; no deployment or database writes
+make release-check  # same gates + mandatory live product-origin smoke
+make stage          # static-only deploy bundle
+```
+
+A passing build is not launch approval. Public-origin, physical-band and
+clinical-content gates remain separate. `supabase/` contains an ops-only
+release-ledger migration; it must never become a medical-profile database.
+
 ## Write base
 
 **`https://redmed.live/tapper/`** — Hostinger static origin + Cloudflare DNS/SSL.  
