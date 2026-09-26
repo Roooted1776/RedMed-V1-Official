@@ -27,7 +27,9 @@ RedMed-V1-Official/
 ├── owner/                 # App Store wearer app (SwiftUI) + Document/ policy source
 ├── RedMed-Xcode → owner/  # compatibility symlink only (do not recreate as a real folder)
 ├── tapper/                # tap pages only — passerby shell, no owner-app features
-├── supabase/              # ops release ledger only — no medical profiles, no MCP
+├── mcp/                   # ops MCP only (redmed-mcp) — not Assist origin; see docs/mcp.md
+├── worker/ · wrangler.jsonc  # optional CF device-aspect leftover — not Assist origin
+├── supabase/              # ops release ledger only — no medical profiles, no MCP component
 ├── Document/              # hosted Help: index.html = full policy; Document.html = redirect
 ├── privacy/               # /privacy bounce → /Document/#privacy (_redirects + privacy/index.html)
 ├── support/               # App Store Connect Support URL (scripts/publish-github-io.sh)
@@ -48,6 +50,7 @@ RedMed-V1-Official/
 | `docs/DUAL-MAC.md` | MacBook + Mini: Cursor ShipIt repair, prefs/colors sync, `gh` HTTPS push/pull |
 | `docs/domain.md` | `redmed.live` Namecheap → Cloudflare DNS/SSL → Hostinger static |
 | `docs/OPS.md` | VPS / Supabase / secrets — ops only, product wall |
+| `docs/mcp.md` | Ops MCP package in `mcp/` + DNS upsert (`scripts/upsert-mcp-dns.mjs`) |
 | `docs/AUDIT-V1-GOLIVE.md` | V1 go-live deployability audit |
 | `docs/NFC-RESTORE.md` | CoreNFC entitlement restore |
 | `docs/band-engraving-and-nfc-sourcing.md` | Hardware |
@@ -71,7 +74,7 @@ Hosted `/Document/` stays lockstep with `owner/RedMed/Document/` via `scripts/sy
 | **Who** | Stranger who tapped the band | Wearer with the App Store app |
 | **What** | Web tap pages (`/tapper/#d=…`), 911 · Aid | SwiftUI app: Edit, NFC, Keychain, Face ID |
 | **Claims** | No ads, no auth, no trackers | General Wellness ICE card — **not** HIPAA-certified |
-| **Do not put here** | NFC tab, Edit, owner Keychain, App Store copy | Passerby-only redirect stubs, Worker device hints |
+| **Do not put here** | NFC tab, Edit, owner Keychain, App Store copy | Passerby-only redirect stubs; optional `worker/` device hints are not Owner features |
 
 Xcode bundles `tapper/index.html` as read-only `tapper.html` for NFC Preview — one source file, not a fork.
 

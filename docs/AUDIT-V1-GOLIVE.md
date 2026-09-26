@@ -7,12 +7,12 @@
 
 | Surface | Deployable? | Notes |
 |---------|-------------|-------|
-| Assist code (`tapper/`, SW, `#d=` tests) | **Yes** | CI gates: d-codec, nfc-hardware (51), sw-offline, worker-device |
+| Assist code (`tapper/`, SW, `#d=` tests) | **Yes** | CI gates: d-codec, nfc-hardware (51), sw-offline, product-independence |
 | Public `https://redmed.live/tapper/` | **No (parking)** | Hostinger parked HTML; NS = dns-parking |
 | Origin `195.35.60.70` + Host `redmed.live` | **Parking HTML** | Must attach/deploy real static files |
 | Backup `roooted1776.github.io/tapper/` | **Yes** | Live Assist while custom domain parks |
 | Owner iOS | Compile yes / NFC no | Flags parked; restore docs ready |
-| Ops MCP | **Outside this repo** | Not a product, website, database, or structure dependency |
+| Ops MCP | **`mcp/` in-repo** | Ops-only; product surfaces must not call it (`docs/mcp.md`) |
 | Supabase `mohxobgyjkcmkqxijgeg` | Empty | Ops only — keep free of medical data |
 | VPS `2010795` | Ops only | Not Assist origin |
 

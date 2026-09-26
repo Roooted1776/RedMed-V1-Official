@@ -12,7 +12,7 @@ Ops is separate from the Assist band write path. **Never** put ICE profiles, Ass
 | **Backup Assist** | `Roooted1776.github.io` via `scripts/publish-github-io.sh` |
 | **VPS** | Hostinger KVM `2010795` / `srv2010795.hstgr.cloud` / `2.25.249.204` — Docker/Traefik for **ops tools only** |
 | **Supabase** | Project `mohxobgyjkcmkqxijgeg` (`RedMed Secure Data`) — ops/metadata only; no PHI |
-| **MCP** | Not part of this repository. Assist, the website, Owner, and `supabase/` do not call one. |
+| **MCP** | Ops package in [`mcp/`](../mcp/) (`docs/mcp.md`). Assist, the website, Owner, and `supabase/` do not call it. |
 
 ## VPS (ops only)
 
@@ -37,7 +37,7 @@ Store in 1Password / CI secrets. Do not commit tokens.
 
 ## Product wall
 
-This tree does not contain an MCP package, an MCP workflow, or an MCP database component. Assist, Owner, the static site, and `supabase/` must not call an MCP. ICE profiles and Assist `#d=` payloads must not be sent to an MCP, Supabase, or the VPS.
+Ops MCP may live in `mcp/` (plus `scripts/upsert-mcp-dns.mjs` / `.github/workflows/upsert-mcp-dns.yml` for `mcp.redmed.live` DNS). Assist, Owner, the static site, and `supabase/` must not call it. ICE profiles and Assist `#d=` payloads must not be sent to an MCP, Supabase, or the VPS. The release ledger has no `mcp` component.
 
 ## Side repos
 

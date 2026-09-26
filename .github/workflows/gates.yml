@@ -1,7 +1,7 @@
 # Fast, always-on gates for every push/PR (ubuntu, no secrets).
 # pages-deploy.yml and ios-build.yml are path-filtered; this one is not,
 # so a change anywhere still has to pass the Assist invariants before it
-# can merge. The ops MCP is not part of this product.
+# can merge. Ops MCP may live in mcp/; product must stay independent of it.
 name: Gates
 
 on:

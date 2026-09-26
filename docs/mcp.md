@@ -17,7 +17,9 @@ Ops-facing Model Context Protocol server for agents. Package lives in [`mcp/`](.
 
 Assist (`tapper/` → `https://redmed.live/tapper/`) stays no-auth / no RedMed DB.
 Band ICE profiles stay in `#d=` (+ Owner Keychain). **Do not** put medical card
-payloads in Supabase or expose them through MCP tools.
+payloads in Supabase or expose them through MCP tools. Package name is
+`redmed-mcp`; product independence gate allows `mcp/` but forbids Assist/Owner/site
+from importing it.
 
 ## Secrets
 

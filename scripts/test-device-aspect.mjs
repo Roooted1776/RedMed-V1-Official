@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Worker device-aspect mapping lockstep (UA / CF-Device-Type / ?view=).
- *   node scripts/test-worker-device.mjs
+ * Device-aspect mapping lockstep for optional worker/ leftover
+ * (UA / CF-Device-Type / ?view=). Not the Assist Hostinger origin.
+ *   node scripts/test-device-aspect.mjs
  */
 import { deviceFromUserAgent, deviceFromCfHeader, deviceFromRequest, isHtmlPath, viewLockFromRequest } from '../worker/device.js';
 
@@ -71,7 +72,7 @@ assert('not png', isHtmlPath('/tapper/BrandLogo.png') === false);
 assert('not sw', isHtmlPath('/sw.js') === false);
 
 if (failed) {
-  console.error(`\ntest-worker-device: ${failed} failed`);
+  console.error(`\ntest-device-aspect: ${failed} failed`);
   process.exit(1);
 }
-console.log('test-worker-device OK');
+console.log('test-device-aspect OK');

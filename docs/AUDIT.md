@@ -1,6 +1,6 @@
 # RedMed codebase audit
 
-**Repo:** [Roooted1776/frisky](https://github.com/Roooted1776/frisky)  
+**Repo:** [Roooted1776/RedMed-V1-Official](https://github.com/Roooted1776/RedMed-V1-Official) (historical audit; originally written against legacy `frisky`)  
 **Checked:** 2026-09-08 against `main` (post Document.html + entitlements conflict fix)  
 **Method:** static read of Swift / HTML / CI / docs on this tree, plus live HTTP probes. No iOS Simulator here (Linux VM). No secrets found that needed rotation.
 

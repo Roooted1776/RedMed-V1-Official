@@ -73,8 +73,8 @@ Do not market “write from the app” until Tag Reading + Write The Band on bla
 ## Ops (not the band host)
 
 - VPS / Traefik / Docker: **ops only** — never Assist `#d=` origin ([`docs/OPS.md`](docs/OPS.md)).
-- No MCP in this repository. Assist, the website, Owner, and Supabase do not call one. Product wall: no ICE / `#d=` / PHI through an MCP, Supabase, or the VPS.
+- Ops MCP package: [`mcp/`](mcp/) — Assist, the website, Owner, and Supabase do not call it. Product wall: no ICE / `#d=` / PHI through an MCP, Supabase, or the VPS.
 - Supabase project `RedMed Secure Data` (`mohxobgyjkcmkqxijgeg`): ops/metadata only — **zero medical profiles**.
 - Side repos: `Roooted1776.github.io` (Assist backup), `redmed-privacy` (do **not** use as Connect Privacy URL — use live `/Document/`).
 
-One public site: Hostinger static at `https://redmed.live/tapper/`. Cloudflare is DNS and SSL only. Do not add a Worker. `github.io` is only the backup for bands already written to that host.
+One public site: Hostinger static at `https://redmed.live/tapper/`. Cloudflare is DNS and SSL only. Do not treat optional leftover `worker/` / `wrangler.jsonc` as the Assist origin. `github.io` is only the backup for bands already written to that host.
