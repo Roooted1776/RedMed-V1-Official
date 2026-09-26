@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# Tapper shell deploy / local serve.
+#
+# Bracelet taps must open AppConfig.medicalCardBaseURL#d=… as RedMed · 911 · Aid.
+# Live product host: https://redmed.live/tapper/ on Hostinger (docs/domain.md).
+# github.io kept as backup for already-written bands.
+# (quick, no login, no server, no app). Repo tapper/index.html is that shell.
+# Legacy /get/ / redmed-emergency.html redirect to /tapper/ and keep #d=.
+#
+# Usage:
+#   ./scripts/deploy-pages.sh              # local http://127.0.0.1:8787/tapper/
+#   PORT=9000 ./scripts/deploy-pages.sh
+#   DEPLOY=1 ./scripts/deploy-pages.sh     # push to Hostinger (needs HOSTINGER_API_TOKEN)
+#
+# Hostinger:
+#   export HOSTINGER_API_TOKEN=…
+#   npm install --no-save axios tus-js-client   # once per machine
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+SHELL="tapper/index.html"
+# Sanity: refuse to serve/deploy if the tapper shell is missing tabs or is band-setup.
+if ! grep -q 'data-tab="medical"' "$SHELL" \
+  || ! grep -q 'data-tab="911"' "$SHELL" \
+  || ! grep -q 'id="tab-aid"' "$SHELL"; then
+  echo "$SHELL is missing RedMed · 911 · Aid tabs — abort." >&2
+  exit 1
+fi
+if grep -q 'id="tab-nfc"' "$SHELL"; then
+  echo "$SHELL has NFC tab — passerby is RedMed · 911 · Aid only — abort." >&2
+  exit 1
+fi
+if grep -q 'Checking your phone' "$SHELL" \
+  || grep -q 'Set up your RedMed band' "$SHELL"; then
+  echo "$SHELL looks like the old band-setup page — abort." >&2
+  exit 1
+fi
+
+if [[ "${DEPLOY:-0}" == "1" ]]; then
+  if [[ -z "${HOSTINGER_API_TOKEN:-}" ]]; then
+    echo "DEPLOY=1 needs HOSTINGER_API_TOKEN (hPanel → API Tokens). See docs/domain.md." >&2
+    exit 1
+  fi
+  bash scripts/stage-worker-assets.sh
+  echo "Deploying tapper shell → Hostinger redmed.live"
+  if ! node -e "import('axios')" 2>/dev/null || ! node -e "import('tus-js-client')" 2>/dev/null; then
+    npm install --no-save axios tus-js-client
+  fi
+  exec node scripts/deploy-hostinger-static.mjs redmed.live
+fi
+
+PORT="${PORT:-8787}"
+HOST="${HOST:-127.0.0.1}"
+URL="http://${HOST}:${PORT}/tapper/"
+ROOT_URL="http://${HOST}:${PORT}/"
+echo "Local tapper shell → ${URL}"
+echo "  Site root ${ROOT_URL} redirects to /tapper/ (any device browser)."
+echo "  Use 127.0.0.1 (not a LAN IP) so #d= AES decrypt works."
+echo "  Live push: DEPLOY=1 HOSTINGER_API_TOKEN=… $0"
+echo "Ctrl-C to stop."
+
+(
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    if curl -sf -o /dev/null "$URL"; then
+      if command -v open >/dev/null 2>&1; then
+        open "$URL"
+      fi
+      exit 0
+    fi
+    sleep 0.2
+  done
+) >/dev/null 2>&1 &
+
+exec python3 -m http.server "$PORT" --bind "$HOST"
