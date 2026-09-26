@@ -4,9 +4,9 @@
 # Run from Terminal.app on the Macs.
 #
 # On the Mac that looks right:
-#   ~/Documents/frisky/scripts/sync-cursor-settings-macos.sh export
+#   scripts/sync-cursor-settings-macos.sh export
 # Copy the tarball to the other Mac (AirDrop / USB / scp), then:
-#   ~/Documents/frisky/scripts/sync-cursor-settings-macos.sh import [path-to-tarball]
+#   scripts/sync-cursor-settings-macos.sh import [path-to-tarball]
 #
 # Colors live in User/settings.json:
 #   workbench.colorTheme, workbench.colorCustomizations,
@@ -17,7 +17,7 @@ ok() { printf 'OK  %s\n' "$*"; }
 warn() { printf 'WARN  %s\n' "$*"; }
 die() { printf 'FAIL  %s\n' "$*" >&2; exit 1; }
 
-CLONE_DIR="${FRISKY_HOME:-$HOME/Documents/frisky}"
+CLONE_DIR="${REDMED_HOME:-${FRISKY_HOME:-$HOME/Documents/RedMed-V1-Official}}"
 BUNDLE_DIR="${CLONE_DIR}/.local/cursor-user-sync"
 BUNDLE_NAME="cursor-user-sync.tar.gz"
 DEFAULT_BUNDLE="${BUNDLE_DIR}/${BUNDLE_NAME}"

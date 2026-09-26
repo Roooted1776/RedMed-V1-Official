@@ -1,6 +1,6 @@
 # RedMed operations database
 
-This is a release-evidence ledger, not a medical-profile backend. Assist and Owner have no dependency on it.
+This is a release-evidence ledger, not a medical-profile backend. Assist, Owner, and the static site have no dependency on it. It has no MCP component and no MCP gate. Nothing in this schema is written or read by an MCP.
 
 ## Contract
 

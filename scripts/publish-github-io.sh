@@ -36,7 +36,7 @@ if grep -q 'Checking your phone' "$SHELL" \
 fi
 
 mkdir -p "$DEST/tapper" "$DEST/get" "$DEST/support" "$DEST/assets" "$DEST/.github/workflows" "$DEST/.well-known" "$DEST/Document" "$DEST/privacy"
-# Same passerby include set as scripts/stage-worker-assets.sh (stubs + tapper +
+# Same public include set as scripts/stage-site.sh (stubs + tapper +
 # assets + policies). Do not invent extra excludes — omit owner / docs /
 # scripts by only copying this list.
 cp -f index.html tapper.html card.html get.html redmed-emergency.html sw.js \
@@ -63,7 +63,7 @@ cp -f tapper/index.html tapper/emergency.html tapper/sw.js \
 cp -f assets/pheart.png assets/BrandLogo.png assets/BrandWordmark.png \
   assets/BrandWordmark.svg \
   "$DEST/assets/"
-# Optional densities when present in assets/ (stage-worker copies whole assets/).
+# Optional densities when present in assets/ (stage-site copies whole assets/).
 for f in assets/BrandLogo.svg assets/BrandLogo@2x.png assets/BrandLogo@3x.png; do
   if [[ -f "$f" ]]; then cp -f "$f" "$DEST/assets/"; fi
 done

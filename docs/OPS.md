@@ -12,7 +12,7 @@ Ops is separate from the Assist band write path. **Never** put ICE profiles, Ass
 | **Backup Assist** | `Roooted1776.github.io` via `scripts/publish-github-io.sh` |
 | **VPS** | Hostinger KVM `2010795` / `srv2010795.hstgr.cloud` / `2.25.249.204` — Docker/Traefik for **ops tools only** |
 | **Supabase** | Project `mohxobgyjkcmkqxijgeg` (`RedMed Secure Data`) — ops/metadata only; no PHI |
-| **MCP** | In-repo `mcp/redmed-mcp` (v0.3, allow-listed SSH) + Cursor Hostinger product MCPs |
+| **MCP** | Not part of this repository. Assist, the website, Owner, and `supabase/` do not call one. |
 
 ## VPS (ops only)
 
@@ -35,22 +35,9 @@ Ops is separate from the Assist band write path. **Never** put ICE profiles, Ass
 
 Store in 1Password / CI secrets. Do not commit tokens.
 
-## RedMed MCP product wall
+## Product wall
 
-Tools in `mcp/redmed-mcp` may call Hostinger API, SSH, and Supabase **status**. They must refuse:
-
-- Decoding or storing Assist `#d=` fragments
-- Reading/writing Owner ICE / Keychain-shaped profiles
-- Shipping medical data to Supabase or VPS disk
-
-See `mcp/redmed-mcp/README.md` and `AGENTS.md` § Product wall.
-
-## Stack status
-
-```bash
-# Prefer MCP tool redmed_stack_status when Cursor is connected to redmed-mcp
-node mcp/redmed-mcp/bin/redmed-stack-status.mjs
-```
+This tree does not contain an MCP package, an MCP workflow, or an MCP database component. Assist, Owner, the static site, and `supabase/` must not call an MCP. ICE profiles and Assist `#d=` payloads must not be sent to an MCP, Supabase, or the VPS.
 
 ## Side repos
 

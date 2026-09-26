@@ -47,7 +47,7 @@ begin
   insert into redmed_ops.release_candidates(component, commit_sha)
     values ('ops', repeat('0', 40)) returning id into candidate;
   insert into redmed_ops.gate_runs(candidate_id, gate_key, outcome, duration_ms)
-    values (candidate, 'mcp', 'pass', 1);
+    values (candidate, 'codec', 'pass', 1);
   begin
     insert into redmed_ops.release_candidates(component, commit_sha)
       values ('ops', 'invalid');
@@ -62,7 +62,7 @@ begin
   end;
   begin
     insert into redmed_ops.gate_runs(candidate_id, gate_key, outcome, duration_ms)
-      values (candidate, 'mcp', 'pass', -1);
+      values (candidate, 'codec', 'pass', -1);
     raise exception 'negative duration accepted';
   exception when check_violation then null;
   end;

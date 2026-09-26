@@ -7,7 +7,7 @@ Hub is GitHub. Each Mac is a client. They never push to each other.
 | MacBook Air | `~/Documents/RedMed-V1-Official` | `https://github.com/Roooted1776/RedMed-V1-Official.git` | `macbook-air` |
 | Mac Mini | `~/Documents/RedMed-V1-Official` | same | `mac-mini` |
 
-Legacy path `~/Documents/frisky` → `Roooted1776/frisky` is fine until you re-clone. Prefer V1 Official as the remote name. One clone per machine. GitHub Desktop may sit on that clone. Do not let it make a second folder.
+One clone per machine, origin `Roooted1776/RedMed-V1-Official`. GitHub Desktop may sit on that clone. Do not let it make a second folder. `frisky` is archived.
 
 HTTPS + `gh` (port 443). School/cafe Wi‑Fi often blocks SSH:22, and `Roooted1776` has no GitHub SSH keys. Do not copy Cloud Agent tokens onto either Mac.
 
@@ -145,6 +145,6 @@ Any-location smoke (home, school, cafe): `gh auth status` and `git fetch` both s
 | Cursor “couldn’t update” | Section 1. Do not keep clicking Try Again. |
 | Theme/colors don’t match the other Mac | Section 1 “Cursor settings + colors”. Export on the good Mac, import on the other; install listed theme extensions. |
 | Machine missing in agents environment dropdown | Section 0. Worker process stopped, wrong Cursor login, or not started inside `~/Documents/RedMed-V1-Official`. Run `setup-mac-worker.sh status` / `debug`. |
-| `worker=mac-mini` rejected / wrong repo | Worker name or git remote mismatch. Restart with `start mac-mini` from the frisky clone. No silent fallback to Linux. |
+| `worker=mac-mini` rejected / wrong repo | Worker name or git remote mismatch. Restart with `start mac-mini` from the RedMed-V1-Official clone. No silent fallback to Linux. |
 | Only Air shows online, not Mini | Mini worker not started (or asleep / offline). Section 0 on the Mini. |
 | Wrong remote `rooted1776/risky` | Does not exist. Repo is `Roooted1776/RedMed-V1-Official` (three o’s). |

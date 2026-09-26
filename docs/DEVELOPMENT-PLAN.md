@@ -4,7 +4,7 @@ Prepared 2026-09-26 against `a7740a2405b222d87772b55450cc04ec4ea3dba8`. The imme
 
 ## Executive decision
 
-Keep medical information on the existing Owner/band path. Use MCP, Supabase and the VPS to make development, deployment and recovery dependable without making them dependencies of emergency access.
+Keep medical information on the existing Owner/band path. The product, website, database, and repository structure do not depend on an MCP.
 
 **Launch is blocked.** The live product URL returned a Hostinger parking page during this inspection; the response was HTTP 200 but lacked the medical-shell marker. The existing smoke test failed at the public origin.
 
@@ -17,8 +17,6 @@ Keep medical information on the existing Owner/band path. Use MCP, Supabase and 
 | Public Assist | Parking page at `https://redmed.live/tapper/` | P0; do not approve new encoded-band launch |
 | Supabase | `RedMed Secure Data` active; no public tables or migration history at inspection | Ops ledger is a new, explicitly scoped change |
 | Supabase advisor | No security findings on the inspected baseline | Not a health-data compliance assessment |
-| RedMed MCP | Connected listing, but stack-status request returned 401 | VPS process, routes, backups and firewall remain unverified |
-| In-repo MCP | Version 0.4.0; seven tests and syntax checks passed | Not evidence that this same version is deployed |
 | Owner capabilities | NFC and associated-domain features remain parked in configuration | Physical write/read-back remains a pilot gate |
 | Project context | File repo was empty; no knowledge index materialized after sync | This control-center pack seeds durable project structure |
 
@@ -42,8 +40,7 @@ Retain the current physical layout; do not relocate the iOS project or stable we
 |---|---|---|
 | `tapper/`, root `sw.js` | Responder card, offline shell, decode | Product engineering; clinical review when content changes |
 | `owner/` | Wearer profile, consent, NFC and iOS integration | iOS engineering |
-| `mcp/redmed-mcp/` | Operations connector and bounded tools | Backend/operations |
-| `supabase/migrations/` | Versioned ops schema, never medical profiles | Backend/operations |
+| `supabase/migrations/` | Versioned ops schema, never medical profiles, no MCP | Backend/operations |
 | `supabase/tests/` | Privilege and data-contract tests | Backend/security |
 | `scripts/`, `.github/workflows/` | Repeatable checks and release gates | Backend/operations |
 | `docs/adr/` | Architecture decisions | Max |
@@ -56,12 +53,11 @@ Max can initially hold several engineering roles. Independent clinical review sh
 | ID | Priority | Work | Acceptance criteria | Owner / dependency |
 |---|---|---|---|---|
 | RM-001 | P0 | Restore live static origin | Actual medical shell, policy and SW served over correct HTTPS URL; strict smoke and clean-device scan pass | Ops; Hostinger/DNS access |
-| RM-002 | P0 | Restore MCP authentication | Ping and stack status work; declared tools/version match runtime; no secrets printed | Ops; connection re-authorization |
 | RM-003 | P0 | Land offline-readiness patch | Automated gates, browser warm-offline test and iOS bundle build pass on candidate | Engineering; review |
 | RM-004 | P0 | Clinical-content inventory | Every condition-specific action has reviewer, provenance, version and review date; unresolved instructions block pilot | Max appoints qualified reviewer |
 | RM-005 | P0 | Prove physical band path | Blank NTAG216 write, verified read-back and independent iPhone/Android scan demonstrated; QR independently tested | iOS + hardware; capabilities |
 | RM-006 | P1 | Apply ops release ledger | Exact migration approved; role/constraint tests and advisor checks pass; no patient columns | Backend; schema approval |
-| RM-007 | P1 | Recovery and monitoring | Fixed-path external synthetic monitoring, alert recipient, restore drill and documented response; no scan telemetry | Ops; recovered MCP |
+| RM-007 | P1 | Recovery and monitoring | Fixed-path external synthetic monitoring, alert recipient, restore drill and documented response; no scan telemetry | Ops; Hostinger access |
 | RM-008 | P1 | Real-browser regression suite | Online, warm offline, cold offline, cache eviction, old worker upgrade, bad payload, no previous-card leak | Engineering |
 | RM-009 | P1 | Owner automated tests | XCTest target for profile persistence, codec failures, write/read-back states and erase semantics | iOS engineering |
 | RM-010 | P1 | Emergency usability | Representative helpers can find action, urgency and contact in a proposed 10-second task; test large text, screen reader and low light | Product + clinical reviewer |
@@ -72,7 +68,7 @@ Max can initially hold several engineering roles. Independent clinical review sh
 
 ### Foundation
 
-Close RM-001 through RM-003 and approve or defer RM-006. Exit evidence: genuine public shell, authenticated operations, green candidate tests and documented remaining limits.
+Close RM-001 and RM-003 and approve or defer RM-006. Exit evidence: genuine public shell, green candidate tests and documented remaining limits.
 
 ### Safe pilot candidate
 
@@ -102,8 +98,6 @@ Define device/network cohorts before accepting targets. No current uptime, outco
 ## Approval and access boundary
 
 Approval is needed for the prepared production database migration and publication of the code patch to the public GitHub repository. Production deployment, DNS changes, firewall changes and secret rotation remain separate from that approval.
-
-MCP authentication must be restored before VPS inspection can continue. Do not substitute broad shell access or a pasted secret for a working authenticated connector.
 
 ## Engineering principle
 

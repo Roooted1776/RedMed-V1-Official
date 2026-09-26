@@ -42,7 +42,7 @@ if [[ "${DEPLOY:-0}" == "1" ]]; then
     echo "DEPLOY=1 needs HOSTINGER_API_TOKEN (hPanel → API Tokens). See docs/domain.md." >&2
     exit 1
   fi
-  bash scripts/stage-worker-assets.sh
+  bash scripts/stage-site.sh
   echo "Deploying tapper shell → Hostinger redmed.live"
   if ! node -e "import('axios')" 2>/dev/null || ! node -e "import('tus-js-client')" 2>/dev/null; then
     npm install --no-save axios tus-js-client

@@ -17,7 +17,7 @@ recorded in [`docs/adr/001-emergency-path-and-ops.md`](docs/adr/001-emergency-pa
 the release procedure is [`docs/RELEASE-RUNBOOK.md`](docs/RELEASE-RUNBOOK.md).
 
 ```bash
-make setup          # pinned MCP dependencies, no lifecycle scripts
+make setup          # pinned deploy-script dependencies, no lifecycle scripts
 make check          # local automated gates; no deployment or database writes
 make release-check  # same gates + mandatory live product-origin smoke
 make stage          # static-only deploy bundle
@@ -46,10 +46,9 @@ bash scripts/sync-tapper.sh
 node scripts/test-d-codec.mjs
 node scripts/test-nfc-hardware.mjs
 node scripts/test-sw-offline.mjs
-node scripts/test-worker-device.mjs
 
 # Stage + deploy to Hostinger
-bash scripts/stage-worker-assets.sh
+bash scripts/stage-site.sh
 HOSTINGER_API_TOKEN=… node scripts/deploy-hostinger-static.mjs redmed.live
 
 # Smoke (after DNS cutover)
@@ -74,10 +73,8 @@ Do not market “write from the app” until Tag Reading + Write The Band on bla
 ## Ops (not the band host)
 
 - VPS / Traefik / Docker: **ops only** — never Assist `#d=` origin ([`docs/OPS.md`](docs/OPS.md)).
-- RedMed MCP (`mcp/redmed-mcp`): Hostinger + SSH + Supabase **ops** tools. Product wall: no ICE / `#d=` / PHI through MCP, Supabase, or VPS.
+- No MCP in this repository. Assist, the website, Owner, and Supabase do not call one. Product wall: no ICE / `#d=` / PHI through an MCP, Supabase, or the VPS.
 - Supabase project `RedMed Secure Data` (`mohxobgyjkcmkqxijgeg`): ops/metadata only — **zero medical profiles**.
 - Side repos: `Roooted1776.github.io` (Assist backup), `redmed-privacy` (do **not** use as Connect Privacy URL — use live `/Document/`).
 
-## Leftover tooling
-
-[`wrangler.jsonc`](wrangler.jsonc) + [`worker/`](worker/) are **non-product** leftovers. Do not recreate Cloudflare Worker `redmed-emergency` for bands. Product host is Hostinger static.
+One public site: Hostinger static at `https://redmed.live/tapper/`. Cloudflare is DNS and SSL only. Do not add a Worker. `github.io` is only the backup for bands already written to that host.

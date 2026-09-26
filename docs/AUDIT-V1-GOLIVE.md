@@ -12,7 +12,7 @@
 | Origin `195.35.60.70` + Host `redmed.live` | **Parking HTML** | Must attach/deploy real static files |
 | Backup `roooted1776.github.io/tapper/` | **Yes** | Live Assist while custom domain parks |
 | Owner iOS | Compile yes / NFC no | Flags parked; restore docs ready |
-| Ops MCP (`mcp/redmed-mcp`) | **v0.3 hardened** | Allow-listed SSH, wall regex fixed, host key pinned, tests in `gates.yml` |
+| Ops MCP | **Outside this repo** | Not a product, website, database, or structure dependency |
 | Supabase `mohxobgyjkcmkqxijgeg` | Empty | Ops only — keep free of medical data |
 | VPS `2010795` | Ops only | Not Assist origin |
 

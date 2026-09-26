@@ -6,11 +6,6 @@ updates:
     groups:
       actions: { patterns: ['*'] }
   - package-ecosystem: npm
-    directory: /mcp/redmed-mcp
-    schedule: { interval: weekly }
-    groups:
-      mcp: { patterns: ['*'] }
-  - package-ecosystem: npm
     directory: /scripts
     schedule: { interval: weekly }
     groups:

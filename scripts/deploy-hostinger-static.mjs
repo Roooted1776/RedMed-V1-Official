@@ -3,7 +3,7 @@
  * Deploy staged passerby static assets to Hostinger (no build step).
  *
  * Prereqs:
- *   bash scripts/stage-worker-assets.sh
+ *   bash scripts/stage-site.sh
  *   HOSTINGER_API_TOKEN in env (hPanel → Profile & settings → API Tokens)
  *
  * Usage:
@@ -30,7 +30,7 @@ if (!TOKEN) {
   process.exit(1);
 }
 if (!fs.existsSync(path.join(STAGE_DIR, 'index.html'))) {
-  console.error('Missing staged index.html — run: bash scripts/stage-worker-assets.sh');
+  console.error('Missing staged index.html — run: bash scripts/stage-site.sh');
   process.exit(1);
 }
 

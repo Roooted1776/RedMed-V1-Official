@@ -16,15 +16,15 @@ Wearer → Owner iOS app → local Keychain
 Responder → static Assist shell + local decode → displayed emergency card
 
 Developer → GitHub tests / release gates → static deployment
-Operator  → authenticated MCP → Hostinger operations
-                             → Supabase ops release evidence
+Operator  → Hostinger operations, outside this repository
+         → Supabase ops release evidence (no MCP component)
 ```
 
 ## Responsibilities
 
 - **Assist, `tapper/`:** unauthenticated medical-card viewer, no ads, no tracking SDKs, no cloud profile lookup. Keep the permanent URL path for existing bands.
 - **Owner, `owner/`:** editing, consent, local storage, preview, explicit NFC write and read-back. Do not enable parked capabilities without entitlement and physical-device verification.
-- **MCP, `mcp/redmed-mcp/`:** development and infrastructure operations only. Never accept real band URLs or medical content as tool inputs.
+- **MCP:** not a module of this repository. Operator tooling stays outside Assist, Owner, the static origin, and `redmed_ops`. Never send real band URLs or medical content to an MCP.
 - **Supabase, `supabase/`:** bounded release evidence in `redmed_ops`, not patients, accounts for responders, or condition histories.
 - **Hostinger VPS:** ops services and future synthetic monitoring. A VPS restart must not take down the Assist origin.
 - **Hostinger static origin:** serve the emergency shell correctly over the stable production URL. DNS/SSL and content correctness are release requirements.

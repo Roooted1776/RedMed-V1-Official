@@ -13,4 +13,3 @@ jobs:
           persist-credentials: false
       - run: make setup
       - run: make release-check
-      - run: npm audit --omit=dev --audit-level=high --prefix mcp/redmed-mcp
