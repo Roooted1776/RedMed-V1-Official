@@ -25,6 +25,7 @@ No brand PNGs at repo root — canonical in `assets/`, shell-relative copies in 
 RedMed-V1-Official/
 ├── README.md · AGENTS.md · MAX.md
 ├── owner/                 # App Store wearer app (SwiftUI) + Document/ policy source
+├── RedMed-Xcode → owner/  # compatibility symlink only (do not recreate as a real folder)
 ├── tapper/                # tap pages only — passerby shell, no owner-app features
 ├── supabase/              # ops release ledger only — no medical profiles, no MCP
 ├── Document/              # hosted Help: index.html = full policy; Document.html = redirect
@@ -46,7 +47,7 @@ RedMed-V1-Official/
 | `docs/STRUCTURE.md` | This map |
 | `docs/DUAL-MAC.md` | MacBook + Mini: Cursor ShipIt repair, prefs/colors sync, `gh` HTTPS push/pull |
 | `docs/domain.md` | `redmed.live` Namecheap → Cloudflare DNS/SSL → Hostinger static |
-| `docs/OPS.md` | VPS / MCP / Supabase / secrets — ops only, product wall |
+| `docs/OPS.md` | VPS / Supabase / secrets — ops only, product wall |
 | `docs/AUDIT-V1-GOLIVE.md` | V1 go-live deployability audit |
 | `docs/NFC-RESTORE.md` | CoreNFC entitlement restore |
 | `docs/band-engraving-and-nfc-sourcing.md` | Hardware |
