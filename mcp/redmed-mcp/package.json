@@ -1,7 +1,7 @@
 {
   "name": "redmed-mcp",
   "version": "0.4.0",
-  "description": "RedMed ops MCP — Hostinger API + SSH + Supabase status. Product wall: no ICE / #d= / PHI.",
+  "description": "RedMed ops MCP \u2014 Hostinger API + SSH + Supabase status. Product wall: no ICE / #d= / PHI.",
   "type": "module",
   "bin": {
     "redmed-stack-status": "./bin/redmed-stack-status.mjs",
