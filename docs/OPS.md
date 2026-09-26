@@ -12,7 +12,7 @@ Ops is separate from the Assist band write path. **Never** put ICE profiles, Ass
 | **Backup Assist** | `Roooted1776.github.io` via `scripts/publish-github-io.sh` |
 | **VPS** | Hostinger KVM `2010795` / `srv2010795.hstgr.cloud` / `2.25.249.204` — Docker/Traefik for **ops tools only** |
 | **Supabase** | Project `mohxobgyjkcmkqxijgeg` (`RedMed Secure Data`) — ops/metadata only; no PHI |
-| **MCP** | In-repo `mcp/redmed-mcp` (v0.3, allow-listed SSH) + Cursor Hostinger product MCPs |
+| **MCP** | VPS package `mcp/` (v0.2 Streamable HTTP at `https://mcp.redmed.live/mcp`) and CI package `mcp/redmed-mcp` (allow-listed SSH). See [`docs/mcp.md`](mcp.md). |
 
 ## VPS (ops only)
 
@@ -21,7 +21,7 @@ Ops is separate from the Assist band write path. **Never** put ICE profiles, Ass
 - Hostinger product MCP (`Hostinger-vps`): power, firewall, snapshots — not shell.
 - Confirm before destructive changes (reboot, recreate, firewall wipe, `rm -rf`).
 
-**Do not** point `redmed.live` A records at the VPS for Assist in this sprint. Assist stays on Hostinger static.
+**Do not** point the apex `redmed.live` A record at the VPS. Assist stays on Hostinger static. The ops hostname is `mcp.redmed.live` (DNS-only A → `2.25.249.204`), which Traefik already routes. Until Namecheap nameservers move to Cloudflare, that record lives in the Hostinger DNS zone (`scripts/upsert-mcp-dns-hostinger.mjs`). After the Cloudflare cutover, keep the same grey-cloud A with `scripts/upsert-mcp-dns.mjs`.
 
 ## Secrets matrix
 
@@ -37,7 +37,7 @@ Store in 1Password / CI secrets. Do not commit tokens.
 
 ## RedMed MCP product wall
 
-Tools in `mcp/redmed-mcp` may call Hostinger API, SSH, and Supabase **status**. They must refuse:
+Tools in `mcp/` and `mcp/redmed-mcp` may call Hostinger API, SSH, and Supabase **status**. They must refuse:
 
 - Decoding or storing Assist `#d=` fragments
 - Reading/writing Owner ICE / Keychain-shaped profiles

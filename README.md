@@ -74,7 +74,7 @@ Do not market “write from the app” until Tag Reading + Write The Band on bla
 ## Ops (not the band host)
 
 - VPS / Traefik / Docker: **ops only** — never Assist `#d=` origin ([`docs/OPS.md`](docs/OPS.md)).
-- RedMed MCP (`mcp/redmed-mcp`): Hostinger + SSH + Supabase **ops** tools. Product wall: no ICE / `#d=` / PHI through MCP, Supabase, or VPS.
+- RedMed MCP: VPS service in [`mcp/`](mcp/) at `https://mcp.redmed.live/mcp` (ops only), plus the allow-listed CI package [`mcp/redmed-mcp`](mcp/redmed-mcp/). Product wall: no ICE / `#d=` / PHI through MCP, Supabase, or VPS. See [`docs/mcp.md`](docs/mcp.md).
 - Supabase project `RedMed Secure Data` (`mohxobgyjkcmkqxijgeg`): ops/metadata only — **zero medical profiles**.
 - Side repos: `Roooted1776.github.io` (Assist backup), `redmed-privacy` (do **not** use as Connect Privacy URL — use live `/Document/`).
 

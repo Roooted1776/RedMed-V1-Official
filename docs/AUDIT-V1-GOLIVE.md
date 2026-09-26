@@ -12,9 +12,11 @@
 | Origin `195.35.60.70` + Host `redmed.live` | **Parking HTML** | Must attach/deploy real static files |
 | Backup `roooted1776.github.io/tapper/` | **Yes** | Live Assist while custom domain parks |
 | Owner iOS | Compile yes / NFC no | Flags parked; restore docs ready |
-| Ops MCP (`mcp/redmed-mcp`) | **v0.3 hardened** | Allow-listed SSH, wall regex fixed, host key pinned, tests in `gates.yml` |
-| Supabase `mohxobgyjkcmkqxijgeg` | Empty | Ops only — keep free of medical data |
-| VPS `2010795` | Ops only | Not Assist origin |
+| Ops MCP (`mcp/redmed-mcp`) | **CI package** | Allow-listed SSH, wall tests in `gates.yml` |
+| Ops MCP (`mcp/` on VPS) | **Running v0.2.0** | Container `redmed-mcp` + Traefik. Health `https://srv2010795.hstgr.cloud/healthz`. Public name `https://mcp.redmed.live/mcp` |
+| Supabase `mohxobgyjkcmkqxijgeg` | Active | Ops only — keep free of medical data |
+| VPS `2010795` | **Running** | KVM 2, Ubuntu 24.04 + Docker/Traefik. Projects: `redmed-mcp`, `traefik`. Not Assist origin |
+| Hostinger websites on the VPS token | **None** | `GET /api/hosting/v1/websites` total 0, so Assist static deploy cannot run with that token |
 
 ## Invariants (must stay green)
 
@@ -28,7 +30,8 @@
 
 ## Go-live remaining (Max + agent)
 
-1. Hostinger: un-park website / deploy staged `dist/passerby` (`HOSTINGER_API_TOKEN`)
+1. Hostinger: un-park website / deploy staged `dist/passerby` (`HOSTINGER_API_TOKEN` on the account that owns the static site — the VPS token currently sees zero websites)
+1b. ~~Ops hostname~~ Applied 2026-09-26: Hostinger `A mcp → 2.25.249.204` (apex still `2.57.91.91`). `https://mcp.redmed.live/healthz` returns `redmed-mcp` v0.2.0 with a Let's Encrypt cert. Apex Assist is still the parking page.
 2. Cloudflare DNS script + Namecheap Custom NS
 3. Smoke: `BASE=https://redmed.live bash scripts/smoke-pages.sh`
 4. AASA JSON (not parking) at `/apple-app-site-association` + `.well-known/`

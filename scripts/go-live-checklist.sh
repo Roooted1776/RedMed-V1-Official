@@ -21,7 +21,11 @@ echo
 echo "== Max / secrets (agent cannot finish without these) =="
 cat <<'EOF'
 1. HOSTINGER_API_TOKEN → node scripts/deploy-hostinger-static.mjs redmed.live
+   (needs the hosting account that owns the static site; the VPS token may see zero websites)
+1b. HOSTINGER_API_TOKEN → node scripts/upsert-mcp-dns-hostinger.mjs
+   (ops only: A mcp.redmed.live → 2.25.249.204 while NS is dns-parking)
 2. CLOUDFLARE_API_TOKEN → node scripts/setup-cloudflare-dns.mjs redmed.live
+   then node scripts/upsert-mcp-dns.mjs so mcp survives the NS cutover
 3. Namecheap → Custom DNS → Cloudflare NS (DNSSEC off first)
 4. bash scripts/verify-cf-dns-cutover.sh
 5. BASE=https://redmed.live bash scripts/smoke-pages.sh

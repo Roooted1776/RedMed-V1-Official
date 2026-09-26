@@ -13,6 +13,26 @@
         "GITHUB_TOKEN": "${env:GITHUB_TOKEN}"
       }
     },
+    "redmed-vps": {
+      "command": "mcp/bin/run-stdio.sh",
+      "env": {
+        "REDMED_EXEC_MODE": "ssh",
+        "REDMED_VPS_HOST": "hostinger-vps",
+        "REDMED_VPS_USER": "root",
+        "REDMED_VPS_IDENTITY": "${env:HOME}/.ssh/hostinger_vps",
+        "HOSTINGER_API_TOKEN": "${env:HOSTINGER_API_TOKEN}",
+        "SUPABASE_URL": "${env:SUPABASE_URL}",
+        "SUPABASE_PUBLISHABLE_KEY": "${env:SUPABASE_PUBLISHABLE_KEY}",
+        "SUPABASE_SECRET_KEY": "${env:SUPABASE_SECRET_KEY}",
+        "REDMED_MCP_TOKEN": "${env:REDMED_MCP_TOKEN}"
+      }
+    },
+    "redmed-remote": {
+      "url": "https://mcp.redmed.live/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:REDMED_MCP_TOKEN}"
+      }
+    },
     "github": {
       "url": "https://api.githubcopilot.com/mcp/",
       "headers": {

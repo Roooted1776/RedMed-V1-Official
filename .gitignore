@@ -41,3 +41,8 @@ dist/
 .wrangler/
 
 node_modules/
+
+# RedMed MCP local secrets (never commit keys). Frisky once committed these; do not repeat that.
+mcp/.env
+mcp/.env.local
+.mcp.json
