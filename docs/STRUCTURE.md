@@ -14,7 +14,7 @@ Only what must live at the deploy / GitHub surface:
 | `tapper.html` · `index.html` · `card.html` · `get.html` · `get/` · `redmed-emergency.html` | Identical `#d=` redirect stubs → `/tapper/` (`scripts/write-tapper-redirects.sh`) |
 | `sw.js` · `_headers` · `_redirects` · `scripts/stage-worker-assets.sh` · `scripts/deploy-hostinger-static.mjs` · `scripts/setup-cloudflare-dns.mjs` · `scripts/verify-cf-dns-cutover.sh` | Hostinger static deploy + Cloudflare DNS/SSL cutover for `redmed.live` / SW |
 | `wrangler.jsonc` · `worker/` | **Non-product leftover** — do not recreate Worker for bands; product host is Hostinger (`docs/domain.md`) |
-| `mcp/redmed-mcp/` | Ops MCP (Hostinger/SSH/Supabase status) — product wall in `AGENTS.md` / `docs/OPS.md` |
+| `mcp/` · `mcp/redmed-mcp/` | TypeScript ops MCP imported from `frisky` (`docs/mcp.md`) next to the CI-tested `mcp/redmed-mcp` server. Product wall in `AGENTS.md` / `docs/OPS.md` |
 | `.htaccess` | Hostinger Apache AASA Content-Type (staged into `dist/passerby`) |
 | `apple-app-site-association` · `.well-known/apple-app-site-association` | Universal Links — identical, both locations required (Apple checks root, then `.well-known/`) |
 | `.gitignore` · `.github/` · `.cursor/` | tooling |
@@ -27,9 +27,11 @@ No brand PNGs at repo root — canonical in `assets/`, shell-relative copies in 
 RedMed-V1-Official/
 ├── README.md · AGENTS.md · MAX.md
 ├── owner/                 # App Store wearer app (SwiftUI) + Document/ policy source
+├── RedMed-Xcode → owner/  # compatibility symlink only (do not recreate as a real folder)
 ├── tapper/                # tap pages only — passerby shell, no owner-app features
 ├── worker/                # NON-PRODUCT leftover HTMLRewriter (device aspect hint)
-├── mcp/redmed-mcp/        # ops MCP v0.2 — no ICE/#d=/PHI
+├── mcp/                   # TypeScript ops MCP from frisky (src/, docs/mcp.md) — no ICE/#d=/PHI
+├── mcp/redmed-mcp/        # ops MCP checked by gates.yml — no ICE/#d=/PHI
 ├── Document/              # hosted Help: index.html = full policy; Document.html = redirect
 ├── privacy/               # /privacy bounce → /Document/#privacy (_redirects + privacy/index.html)
 ├── support/               # App Store Connect Support URL (scripts/publish-github-io.sh)
@@ -49,6 +51,7 @@ RedMed-V1-Official/
 | `docs/STRUCTURE.md` | This map |
 | `docs/DUAL-MAC.md` | MacBook + Mini: Cursor ShipIt repair, prefs/colors sync, `gh` HTTPS push/pull |
 | `docs/domain.md` | `redmed.live` Namecheap → Cloudflare DNS/SSL → Hostinger static |
+| `docs/mcp.md` | TypeScript ops MCP imported from `frisky` (`mcp/`, v0.2). CI-tested server stays `mcp/redmed-mcp` |
 | `docs/OPS.md` | VPS / MCP / Supabase / secrets — ops only, product wall |
 | `docs/AUDIT-V1-GOLIVE.md` | V1 go-live deployability audit |
 | `docs/NFC-RESTORE.md` | CoreNFC entitlement restore |
