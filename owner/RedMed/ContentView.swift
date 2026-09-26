@@ -287,7 +287,7 @@ private struct IsolatedKeepAliveTab<Content: View>: View {
         .zIndex(isFront ? 1 : 0)
         .transaction { $0.animation = nil }
         .allowsHitTesting(isFront)
-        // opacity 0 alone still left Help in the AX tree (UITest saw 3× Help).
+        // opacity 0 alone still left chrome actions in the AX tree.
         .accessibilityHidden(!isFront)
         .accessibilityElement(children: isFront ? .contain : .ignore)
     }
