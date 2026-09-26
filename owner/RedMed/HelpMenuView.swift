@@ -591,6 +591,26 @@ struct HelpMenuView: View {
                         if showsOwnerTools {
                             helpSectionLabel("Data")
                             helpCard {
+                                if AppConfig.profileSyncEnabled {
+                                    NavigationLink {
+                                        OwnerAccountView()
+                                    } label: {
+                                        HStack(spacing: 10) {
+                                            Text("☁️")
+                                                .font(.system(size: 17))
+                                                .frame(width: 22, alignment: .center)
+                                                .accessibilityHidden(true)
+                                            Text("Account sync")
+                                                .font(.system(size: Metrics.font, weight: .medium))
+                                                .foregroundColor(.redmedDark)
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                        }
+                                        .padding(.horizontal, Metrics.rowHPad)
+                                        .padding(.vertical, Metrics.rowVPad)
+                                    }
+                                    .buttonStyle(.plain)
+                                    Divider().overlay(Color.redmedDivider)
+                                }
                                 Button(role: .destructive) {
                                     showEraseConfirm = true
                                 } label: {
@@ -618,7 +638,9 @@ struct HelpMenuView: View {
                                 .disabled(isErasing)
                                 .accessibilityLabel("Erase All User Data")
                             }
-                            Text("Deletes the profile from this iPhone’s Keychain. Haptic prefs stay. The physical band is not wiped remotely — rewrite or discard it.")
+                            Text(AppConfig.profileSyncEnabled
+                                 ? "Deletes the profile from this iPhone’s Keychain and, if you are signed in, the account copy. Haptic prefs stay. The physical band is not wiped remotely — rewrite or discard it."
+                                 : "Deletes the profile from this iPhone’s Keychain. Haptic prefs stay. The physical band is not wiped remotely — rewrite or discard it.")
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(.redmedMuted)
                                 .padding(.horizontal, 4)

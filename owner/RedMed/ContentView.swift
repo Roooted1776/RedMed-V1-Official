@@ -92,6 +92,7 @@ struct ContentView: View {
             // + UIApplication.active, not a fixed sleep).
             RedMedSignpost.coldMark("restoreOnLaunch start")
             await profile.restoreOnLaunch()
+            await ProfileCloudSync.pullIfNeeded(into: profile)
             RedMedSignpost.coldMark("restoreOnLaunch done")
             guard !Task.isCancelled else { return }
             // String-only tapper.html read — safe during Face ID (no WK).
@@ -157,6 +158,24 @@ struct ContentView: View {
             }
         }
         .onChange(of: isScannerSession) { _, _ in clampScannerTab() }
+        .alert(
+            "Newer account copy",
+            isPresented: Binding(
+                get: { profile.cloudConflict != nil },
+                set: { if !$0 { profile.cloudConflict = nil } }
+            )
+        ) {
+            Button("Keep this iPhone", role: .cancel) {
+                ProfileCloudSync.keepLocal(profile)
+            }
+            Button("Use account copy") {
+                if let remote = profile.cloudConflict {
+                    profile.applyCloudRecord(remote)
+                }
+            }
+        } message: {
+            Text("The signed-in account has a newer profile. The band on a wrist does not change until you write it.")
+        }
         // Crash / SOS → 911. Notification avoids @ObservedObject on the root tab tree.
         .onReceive(NotificationCenter.default.publisher(for: .redMedSurvivalArmed)) { _ in
             tab = .emergency

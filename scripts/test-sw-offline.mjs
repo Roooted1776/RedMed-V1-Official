@@ -221,7 +221,7 @@ const LIVE = { [TAPPER + 'index.html']: SHELL('NEW'), [TAPPER]: SHELL('NEW'), [T
 }
 
 // 8. Copies stay byte-identical to root (sync-tapper.sh lockstep).
-for (const copy of ['tapper/sw.js', 'owner/RedMed/sw.js']) {
+for (const copy of ['tapper/sw.js']) {
   assert(`${copy} matches root sw.js`, readFileSync(join(ROOT, copy), 'utf8') === SRC);
 }
 

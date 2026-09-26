@@ -12,7 +12,8 @@ import SwiftUI
 ///
 /// Owns hardware write/read sessions (`NFCWriter` / `NFCReader`), NDEF URI
 /// envelope handling (`NFCURICodec`), and CryptoKit pack/unpack
-/// (`ProfileNFCCodec`). No network — chip bytes stay on device. Owner NFC tab
+/// (`ProfileNFCCodec`). Chip bytes stay on device. A verified write may store a
+/// sha256 of the packed URL on the signed-in account — never the raw `#d=`. Owner NFC tab
 /// only; scanners never mount this manager for setup.
 /// Band writes use live `AppConfig.medicalCardBaseURL#d=` only (owner data
 /// independence: no vendor cloud, no social/short URL, no BLE).
@@ -205,6 +206,9 @@ final class NFCBandManager: ObservableObject {
             .sink { [weak self] success, verified in
                 self?.writeSucceeded = success
                 self?.writeVerified = verified
+                if success, verified, let url = self?.writer.lastVerifiedURL, !url.isEmpty {
+                    ProfileCloudSync.recordVerifiedWrite(url: url)
+                }
             }
             .store(in: &cancellables)
 

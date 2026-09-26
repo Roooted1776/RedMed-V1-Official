@@ -9,11 +9,13 @@ One clone per machine. `frisky` is archived (`docs/FRISKY-ARCHIVE.md`).
 
 ## Product wall (ops vs Assist)
 
-Assist `#d=` / ICE profiles / Owner medical Keychain data must **never** pass through:
+Assist `#d=` fragments and rescuer reads must **never** pass through:
 
 - any MCP (none ship in this repository)
-- Supabase (`mohxobgyjkcmkqxijgeg` — ops/metadata only)
 - Hostinger VPS (`2010795` / `2.25.249.204`) shell or Traefik routes
+- the public tap page (`tapper/` does not call Supabase)
+
+Supabase project `mohxobgyjkcmkqxijgeg` has two schemas. `redmed_ops` is release evidence only. `redmed_owner` is the signed-in wearer copy (RLS, `auth.uid()`), written by the Owner app — not by an MCP, the VPS, or `tapper/`. See `docs/adr/002-owner-account-sync.md`.
 
 Assist origin stays Hostinger **static** + Cloudflare DNS/SSL (`docs/domain.md`). VPS is ops-only.
 
@@ -34,13 +36,13 @@ Two folders, two audiences — never cross owner-only features into Assist.
 | Surface | Folder / URL | Audience | Scope |
 | --- | --- | --- | --- |
 | **Assist** | `tapper/` → `https://redmed.live/tapper/` | The person **tapping** the band (passerby / responder) | Tap pages, band `#d=` decode, RedMed · 911 · Aid web shell only. No NFC tab, Edit, Face ID, Keychain, or App Store flows. No-auth, no-ads. Folder + URL path stay `tapper/` so already-written bands keep working. |
-| **Owner** | `owner/` | The person with the **app on their phone** (App Store wearer) | Native iOS / SwiftUI (`com.redmed.app`). Profile, Edit, NFC Write/Scan, Face ID chrome, Keychain, HealthKit import. **Not** HIPAA-certified — local-only ICE card. |
+| **Owner** | `Roooted1776/RedMed-iOS` (`owner/`) | The person with the **app on their phone** (App Store wearer) | Native iOS / SwiftUI (`com.redmed.app`). Profile, Edit, NFC Write/Scan, Face ID chrome, Keychain, optional Supabase account sync, HealthKit import. **Not** HIPAA-certified. |
 
 - **Assist (static Hostinger shell)** — Product write base `https://redmed.live/tapper/` (`docs/domain.md`). Stage with `scripts/stage-site.sh` → `dist/passerby`; deploy with `node scripts/deploy-hostinger-static.mjs redmed.live` (`HOSTINGER_API_TOKEN`). Serves `tapper/`, redirect stubs (`index.html`, `redmed-emergency.html`, …), `sw.js`, `Document/`, `assets/`, `.htaccess` (AASA Content-Type on Apache). No app build. No RedMed server / DB. Local: `python3 -m http.server`. CI: `.github/workflows/pages-deploy.yml`. Before merge: `bash scripts/sync-tapper.sh`, `node scripts/test-d-codec.mjs`, and `node scripts/test-product-independence.mjs`. No MCP and no Cloudflare Worker in this tree (product wall above).
-- **Owner (native iOS app)** — `owner/RedMed.xcodeproj`. macOS only. `ios-build.yml` on `macos-latest`. Xcode copies `tapper/index.html` into the bundle as `tapper.html` for NFC Preview only — that copy is read-only embed, not a second shell fork.
+- **Owner (native iOS app)** — public git `Roooted1776/RedMed-iOS`, project `owner/RedMed.xcodeproj`. macOS only. That repo’s `ios-build.yml` runs on `macos-latest`. Xcode copies pinned `Vendor/tapper/index.html` into the bundle as `tapper.html` for NFC Preview only — that copy is a read-only pin of this repo’s `tapper/index.html`, not a second shell fork. Wire format lockstep is `contracts/d-codec-fixtures.json`.
 - **Own-band / Assist SOS** — SOS exists so helpers can find someone on a **dark rainy night after a motorist ejects from a vehicle**: **full sound + full light**. It arms only when the helper toggles **SOS · Locate Me**, or when collision is detected using **US Crash Detection** timing (Apple Support 104959: 10s alert + 30s countdown → `tel:` unless Stop) — not Apple's Crash Detection API. Band tap never auto-arms SOS. After the owner writes their custom band and has RedMed installed, Associated Domains (Universal Links) claims the tap — never a `redmed://` handoff carrying `#d=` (custom schemes are not exclusive; any app registering `redmed` would get the profile). NFC write ships only with Associated Domains (enforced by `test-nfc-hardware.mjs`). No distance / BLE ranging.
 
-Keep `sw.js`, `tapper/sw.js`, and `owner/RedMed/sw.js` CACHE versions in lockstep.
+Keep `sw.js` and `tapper/sw.js` CACHE versions in lockstep. The iOS repo vendors the same `sw.js` bytes when the Preview pin is bumped.
 
 ## Git identity
 

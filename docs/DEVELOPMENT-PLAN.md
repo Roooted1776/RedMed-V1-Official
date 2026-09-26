@@ -12,7 +12,7 @@ Keep medical information on the existing Owner/band path. The product, website, 
 
 | Area | Observation | Meaning |
 |---|---|---|
-| Repository | Canonical `Roooted1776/RedMed-V1-Official`, inspected main `a7740a2` | Build on this tree, not a new product repository |
+| Repository | Assist `Roooted1776/RedMed-V1-Official`; Owner `Roooted1776/RedMed-iOS` | Web and iOS are separate gits. Codec lockstep is `contracts/d-codec-fixtures.json` |
 | GitHub CI | Gates passed on `a7740a2` | Local code checks are not proof of live hosting |
 | Public Assist | Parking page at `https://redmed.live/tapper/` | P0; do not approve new encoded-band launch |
 | Supabase | `RedMed Secure Data` active; no public tables or migration history at inspection | Ops ledger is a new, explicitly scoped change |
@@ -39,7 +39,7 @@ Retain the current physical layout; do not relocate the iOS project or stable we
 | Path | Responsibility | Review owner |
 |---|---|---|
 | `tapper/`, root `sw.js` | Responder card, offline shell, decode | Product engineering; clinical review when content changes |
-| `owner/` | Wearer profile, consent, NFC and iOS integration | iOS engineering |
+| `Roooted1776/RedMed-iOS` | Wearer profile, consent, NFC, account sync | iOS engineering |
 | `supabase/migrations/` | Versioned ops schema, never medical profiles, no MCP | Backend/operations |
 | `supabase/tests/` | Privilege and data-contract tests | Backend/security |
 | `scripts/`, `.github/workflows/` | Repeatable checks and release gates | Backend/operations |

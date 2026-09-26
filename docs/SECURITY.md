@@ -3,7 +3,7 @@
 Pointer only — not a second threat model, not a HIPAA badge, not a Security Rule program.
 
 **In-app:** Help → Policies → Security  
-(`owner/RedMed/Document/Document.html` `#security`)
+(in-app `Document.html` `#security` in `Roooted1776/RedMed-iOS`; hosted `/Document/#security`)
 
 **Hosted:** [`/Document/#security`](../Document/index.html#security) (lockstep with the in-app source)
 

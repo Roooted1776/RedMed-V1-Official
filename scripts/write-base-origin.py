@@ -1,38 +1,24 @@
 #!/usr/bin/env python3
-"""Print the origin of AppConfig.medicalCardBaseURL (scheme://host).
+"""Print the origin of the band write base (scheme://host).
 
 Used by pages-deploy.yml so live smoke tracks the URL written onto bands.
-Fails if the Swift file cannot be parsed — do not silently fall back to a
-hardcoded host (that is how a 404 write base stayed green).
+The source is contracts/d-codec-fixtures.json, shared with the iOS repo.
+Fails closed if that file cannot be parsed.
 """
 from __future__ import annotations
 
-import re
+import json
 from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
-SWIFT = ROOT / "owner" / "RedMed" / "AppConfig.swift"
+FIXTURES = ROOT / "contracts" / "d-codec-fixtures.json"
 
 
-def write_base_url(text: str) -> str:
-    m = re.search(
-        r"static let medicalCardCustomDomainTBD: String\? = (nil|\"([^\"]+)\")",
-        text,
-    )
-    if not m:
-        raise SystemExit("AppConfig.medicalCardCustomDomainTBD not found")
-    if m.group(1) != "nil":
-        url = m.group(2)
-    else:
-        m = re.search(
-            r"static var medicalCardBaseURL: String \{.*?return \"(https://[^\"]+)\"",
-            text,
-            re.S,
-        )
-        if not m:
-            raise SystemExit("AppConfig.medicalCardBaseURL fallback URL not found")
-        url = m.group(1)
+def write_base_url(payload: dict) -> str:
+    url = payload.get("writeBase")
+    if not isinstance(url, str) or not url:
+        raise SystemExit("contracts/d-codec-fixtures.json writeBase missing")
     parsed = urlparse(url)
     if parsed.scheme not in ("https", "http") or not parsed.netloc:
         raise SystemExit(f"write base is not an http(s) URL: {url!r}")
@@ -40,8 +26,8 @@ def write_base_url(text: str) -> str:
 
 
 def main() -> int:
-    text = SWIFT.read_text(encoding="utf-8")
-    print(write_base_url(text))
+    payload = json.loads(FIXTURES.read_text(encoding="utf-8"))
+    print(write_base_url(payload))
     return 0
 
 

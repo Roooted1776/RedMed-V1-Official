@@ -1,6 +1,6 @@
 # RedMed ops stack
 
-Ops is separate from the Assist band write path. **Never** put ICE profiles, Assist `#d=` payloads, or medical card data through MCP, Supabase, or the VPS.
+Ops is separate from the Assist band write path. **Never** put Assist `#d=` payloads or wearer profile bodies through MCP or the VPS. Supabase `redmed_ops` stays release evidence. Supabase `redmed_owner` is the signed-in wearer store and is not an MCP or VPS tool. The public tap page does not query either schema. See `docs/adr/002-owner-account-sync.md`.
 
 ## Topology
 
@@ -11,7 +11,7 @@ Ops is separate from the Assist band write path. **Never** put ICE profiles, Ass
 | **Registrar** | Namecheap (NS → Cloudflare after cutover) |
 | **Backup Assist** | `Roooted1776.github.io` via `scripts/publish-github-io.sh` |
 | **VPS** | Hostinger KVM `2010795` / `srv2010795.hstgr.cloud` / `2.25.249.204` — Docker/Traefik for **ops tools only** |
-| **Supabase** | Project `mohxobgyjkcmkqxijgeg` (`RedMed Secure Data`) — ops/metadata only; no PHI |
+| **Supabase** | Project `mohxobgyjkcmkqxijgeg` (`RedMed Secure Data`) — `redmed_ops` release ledger; `redmed_owner` signed-in wearer rows. MCP does not read wearer rows. |
 | **MCP** | Not part of this repository. Assist, the website, Owner, and `supabase/` do not call one. |
 
 ## VPS (ops only)

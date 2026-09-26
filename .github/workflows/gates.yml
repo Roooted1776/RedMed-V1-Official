@@ -28,7 +28,6 @@ jobs:
           persist-credentials: false
       - run: bash scripts/sync-tapper.sh
       - run: node scripts/test-d-codec.mjs
-      - run: node scripts/test-nfc-hardware.mjs
       - run: node scripts/test-sw-offline.mjs
       - run: node scripts/test-product-independence.mjs
 

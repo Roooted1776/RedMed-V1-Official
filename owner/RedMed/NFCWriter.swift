@@ -7,6 +7,8 @@ final class NFCWriter: NSObject, ObservableObject {
     @Published var isWriting = false
     @Published var success = false
     @Published var verified = false
+    /// Set only after read-back matches. Used to hash a verified write. Not logged.
+    private(set) var lastVerifiedURL: String = ""
 
     private var session: NFCNDEFReaderSession?
     private var urlToWrite: String = ""
@@ -245,6 +247,7 @@ extension NFCWriter: NFCNDEFReaderSessionDelegate {
             guard let self else { return }
             self.success = success
             self.verified = verified
+            self.lastVerifiedURL = verified ? self.urlToWrite : ""
             self.statusMessage = status
             self.isWriting = false
             session.invalidate()

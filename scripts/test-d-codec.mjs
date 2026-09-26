@@ -283,32 +283,24 @@ function sampleChip() {
   };
 }
 
-// --- constant lockstep ---
-const swift = readFileSync(join(ROOT, 'owner/RedMed/ProfileNFCCodec.swift'), 'utf8');
+// --- constant lockstep (shared fixtures; Swift checks live in RedMed-iOS) ---
+const fixtures = JSON.parse(readFileSync(join(ROOT, 'contracts/d-codec-fixtures.json'), 'utf8'));
 const tapper = readFileSync(join(ROOT, 'tapper/index.html'), 'utf8');
-const appConfig = readFileSync(join(ROOT, 'owner/RedMed/AppConfig.swift'), 'utf8');
-const profileData = readFileSync(join(ROOT, 'owner/RedMed/ProfileData.swift'), 'utf8');
 const support = readFileSync(join(ROOT, 'support/index.html'), 'utf8');
 
-assert('KEY_LABEL in Swift', swift.includes(`keyLabel = "${KEY_LABEL}"`));
+assert('fixture key label', fixtures.keyLabel === KEY_LABEL);
+assert('fixture AES version', fixtures.aesVersion === AES_VERSION);
+assert('fixture zlib version', fixtures.zlibVersion === ZLIB_VERSION);
+assert('fixture max payload', fixtures.maxPayload === MAX_PAYLOAD);
+assert('fixture max str', fixtures.maxStr === MAX_STR);
+assert('fixture max list', fixtures.maxList === MAX_LIST);
+assert('fixture write base', fixtures.writeBase === WRITE_BASE);
 assert('KEY_LABEL in tapper', tapper.includes(`KEY_LABEL = '${KEY_LABEL}'`));
-assert('AES 0x02 Swift', /aesVersion: UInt8 = 0x02/.test(swift));
 assert('AES 0x02 tapper', /AES_VERSION = 0x02/.test(tapper));
-assert('zlib 0x01 Swift', /zlibVersion: UInt8 = 0x01/.test(swift));
 assert('zlib 0x01 tapper', /ZLIB_VERSION = 0x01/.test(tapper));
-assert('MAX_PAYLOAD Swift', swift.includes('maxEncodedLength = 8192'));
 assert('MAX_PAYLOAD tapper', tapper.includes('MAX_PAYLOAD = 8192'));
-assert('MAX_STR Swift', /maxStr = 200/.test(swift));
 assert('MAX_STR tapper', tapper.includes('MAX_STR = 200'));
-assert('MAX_LIST Swift', /maxList = 40/.test(swift));
 assert('MAX_LIST tapper', tapper.includes('MAX_LIST = 40'));
-assert('current idx name=4 Swift', /static let name = 4/.test(swift));
-assert('current idx blood=0 Swift', /static let blood = 0/.test(swift));
-assert('current idx notes=12 Swift', /static let notes = 12/.test(swift));
-assert('legacy idx name=0 Swift', /static let name = 0/.test(swift));
-assert('write base AppConfig', appConfig.includes(`"${WRITE_BASE}"`));
-assert('empty persist guard', profileData.includes('if !hasSensitiveProfileData') && profileData.includes('return false'));
-assert('embed escapes lt', swift.includes('u003c'));
 
 // --- OwnerBandURI ---
 assert('URI accept AES payload', isValidWriteURL(`${WRITE_BASE}#d=${b64url(Buffer.from('x'))}`));
@@ -319,8 +311,6 @@ assert('URI reject second hash', !isValidWriteURL(`${WRITE_BASE}#d=abc#more`));
 assert('URI reject space', !isValidWriteURL(`${WRITE_BASE}#d=ab c`));
 assert('URI reject +', !isValidWriteURL(`${WRITE_BASE}#d=ab+c`));
 assert('URI reject amp tab', !isValidWriteURL(`${WRITE_BASE}#d=abc&tab=aid`));
-assert('Swift strips amp in extract', /firstIndex\(of: "&"\)/.test(swift));
-assert('Swift decode charset gate', swift.includes('isBase64urlCharset'));
 assert('tapper splits amp', /hash\.slice\(3\)\.split\('&'\)\[0\]/.test(tapper));
 
 const ampPayload = b64url(Buffer.from('x'));
@@ -330,26 +320,18 @@ assert('extract empty after amp', extractPayload('#d=&tab=aid') === null);
 assert('charset rejects plus', !isBase64urlCharset('ab+c'));
 assert('charset accepts url', isBase64urlCharset(ampPayload));
 
-const tapperCrash = appConfig.match(/static let tapperNote =\s+"([^"]+)"/);
-assert('crash tapper note lockstep', !!(tapperCrash && tapper.includes(tapperCrash[1])));
-
-const findHelpCrash = appConfig.match(/static let findHelpNote =\s+"([^"]+)"/);
+assert('crash tapper note lockstep', tapper.includes(fixtures.tapperNote));
 assert(
   'crash findHelpNote names iPhone Crash Detection for lock/kill',
-  !!(
-    findHelpCrash &&
-    /iPhone Crash Detection/.test(findHelpCrash[1]) &&
-    /lock or kill/.test(findHelpCrash[1]) &&
-    /while RedMed is open/.test(findHelpCrash[1])
-  )
+  /iPhone Crash Detection/.test(fixtures.findHelpNote) &&
+    /lock or kill/.test(fixtures.findHelpNote) &&
+    /while RedMed is open/.test(fixtures.findHelpNote)
 );
 assert(
   'support page matches findHelpNote lock/kill honesty',
-  !!(findHelpCrash && /iPhone Crash Detection/.test(support) && /lock or kill/.test(support))
+  /iPhone Crash Detection/.test(support) && /lock or kill/.test(support)
 );
-
-const localOnly = appConfig.match(/static let localOnlyLine =\s+"([^"]+)"/);
-assert('Aid localOnlyLine lockstep', !!(localOnly && tapper.includes(localOnly[1])));
+assert('Aid localOnlyLine lockstep', tapper.includes(fixtures.localOnlyLine));
 assert('early vitals expandBlood', /function expandBloodEarly/.test(tapper) && /EARLY_BLOOD/.test(tapper));
 assert('GPS pill status lockstep', /id="gpsPill"/.test(tapper) && /setGpsPill\('LIVE GPS'\)/.test(tapper) && /ACQUIRING GPS/.test(tapper));
 assert('CPR Beat & Breath on tapper', /id="cprToggle"/.test(tapper) && /Start Beat/.test(tapper) && /scheduleCPR\(545\)/.test(tapper));
@@ -472,6 +454,11 @@ assert('AES round blood', round && round.blood === 'O+');
 assert('AES round pregnant', round && round.pregnant === true);
 assert('AES round contact', round && round.contacts[0] && round.contacts[0].name === 'Sam');
 assert('AES write URL', isValidWriteURL(`${WRITE_BASE}#d=${encoded}`));
+const fixtureRound = decodePayload(fixtures.sample.aesPayload);
+assert('fixture AES name', fixtureRound && fixtureRound.name === fixtures.sample.name);
+assert('fixture AES blood', fixtureRound && fixtureRound.blood === 'O+');
+assert('fixture AES pregnant', fixtureRound && fixtureRound.pregnant === true);
+assert('fixture payload has no #d= prefix', !String(fixtures.sample.aesPayload).includes('#d='));
 
 const notesJson = Buffer.from(JSON.stringify(notesRow));
 const notesRound = decodePayload(b64url(aesSeal(notesJson)));

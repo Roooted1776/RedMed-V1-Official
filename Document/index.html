@@ -39,13 +39,13 @@
     <h1 class="legal-doc-title"><span class="legal-title-ico" aria-hidden="true">🔒</span>Privacy</h1>
     <p class="legal-meta">
       <strong>Effective</strong> September 2026<br>
-      <strong>Version</strong> 4.16 (United States)<br>
+      <strong>Version</strong> 4.17 (United States)<br>
       <strong>Law</strong> US federal and state privacy law (including CCPA/CPRA for California residents)
     </p>
     <p class="legal-parties">Applies to people in the United States who use the RedMed app or a RedMed NFC band</p>
     <div class="legal-notice">
       <strong>In short</strong>
-      RedMed keeps your medical ID on your phone and, if you write one, on your band. We run <strong>no profile server</strong>. We never receive your allergies, meds, conditions, contacts, or GPS. Find Nearby Hospitals in the iPhone app asks Apple Maps, not us; it is not available on a band tap in a browser. Anyone who deliberately taps the band can read the card — treat it like a printed medical ID. Not a medical device. Not “HIPAA certified.” Call <strong>911</strong> first in a real emergency.
+      RedMed keeps your medical ID on your phone and, if you write one, on your band. The band copy is the public fragment. If you sign in and account sync is on, a signed-in wearer copy is stored in Supabase so another phone you sign into can load it. The tap page does not look the profile up. GPS stays on this phone. Find Nearby Hospitals in the iPhone app asks Apple Maps, not us; it is not available on a band tap in a browser. Anyone who deliberately taps the band can read the card — treat it like a printed medical ID. Not a medical device. Not “HIPAA certified.” Call <strong>911</strong> first in a real emergency.
     </div>
     <article class="legal-body">
       <p>This Privacy page explains what RedMed does and does not hold about you. Read it with <a href="#terms">Terms</a> and <a href="#security">Security</a>.</p>
@@ -58,10 +58,10 @@
     <p>RedMed is a consumer app for a <strong>local emergency medical ID</strong>: store self-reported details on your iPhone, optionally put them on a passive NFC band when write is available, call for help, and show on-device first-aid while waiting for professionals. In-app Write returns when NFC Tag Reading is live and proven (<a href="#ships-when-ready">Ships When Ready</a>).</p>
     <p>It is not a hospital portal, not an electronic health record, not insurance software, and not a promise that EMS will arrive or that anyone will get a particular medical result. Full limits are in <a href="#terms">Terms</a>.</p>
 
-    <h2><span class="sec-num">3</span> HIPAA — local only, not certified</h2>
+    <h2><span class="sec-num">3</span> HIPAA — not a certification</h2>
     <p>HIPAA regulates <strong>covered entities</strong> and their <strong>business associates</strong> when they handle protected health information (“PHI”).</p>
-    <p><strong>RedMed is not a covered entity and is not a business associate</strong> for your RedMed profile. We do not treat patients, process claims, or run an EHR. Your profile never lands on a RedMed server.</p>
-    <p>That local-only design means we never create, receive, maintain, or transmit your profile as PHI on our systems. It is <strong>not</strong> a “HIPAA certified” badge, not a claim that RedMed is “HIPAA-aligned,” and we do not market RedMed as a HIPAA-covered product.</p>
+    <p><strong>RedMed is not a covered entity and is not a business associate</strong> for your RedMed profile. We do not treat patients, process claims, or run an EHR. The emergency tap does not send your profile to us.</p>
+    <p>If you sign in and account sync is on, RedMed stores that signed-in wearer copy in Supabase. That storage is <strong>not</strong> a “HIPAA certified” badge, not a claim that RedMed is “HIPAA-aligned,” and we do not market RedMed as a HIPAA-covered product.</p>
     <p>If EMS or hospital staff tap the band and later enter what they see into <strong>their</strong> systems, <strong>that organization’s</strong> HIPAA rules may apply to its copy. RedMed does not push data into a hospital EHR and does not become their business associate for bracelet contents.</p>
     <p>This page is not a HIPAA Notice of Privacy Practices.</p>
 
@@ -77,7 +77,7 @@
     <p>Providing a profile is optional. Leaving fields blank is fine; an empty card is less useful in an emergency.</p>
 
     <h2><span class="sec-num">5</span> Where it lives</h2>
-    <p>Your profile stays on your iPhone Keychain and, if you write one, on the band’s NFC chip. Those are two copies. Neither depends on the other — a dead or wiped phone does not blank the chip, and a rewrite does not need iCloud or an account. It is not uploaded, synced, or backed up to any RedMed server — we do not operate one for profiles.</p>
+    <p>Your profile stays on your iPhone Keychain and, if you write one, on the band’s NFC chip. Those copies do not depend on each other — a dead or wiped phone does not blank the chip, and editing the phone does not rewrite the band. If you sign in and account sync is on, a third copy (the signed-in wearer copy) is stored in Supabase. The tap page does not look the profile up. Keychain is still excluded from iCloud.</p>
     <p>On iOS we use the <code>WhenPasscodeSetThisDeviceOnly</code> Keychain class with <strong>no biometry ACL</strong>: readable while this iPhone is unlocked, and <strong>excluded from iCloud and encrypted backups</strong>. It does not sync to your other Apple devices. Face ID gates post-Agree (first launch / after Erase), returning cold re-entry (once per process), Edit, Save, and Erase — not viewing the YOU card, not 911, not Aid, not NFC write, not same-session resume, not tapper. Field-level Clear in Edit (blood type / birth date) does not prompt until you Save. Keychain restore loads the profile on Main without Face ID to view. The band is still the credential for tap-to-view — no Face ID on a passerby tap.</p>
     <p>When someone taps the band, nothing is fetched from us. The card is built from what is on the chip (<code>#d=</code> in the URL fragment).</p>
 
@@ -98,18 +98,18 @@
       <li><strong>Anyone who taps your band</strong> (or opens a card link with your <code>#d=</code>) can read the self-reported ID on it. That local handoff is the product.</li>
       <li><strong>Your phone’s OS apps</strong> — Phone, Messages, Maps, Share Sheet — when you use them. Apple’s rules apply there. Dispatchers hear or read what you say or type, not a RedMed server copy.</li>
       <li><strong>Apple Maps</strong> may see a hospital search (query + region) when you use Find Nearby Hospitals in the RedMed iPhone app. That search is Apple’s, not a RedMed upload. The 911 GPS readout itself stays on-device. Find Nearby Hospitals is not offered on a band tap in a browser.</li>
-      <li><strong>No ad networks, no analytics IDs, no data brokers, no account signup.</strong> We do not sell personal information or share it for cross-context behavioral advertising.</li>
+      <li><strong>No ad networks, no analytics IDs, no data brokers.</strong> Account sync is optional and off until you sign in. We do not sell personal information or share it for cross-context behavioral advertising.</li>
     </ul>
 
     <h2><span class="sec-num">9</span> How long it lasts</h2>
-    <p>We keep none of your RedMed profile, because we receive none. It stays on your phone and band until you remove it.</p>
+    <p>While account sync is off, the profile stays on your phone and band until you remove it. When account sync is on, the signed-in wearer copy stays in Supabase until you erase it or delete the account row. Erase on this iPhone deletes the Keychain copy and, if you are signed in, the account copy. It does not wipe a band.</p>
     <p>On the phone: Help → <strong>Erase All User Data</strong> (Face ID), or delete the app. Edit has field-level Clear only (blood type / birth date) — there is no Clear-all. Clearing some fields and Save updates the stored ID; an empty Save does <strong>not</strong> write or wipe Keychain — use Erase. On the band: overwrite the chip or dispose of the band securely. We cannot wipe a band remotely — there is no link from us to the chip.</p>
     <p>Support emails are kept only as long as needed to answer you, then deleted. Do not send your full medical profile to support.</p>
 
     <h2><span class="sec-num">10</span> Your rights (United States)</h2>
     <p>Most controls are on your device: edit to correct, erase or delete the app to remove, rewrite or discard the band. You do not need our permission.</p>
     <p>For anything we do hold (for example a support email), write <a href="mailto:help.RedMed@gmail.com">help.RedMed@gmail.com</a>. Requests are handled as required by the law that applies to you.</p>
-    <p><strong>California (CCPA/CPRA).</strong> Residents may have rights to know, access, delete, correct, and opt out of “sale” or “sharing,” and to limit use of sensitive personal information, subject to exceptions. RedMed does not sell personal information and does not share it for cross-context advertising. There is no RedMed profile database to disclose. For limited records we may hold, email us with “California Privacy Request” in the subject line. We will not discriminate against you for exercising privacy rights.</p>
+    <p><strong>California (CCPA/CPRA).</strong> Residents may have rights to know, access, delete, correct, and opt out of “sale” or “sharing,” and to limit use of sensitive personal information, subject to exceptions. RedMed does not sell personal information and does not share it for cross-context advertising. The public tap page has no lookup database. A signed-in wearer row exists only after account sync. Email us to access or delete that row. For limited records we may hold, email us with “California Privacy Request” in the subject line. We will not discriminate against you for exercising privacy rights.</p>
     <p>Other state privacy laws may grant similar rights. Use the same address; we will handle requests as required.</p>
 
     <h2><span class="sec-num">11</span> Automated decisions</h2>
@@ -134,19 +134,19 @@
     <h1 class="legal-doc-title"><span class="legal-title-ico" aria-hidden="true">🔐</span>Security</h1>
     <p class="legal-meta">
       <strong>Effective</strong> September 2026<br>
-      <strong>Version</strong> 4.16 (United States)<br>
+      <strong>Version</strong> 4.17 (United States)<br>
       <strong>Read with</strong> <a href="#privacy">Privacy</a> and <a href="#terms">Terms</a>
     </p>
     <p class="legal-parties">How RedMed protects the iPhone app, the passerby card, and the NFC band in the United States</p>
     <div class="legal-notice">
       <strong>In short</strong>
-      Profile stays on your phone (Keychain) and on the band if you write one (in-app Write needs NFC Tag Reading and stays disabled until proven). No RedMed profile backend. Owner Face ID gates post-Agree (first launch / after Erase), returning cold re-entry (once per process), Edit, Save, and Erase — not viewing the YOU card. NFC write, 911, Aid, same-session resume, and tapper do not prompt. Band tap needs <strong>no</strong> Face ID — EMS must read it cold. Packing on the chip is obfuscation, not a private vault.
+      Profile stays on your phone (Keychain) and on the band if you write one (in-app Write needs NFC Tag Reading and stays disabled until proven). The band copy is the public fragment. A signed-in wearer copy in Supabase exists only when account sync is on. The tap page does not look the profile up. This is not a HIPAA certification. Owner Face ID gates post-Agree (first launch / after Erase), returning cold re-entry (once per process), Edit, Save, and Erase — not viewing the YOU card. NFC write, 911, Aid, same-session resume, and tapper do not prompt. Band tap needs <strong>no</strong> Face ID — EMS must read it cold. Packing on the chip is obfuscation, not a private vault.
     </div>
     <article class="legal-body">
       <p>This page describes how RedMed approaches security. It is informational, <strong>not a warranty</strong>, and does not change the medical-device, no-outcome, or liability terms in <a href="#terms">Terms</a>.</p>
 
     <h2><span class="sec-num">1</span> What we defend</h2>
-    <p>Security work focuses on: keeping patient ID off RedMed servers; protecting on-device storage; hosted page integrity for the passerby card; and safe rendering of untrusted <code>#d=</code> payloads. We do <strong>not</strong> try to make a passive NFC ID confidential against a deliberate close tap — that would break the EMS handoff.</p>
+    <p>Security work focuses on: keeping the rescuer path off the database; limiting the signed-in wearer copy to that account; protecting on-device storage; hosted page integrity for the passerby card; and safe rendering of untrusted <code>#d=</code> payloads. We do <strong>not</strong> try to make a passive NFC ID confidential against a deliberate close tap — that would break the EMS handoff.</p>
 
     <h2><span class="sec-num">2</span> On-device profile</h2>
     <ul>
@@ -161,7 +161,7 @@
     <h2><span class="sec-num">3</span> NFC band</h2>
     <p>Writes use AES-GCM packing with a <strong>public client key</strong> shared by the app and <code>tapper.html</code>. Any phone that loads the card can decrypt. A private key would defeat “tap with no account.” Cloning a tag is like photocopying a wallet medical card.</p>
     <p>Walk-by distance will not fire the band; a deliberate ~1–2″ antenna tap can. RedMed does not background-scan. The band stays passive — no battery. <strong>iOS Background Tag Reading</strong> can still open the card on that deliberate tap when the phone is off or locked. Payment / POS terminals use EMV and do not open the RedMed card.</p>
-    <p>The card page renders fields with <code>textContent</code>, length caps, and phone sanitization. There is no RedMed profile server.</p>
+    <p>The card page renders fields with <code>textContent</code>, length caps, and phone sanitization. The tap page does not look the profile up.</p>
 
     <h2><span class="sec-num">4</span> Location</h2>
     <p>GPS updates start only on Find Help (When-In-Use), after Agree has turned Location on. Coordinates stay on-device for display and are never attached to a <code>tel:</code> call. We do not receive, log, or retain them. Find Nearby Hospitals in the iPhone app asks Apple Maps on this phone for ER POIs — Apple may see that search. It is not offered on a band tap in a browser. Accurate coordinates and a successful 911 call are not guaranteed.</p>
@@ -170,13 +170,13 @@
     <p>The on-device motion monitor described in <a href="#terms">Terms</a> §7 runs entirely on the phone: no network call, no upload, no RedMed server involvement. It evaluates a short rolling window of motion sensor data to estimate whether a severe impact occurred, then discards it. It does not run when the phone is locked, you leave the app, or kill RedMed — even if RedMed was open moments before. A false trigger or a missed trigger is a known limitation of on-device motion heuristics, not a data-security failure — see Terms §7, §13, and §14 for the corresponding disclaimers and liability limits.</p>
 
     <h2><span class="sec-num">6</span> HIPAA — not a covered entity</h2>
-    <p>Same posture as <a href="#privacy">Privacy</a>: no profile on our systems → RedMed is outside the covered-entity / BA path for that profile. Device Keychain and no backend are the controls. They are not a hospital Security Rule program and not a “HIPAA certified” claim.</p>
+    <p>Same posture as <a href="#privacy">Privacy</a>: the tap page does not look the profile up. A signed-in wearer copy in Supabase is not a HIPAA certification and not a hospital Security Rule program. Device Keychain stays the offline copy.</p>
 
     <h2><span class="sec-num">7</span> Report a vulnerability</h2>
     <p>Open a private GitHub security advisory on <a href="https://github.com/Roooted1776/RedMed-V1-Official">Roooted1776/frisky</a> for XSS in <code>#d=</code> rendering, Keychain bypass, or owner post-Agree / Edit / Save / Erase gate bypass. Or email <a href="mailto:help.RedMed@gmail.com">help.RedMed@gmail.com</a>. Do not file public issues with live keys or real medical payloads.</p>
 
     <h2><span class="sec-num">8</span> Trust root</h2>
-    <p>There is no RedMed profile server. The trust root is the owner’s iPhone: Keychain, biometrics gates, RAM purge on background, and the band fragment if written.</p>
+    <p>The trust root for a band tap is the chip fragment. The trust root for the phone is Keychain, the biometrics gates, and RAM purge on background. The signed-in wearer copy, when account sync is on, is an additional copy in Supabase — not what a stranger’s tap reads.</p>
 
     <h2><span class="sec-num">9</span> Contact</h2>
     <p><a href="mailto:help.RedMed@gmail.com">help.RedMed@gmail.com</a></p>
@@ -188,7 +188,7 @@
     <h1 class="legal-doc-title"><span class="legal-title-ico" aria-hidden="true">📜</span>Terms</h1>
     <p class="legal-meta">
       <strong>Effective</strong> September 2026<br>
-      <strong>Version</strong> 4.16 (United States)<br>
+      <strong>Version</strong> 4.17 (United States)<br>
       <strong>Governing law</strong> Laws of the State of <strong>New Jersey</strong>, United States
     </p>
     <p class="legal-parties">Applies to people in the United States who use the RedMed app or a RedMed NFC band</p>
@@ -216,11 +216,11 @@
       <li><strong>Band tap</strong> — any phone that taps a written band can open the emergency card in a browser with no app install and no login.</li>
     </ul>
     <p>That is an assist. It is not care delivery and not a promise that EMS will arrive or that a hospital will use the information.</p>
-    <p>RedMed runs <strong>no servers</strong> for your profile. After setup, the band card is rendered from the chip fragment, not fetched from us.</p>
+    <p>The band card is rendered from the chip fragment, not fetched from us. The tap page does not look the profile up. A signed-in wearer copy in Supabase exists only when account sync is on, and editing it does not rewrite the band. This is not a HIPAA certification.</p>
     <p><strong>No promised result.</strong> We do not warrant that EMS will arrive, that a bystander will act, that a tap will succeed, that GPS will be accurate, that Aid content fits the situation, or that anyone will survive or improve because RedMed was used.</p>
 
     <h2><span class="sec-num">4</span> HIPAA pointer</h2>
-    <p>As explained in <a href="#privacy">Privacy</a>: your profile never leaves your device or band for RedMed’s systems. RedMed is not a HIPAA covered entity or business associate for that profile, and we do not market “HIPAA certified.” Do not use RedMed as a substitute for records kept by your clinicians, hospitals, or insurers.</p>
+    <p>As explained in <a href="#privacy">Privacy</a>: the band copy is the public fragment, and the tap page does not look the profile up. A signed-in wearer copy may be stored in Supabase when account sync is on. RedMed is not marketed as “HIPAA certified.” Do not use RedMed as a substitute for records kept by your clinicians, hospitals, or insurers.</p>
 
     <h2><span class="sec-num">5</span> Accuracy is on you</h2>
     <p>You control what you enter. RedMed does not verify allergies, meds, conditions, or blood type. Keep the profile and band current when facts change. Responders should verify critical details when they can and use their own judgment.</p>
@@ -301,7 +301,7 @@
     <h1 class="legal-doc-title"><span class="legal-title-ico" aria-hidden="true">⚕️</span>Medical Disclaimer</h1>
     <p class="legal-meta">
       <strong>Effective</strong> September 2026<br>
-      <strong>Version</strong> 4.16 (United States)<br>
+      <strong>Version</strong> 4.17 (United States)<br>
       <strong>Read with</strong> <a href="#terms">Terms</a> §8–§10
     </p>
     <p class="legal-parties">Applies to people in the United States who use the RedMed app or a RedMed NFC band</p>
@@ -334,7 +334,7 @@
     <h1 class="legal-doc-title"><span class="legal-title-ico" aria-hidden="true">📦</span>Ships When Ready</h1>
     <p class="legal-meta">
       <strong>Effective</strong> September 2026<br>
-      <strong>Version</strong> 4.16 (United States)<br>
+      <strong>Version</strong> 4.17 (United States)<br>
       <strong>Read with</strong> <a href="#terms">Terms</a> §12
     </p>
     <p class="legal-parties">Applies to people in the United States who use the RedMed app or a RedMed NFC band</p>

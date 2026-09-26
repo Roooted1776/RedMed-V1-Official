@@ -130,6 +130,12 @@ enum AppConfig {
     /// "Fill From Apple Health" button stays hidden until restored.
     static let healthKitImportEnabled = false
 
+    /// Signed-in wearer copy in Supabase `redmed_owner`. Default false until a
+    /// publishable key is in the app (`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`)
+    /// and Document version 4.17 is the accepted policy. The public tap page
+    /// never calls Supabase. Turning this on does not rewrite a band.
+    static let profileSyncEnabled = false
+
     /// Hardware RF contract for the RedMed bracelet.
     /// - Band is **passive**: no battery, no BLE/Wi‑Fi radio. RedMed only starts
     ///   CoreNFC on explicit Write/Scan. Separately, iOS Background Tag Reading

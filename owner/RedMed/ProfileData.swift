@@ -216,6 +216,10 @@ class ProfileData: ObservableObject {
     }
     /// True while owner Edit holds draft PHI that may not yet be in Keychain.
     @Published var holdsEditingSession: Bool = false
+    /// Remote wearer row that is newer than a dirty local edit. Nil means no prompt.
+    @Published var cloudConflict: OwnerProfileRecord?
+    /// Account `updated_at` is newer than the last verified band write.
+    @Published var accountNewerThanBand = false
     /// True while launch restore is in flight (or expected). Funnel waits on this.
     @Published var isRestoringFromKeychain: Bool = false
     /// Bumped after a bulk RAM apply (restore / purge). Native YOU card keys
@@ -353,6 +357,53 @@ class ProfileData: ObservableObject {
         }
     }
 
+    /// Fields for `redmed_owner.profiles`. The user id is filled at push time.
+    func cloudFields() -> OwnerProfileRecord {
+        OwnerProfileRecord(
+            id: "",
+            name: name,
+            birthDate: birthDate,
+            bloodType: bloodType,
+            allergies: allergies,
+            medications: medications,
+            conditions: conditions,
+            contacts: contacts.map {
+                OwnerContactRecord(name: $0.name, relationship: $0.relationship, phone: $0.phone)
+            },
+            braceletLinked: braceletLinked,
+            isOrganDonor: isOrganDonor,
+            isPregnant: isPregnant,
+            isDeafOrVisionImpaired: isDeafOrVisionImpaired,
+            lastUpdated: lastUpdated,
+            notes: notes,
+            updatedAt: nil
+        )
+    }
+
+    /// Apply a pulled account row into Keychain without immediately pushing it back.
+    func applyCloudRecord(_ record: OwnerProfileRecord) {
+        withBulkUpdate {
+            name = record.name
+            birthDate = record.birthDate
+            bloodType = record.bloodType
+            allergies = record.allergies
+            medications = record.medications
+            conditions = record.conditions
+            contacts = record.contacts.map {
+                EmergencyContact(name: $0.name, relationship: $0.relationship, phone: $0.phone)
+            }
+            braceletLinked = record.braceletLinked
+            isOrganDonor = record.isOrganDonor
+            isPregnant = record.isPregnant
+            isDeafOrVisionImpaired = record.isDeafOrVisionImpaired
+            lastUpdated = record.lastUpdated
+            notes = record.notes
+        }
+        cloudConflict = nil
+        _ = persist(sync: false)
+        ProfileCloudSync.markClean(stamp: record.updatedAt)
+    }
+
     /// - Returns: `true` when the Keychain write succeeded.
     /// This iPhone only — not iCloud, not another device, not US-state.
     /// Linked chrome, NFC parked, and scenePhase do not gate the blob.
@@ -362,7 +413,8 @@ class ProfileData: ObservableObject {
     /// The band is a separate copy (`#d=` on the chip) — persist() does not
     /// write NFC; owner Write The Band does.
     @discardableResult
-    func persist() -> Bool {
+    @discardableResult
+    func persist(sync: Bool = true) -> Bool {
         guard persists else { return false }
         guard hasSensitiveProfileData else { return false }
 
@@ -374,6 +426,9 @@ class ProfileData: ObservableObject {
         let ok = ProfilePersistence.save(state.asPersistedProfile(stampedAt: lastUpdated))
         if ok {
             cardEpoch &+= 1
+            if sync {
+                ProfileCloudSync.enqueuePush(fields: cloudFields())
+            }
         }
         return ok
     }
@@ -636,6 +691,7 @@ class ProfileData: ObservableObject {
         guard persists else { return false }
         PasserbyShellStaging.wipe()
         guard ProfilePersistence.deleteAll() else { return false }
+        ProfileCloudSync.eraseRemote()
         ConsentSettings.clearAcceptance()
         purgeFromMemory()
         SecurePasteboard.clear()
