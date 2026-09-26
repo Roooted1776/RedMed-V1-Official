@@ -8,7 +8,7 @@
 | Surface | Deployable? | Notes |
 |---------|-------------|-------|
 | Assist code (`tapper/`, SW, `#d=` tests) | **Yes** | CI gates: d-codec, nfc-hardware (51), sw-offline, worker-device |
-| Public `https://redmed.live/tapper/` | **No (parking)** | Hostinger parked HTML; NS = dns-parking |
+| Public `https://redmed.live/` | **Portal on the VPS** | Account site at `/`, Assist shell at `/tapper/`, synced from `portal/` + `tapper/` |
 | Origin `195.35.60.70` + Host `redmed.live` | **Parking HTML** | Must attach/deploy real static files |
 | Backup `roooted1776.github.io/tapper/` | **Yes** | Live Assist while custom domain parks |
 | Owner iOS | Compile yes / NFC no | Flags parked; restore docs ready |

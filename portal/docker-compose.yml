@@ -20,7 +20,7 @@ services:
       - traefik.http.services.redmed-portal.loadbalancer.server.port=8090
       - traefik.http.middlewares.redmed-portal-slash.redirectregex.permanent=true
       - traefik.http.middlewares.redmed-portal-slash.redirectregex.regex=^(https?://[^/]+/redmed)$
-      - traefik.http.middlewares.redmed-portal-slash.redirectregex.replacement=${1}/
+      - "traefik.http.middlewares.redmed-portal-slash.redirectregex.replacement=${1}/"
       - traefik.http.middlewares.redmed-portal-strip.stripprefix.prefixes=/redmed
       - traefik.http.routers.redmed-portal.rule=Host(`srv2010795.hstgr.cloud`) && (Path(`/redmed`) || PathPrefix(`/redmed/`))
       - traefik.http.routers.redmed-portal.entrypoints=websecure
