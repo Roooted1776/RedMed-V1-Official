@@ -196,6 +196,12 @@ jobs:
             echo "::warning::Skipping HTTPS smoke against parking DNS. AppConfig write base is ${ORIGIN}/tapper/ — fix DNS before encoding new bands."
             exit 0
           fi
+          # Hostinger parking (hCDN 2.57.91.91 etc.) answers 200 with parked HTML.
+          # Detect by body, not IP, so a new parking IP can't masquerade as a deploy.
+          if curl -fsS -m 15 "${ORIGIN}/tapper/" | grep -qiE 'Parked Domain name on Hostinger|dns-parking'; then
+            echo "::warning::${ORIGIN}/tapper/ serves Hostinger parking HTML (DNS A=${A_REC}). Deploy dist/passerby + un-park the site (docs/domain.md) before encoding new bands."
+            exit 0
+          fi
           ok=0
           for i in 1 2 3 4 5 6 7 8 9 10; do
             if BASE="${ORIGIN}" bash scripts/smoke-pages.sh; then
