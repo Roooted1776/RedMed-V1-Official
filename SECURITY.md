@@ -17,6 +17,6 @@ Do not open public issues containing live keys or real `#d=` payloads.
 - Service worker cache poisoning or `#d=` reaching any HTTP log, cache key, or server
 - Keychain bypass or Face ID gate bypass in `owner/`
 - Universal Link / custom-scheme hijack of a band tap
-- Ops MCP (`mcp/redmed-mcp`) product-wall bypass or command injection
+- Sending Assist `#d=` or Owner ICE data through an MCP, Supabase, or VPS
 
 Full policy text: Help → Policies → Security in the app, or `/Document/#security`.

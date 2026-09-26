@@ -3,9 +3,9 @@
 # Hub is GitHub HTTPS. This script does not copy Cloud Agent tokens.
 set -euo pipefail
 
-REPO_SLUG="Roooted1776/frisky"
+REPO_SLUG="Roooted1776/RedMed-V1-Official"
 REPO_HTTPS="https://github.com/${REPO_SLUG}.git"
-CLONE_DIR="${FRISKY_HOME:-$HOME/Documents/frisky}"
+CLONE_DIR="${REDMED_HOME:-${FRISKY_HOME:-$HOME/Documents/RedMed-V1-Official}}"
 WANT_NAME="Max"
 # GitHub-verified author on this repo (squash-merge / Desktop). Not Cursor login.
 WANT_EMAIL="maxaguilaraasted@gmail.com"
@@ -55,7 +55,7 @@ cd "$CLONE_DIR"
 
 origin="$(git remote get-url origin)"
 case "$origin" in
-  *github.com/Roooted1776/frisky*) ;;
+  *github.com/Roooted1776/RedMed-V1-Official*|*github.com/Roooted1776/frisky*) ;;
   *) die "origin is ${origin} — expected ${REPO_HTTPS}" ;;
 esac
 git remote set-url origin "$REPO_HTTPS"

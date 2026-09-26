@@ -1,6 +1,6 @@
 # Hostinger Apache — AASA Content-Type + basic static hints.
 # Cloudflare _headers is ignored on Hostinger origin; this file is staged into
-# dist/passerby by scripts/stage-worker-assets.sh when present at repo root.
+# dist/passerby by scripts/stage-site.sh when present at repo root.
 
 <IfModule mod_headers.c>
   <Files "apple-app-site-association">

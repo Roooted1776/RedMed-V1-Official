@@ -12,9 +12,7 @@ cmp sw.js owner/RedMed/sw.js
 node scripts/test-d-codec.mjs
 node scripts/test-nfc-hardware.mjs
 node scripts/test-sw-offline.mjs
-node scripts/test-worker-device.mjs
-npm run check --prefix mcp/redmed-mcp
-npm test --prefix mcp/redmed-mcp
+node scripts/test-product-independence.mjs
 if [[ "${1:-}" == "--live" ]]; then
   # Unlike the transitional deploy workflow, parking / DNS failures are fatal.
   # Never provide a band URL or real profile to any ops check.

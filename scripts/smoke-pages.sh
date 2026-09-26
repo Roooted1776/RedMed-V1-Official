@@ -21,7 +21,7 @@ from pathlib import Path
 
 BASE = os.environ.get("BASE", "http://127.0.0.1:8787").rstrip("/")
 HOST_HEADER = os.environ.get("HOST_HEADER", "").strip()
-UA = "RedMed-smoke-pages/1.0 (+https://github.com/Roooted1776/frisky)"
+UA = "RedMed-smoke-pages/1.0 (+https://github.com/Roooted1776/RedMed-V1-Official)"
 REPO = Path(os.environ["REPO_ROOT"])
 
 # Tap-to-view must stay ungated — no biometrics / login / WebAuthn in the shell.

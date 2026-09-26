@@ -9,13 +9,9 @@ bash scripts/sync-tapper.sh
 node scripts/test-d-codec.mjs
 node scripts/test-nfc-hardware.mjs
 node scripts/test-sw-offline.mjs
-node scripts/test-worker-device.mjs
-bash scripts/stage-worker-assets.sh
+node scripts/test-product-independence.mjs
+bash scripts/stage-site.sh
 test -f dist/passerby/.htaccess
-
-echo
-echo "== Stack status =="
-node mcp/redmed-mcp/bin/redmed-stack-status.mjs || true
 
 echo
 echo "== Max / secrets (agent cannot finish without these) =="

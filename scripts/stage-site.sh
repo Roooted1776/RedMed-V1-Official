@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Stage the passerby shell into dist/passerby for Workers Assets deploy.
-# Keeps owner / docs / scripts out of the public Worker upload.
+# Stage the public Assist site into dist/passerby for Hostinger static deploy.
+# Keeps owner / docs / scripts out of the upload.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"

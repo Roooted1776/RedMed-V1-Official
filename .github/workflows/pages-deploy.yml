@@ -26,7 +26,6 @@ on:
       - 'sw.js'
       - '_headers'
       - '_redirects'
-      - 'wrangler.jsonc'
       - 'assets/**'
       - 'owner/RedMed/AppConfig.swift'
       - 'scripts/sync-tapper.sh'
@@ -41,8 +40,7 @@ on:
       - 'scripts/package-lock.json'
       - 'scripts/deploy-pages.sh'
       - 'scripts/deploy-hostinger-static.mjs'
-      - 'scripts/stage-worker-assets.sh'
-      - 'worker/**'
+      - 'scripts/stage-site.sh'
       - 'docs/domain.md'
       - '.github/workflows/pages-deploy.yml'
   pull_request:
@@ -61,7 +59,6 @@ on:
       - 'sw.js'
       - '_headers'
       - '_redirects'
-      - 'wrangler.jsonc'
       - 'assets/**'
       - 'owner/RedMed/AppConfig.swift'
       - 'scripts/sync-tapper.sh'
@@ -76,8 +73,7 @@ on:
       - 'scripts/package-lock.json'
       - 'scripts/deploy-pages.sh'
       - 'scripts/deploy-hostinger-static.mjs'
-      - 'scripts/stage-worker-assets.sh'
-      - 'worker/**'
+      - 'scripts/stage-site.sh'
       - 'docs/domain.md'
       - '.github/workflows/pages-deploy.yml'
   workflow_dispatch:
@@ -100,7 +96,6 @@ jobs:
           bash scripts/sync-tapper.sh
           node scripts/test-d-codec.mjs
           node scripts/test-nfc-hardware.mjs
-          node scripts/test-worker-device.mjs
           node scripts/test-sw-offline.mjs
           f=tapper/index.html
           ! grep -q 'Checking your phone' "$f" || fail "$f still has Checking your phone"
@@ -130,7 +125,7 @@ jobs:
         run: |
           echo "::warning::HOSTINGER_API_TOKEN not set — skipping Hostinger upload."
           echo "Live band write base is https://redmed.live/tapper/ (docs/domain.md)."
-          echo "Deploy from a machine with the token: bash scripts/stage-worker-assets.sh && node scripts/deploy-hostinger-static.mjs redmed.live"
+          echo "Deploy from a machine with the token: bash scripts/stage-site.sh && node scripts/deploy-hostinger-static.mjs redmed.live"
 
       - name: Stage + deploy passerby assets to Hostinger
         if: github.event_name != 'pull_request' && steps.hostinger.outputs.skip != 'true'
@@ -138,7 +133,7 @@ jobs:
           HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
         run: |
           set -euo pipefail
-          bash scripts/stage-worker-assets.sh
+          bash scripts/stage-site.sh
           # Lockfile-pinned, no lifecycle scripts — this step holds the deploy token.
           npm ci --ignore-scripts --prefix scripts
           node scripts/deploy-hostinger-static.mjs redmed.live

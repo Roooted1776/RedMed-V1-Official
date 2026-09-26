@@ -1,6 +1,6 @@
 # RedMed IP assignment
 
-One-page confirmatory assignment: **frisky / RedMed code, tapper HTML, brand, and band design → the LLC** (or a to-be-formed NJ entity). Cheap. Stops “who owns the app?” with a contractor or cousin.
+One-page confirmatory assignment: **RedMed code, tapper HTML, brand, and band design → the LLC** (or a to-be-formed NJ entity). Cheap. Stops “who owns the app?” with a contractor or cousin. The live repository is `Roooted1776/RedMed-V1-Official`. The printable instrument still says frisky because that was the project name when it was written.
 
 **Print and sign:** [docs/ip-assignment.html](ip-assignment.html) → File → Print (one US Letter page). Fill blanks. Wet ink or DocuSign.
 

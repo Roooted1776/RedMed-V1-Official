@@ -65,7 +65,7 @@ local network. HF NFC physics + Universal Links are the controls.
    Optional extra: `applinks:roooted1776.github.io` as a second entry, only
    so bands written before the cutover also open the app (github.io still
    serves them). `redmed.live` must serve the AASA over valid HTTPS with no
-   redirect (staged by `stage-worker-assets.sh`).
+   redirect (staged by `scripts/stage-site.sh`).
 2. Set `AppConfig.associatedDomainsEnabled = true`.
 3. Developer portal → App ID `com.redmed.app` → enable **Associated Domains**.
 4. Xcode → Signing & Capabilities → **Associated Domains** (same `applinks:`).

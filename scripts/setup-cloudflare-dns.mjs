@@ -10,7 +10,7 @@
  * Prereqs:
  *   CLOUDFLARE_API_TOKEN  — Zone:Edit + DNS:Edit + Zone Settings:Edit
  *                           (or Edit zone DNS template + Zone Settings Edit)
- *   Account id defaults to wrangler.jsonc account_id
+ *   Account id defaults below; override with CLOUDFLARE_ACCOUNT_ID
  *
  * Usage:
  *   node scripts/setup-cloudflare-dns.mjs
@@ -20,26 +20,13 @@
  * Prints Cloudflare nameservers — paste those into Namecheap → Domain →
  * Nameservers → Custom DNS. Then run: bash scripts/verify-cf-dns-cutover.sh
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '..');
 const TOKEN = process.env.CLOUDFLARE_API_TOKEN;
 const DOMAIN = process.argv[2] || 'redmed.live';
 const ORIGIN_IP = process.env.HOSTINGER_ORIGIN_IP || '195.35.60.70';
 const DRY_RUN = process.env.DRY_RUN === '1' || process.env.DRY_RUN === 'true';
 const API = 'https://api.cloudflare.com/client/v4';
 
-function readAccountId() {
-  if (process.env.CLOUDFLARE_ACCOUNT_ID) return process.env.CLOUDFLARE_ACCOUNT_ID;
-  const raw = fs.readFileSync(path.join(ROOT, 'wrangler.jsonc'), 'utf8');
-  const cleaned = raw.replace(/^\s*\/\/.*$/gm, '').replace(/,\s*([}\]])/g, '$1');
-  const json = JSON.parse(cleaned);
-  if (!json.account_id) throw new Error('No account_id in wrangler.jsonc');
-  return json.account_id;
-}
+const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || 'a2d8a74738a0280eb9d5a3e77acd59ea';
 
 async function cf(method, urlPath, body) {
   const res = await fetch(`${API}${urlPath}`, {
@@ -143,7 +130,7 @@ async function setAlwaysHttps(zoneId) {
 }
 
 async function main() {
-  const accountId = readAccountId();
+  const accountId = ACCOUNT_ID;
   console.log(`Account ${accountId}`);
   console.log(`Domain  ${DOMAIN}`);
   console.log(`Origin  ${ORIGIN_IP} (Hostinger static, no domain product, no user-data server)`);

@@ -1,7 +1,7 @@
 # RedMed tree map
 
-Single source of truth: **git `main`** → `Roooted1776/RedMed-V1-Official` (legacy `frisky` until remotes cut over).
-Local path (one clone per machine): **`~/Documents/RedMed-V1-Official`** (legacy `~/Documents/frisky` OK). See [`DUAL-MAC.md`](DUAL-MAC.md).
+Single source of truth: **git `main`** → `Roooted1776/RedMed-V1-Official`.
+One clone per machine. See [`DUAL-MAC.md`](DUAL-MAC.md). `frisky` is archived ([`FRISKY-ARCHIVE.md`](FRISKY-ARCHIVE.md)).
 
 ## Root (intentionally small)
 
@@ -12,9 +12,7 @@ Only what must live at the deploy / GitHub surface:
 | `README.md` | GitHub landing (product + run/deploy + dead-host note) |
 | `AGENTS.md` | Cursor / agent rules (must be easy to find) |
 | `tapper.html` · `index.html` · `card.html` · `get.html` · `get/` · `redmed-emergency.html` | Identical `#d=` redirect stubs → `/tapper/` (`scripts/write-tapper-redirects.sh`) |
-| `sw.js` · `_headers` · `_redirects` · `scripts/stage-worker-assets.sh` · `scripts/deploy-hostinger-static.mjs` · `scripts/setup-cloudflare-dns.mjs` · `scripts/verify-cf-dns-cutover.sh` | Hostinger static deploy + Cloudflare DNS/SSL cutover for `redmed.live` / SW |
-| `wrangler.jsonc` · `worker/` | **Non-product leftover** — do not recreate Worker for bands; product host is Hostinger (`docs/domain.md`) |
-| `mcp/` · `mcp/redmed-mcp/` | TypeScript ops MCP imported from `frisky` (`docs/mcp.md`) next to the CI-tested `mcp/redmed-mcp` server. Product wall in `AGENTS.md` / `docs/OPS.md` |
+| `sw.js` · `_headers` · `_redirects` · `scripts/stage-site.sh` · `scripts/deploy-hostinger-static.mjs` · `scripts/setup-cloudflare-dns.mjs` · `scripts/verify-cf-dns-cutover.sh` | Hostinger static deploy + Cloudflare DNS/SSL cutover for `redmed.live` / SW |
 | `.htaccess` | Hostinger Apache AASA Content-Type (staged into `dist/passerby`) |
 | `apple-app-site-association` · `.well-known/apple-app-site-association` | Universal Links — identical, both locations required (Apple checks root, then `.well-known/`) |
 | `.gitignore` · `.github/` · `.cursor/` | tooling |
@@ -29,16 +27,14 @@ RedMed-V1-Official/
 ├── owner/                 # App Store wearer app (SwiftUI) + Document/ policy source
 ├── RedMed-Xcode → owner/  # compatibility symlink only (do not recreate as a real folder)
 ├── tapper/                # tap pages only — passerby shell, no owner-app features
-├── worker/                # NON-PRODUCT leftover HTMLRewriter (device aspect hint)
-├── mcp/                   # TypeScript ops MCP from frisky (src/, docs/mcp.md) — no ICE/#d=/PHI
-├── mcp/redmed-mcp/        # ops MCP checked by gates.yml — no ICE/#d=/PHI
+├── supabase/              # ops release ledger only — no medical profiles, no MCP
 ├── Document/              # hosted Help: index.html = full policy; Document.html = redirect
 ├── privacy/               # /privacy bounce → /Document/#privacy (_redirects + privacy/index.html)
 ├── support/               # App Store Connect Support URL (scripts/publish-github-io.sh)
 ├── assets/                # canonical brand PNGs / SVG
 ├── docs/                  # all long-form docs (this file, OPS, domain, PRODUCTION)
 ├── scripts/               # run, deploy, smoke, sync-document, write-tapper-redirects, #d= codec
-├── Pages surface files    # redirect stubs, sw, .htaccess, wrangler leftover (see table)
+├── Pages surface files    # redirect stubs, sw, .htaccess (see table)
 └── .github/workflows/
 ```
 
@@ -51,8 +47,7 @@ RedMed-V1-Official/
 | `docs/STRUCTURE.md` | This map |
 | `docs/DUAL-MAC.md` | MacBook + Mini: Cursor ShipIt repair, prefs/colors sync, `gh` HTTPS push/pull |
 | `docs/domain.md` | `redmed.live` Namecheap → Cloudflare DNS/SSL → Hostinger static |
-| `docs/mcp.md` | TypeScript ops MCP imported from `frisky` (`mcp/`, v0.2). CI-tested server stays `mcp/redmed-mcp` |
-| `docs/OPS.md` | VPS / MCP / Supabase / secrets — ops only, product wall |
+| `docs/OPS.md` | VPS / Supabase / secrets — ops only, product wall |
 | `docs/AUDIT-V1-GOLIVE.md` | V1 go-live deployability audit |
 | `docs/NFC-RESTORE.md` | CoreNFC entitlement restore |
 | `docs/band-engraving-and-nfc-sourcing.md` | Hardware |

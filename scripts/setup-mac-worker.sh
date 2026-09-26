@@ -4,8 +4,8 @@
 # Docs: https://cursor.com/docs/cloud-agent/self-hosted/my-machines
 set -euo pipefail
 
-CLONE_DIR="${FRISKY_HOME:-$HOME/Documents/frisky}"
-WANT_REMOTE_HINT="github.com/Roooted1776/frisky"
+CLONE_DIR="${REDMED_HOME:-${FRISKY_HOME:-$HOME/Documents/RedMed-V1-Official}}"
+WANT_REMOTE_HINT="github.com/Roooted1776/RedMed-V1-Official"
 
 usage() {
   cat <<'EOF'
@@ -44,7 +44,7 @@ ensure_agent_cli() {
 }
 
 require_clone() {
-  [[ -d "${CLONE_DIR}/.git" ]] || die "No clone at ${CLONE_DIR}. Run: ~/Documents/frisky/scripts/setup-mac-git.sh"
+  [[ -d "${CLONE_DIR}/.git" ]] || die "No clone at ${CLONE_DIR}. Run: scripts/setup-mac-git.sh"
   cd "$CLONE_DIR"
   local origin
   origin="$(git remote get-url origin 2>/dev/null || true)"

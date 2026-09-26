@@ -22,11 +22,11 @@ band URL `#d=` fragment only — the browser decodes it on the phone.
 
 | Path | Status |
 |------|--------|
-| Product HTML app | Hostinger site `u666300215`, files in `public_html` / plan IP **`195.35.60.70`**. Deploy: `bash scripts/stage-worker-assets.sh` then `node scripts/deploy-hostinger-static.mjs redmed.live` (`HOSTINGER_API_TOKEN`). Stage includes `.htaccess` for AASA Content-Type on Apache. |
+| Product HTML app | Hostinger site `u666300215`, files in `public_html` / plan IP **`195.35.60.70`**. Deploy: `bash scripts/stage-site.sh` then `node scripts/deploy-hostinger-static.mjs redmed.live` (`HOSTINGER_API_TOKEN`). Stage includes `.htaccess` for AASA Content-Type on Apache. |
 | Hostinger domain product | **None** — domains portfolio is empty. Website hostname `redmed.live` lives on the hosting plan only. |
 | Public DNS | **Parking** as of V1 go-live audit — Hostinger `dns-parking` NS / parked HTML on `https://redmed.live/tapper/`. Must finish Cloudflare NS cutover before bands use this host. |
 | Cloudflare DNS + SSL | **Cutover ready** — `node scripts/setup-cloudflare-dns.mjs` (needs `CLOUDFLARE_API_TOKEN`), then Namecheap Custom DNS → Cloudflare NS. Verify: `bash scripts/verify-cf-dns-cutover.sh`. |
-| Cloudflare Worker `redmed-emergency` | **Non-product leftover** — do not recreate for bands. |
+| Cloudflare Worker | **Not used.** DNS and SSL only. Do not add a Worker. |
 | Public GitHub Pages `Roooted1776.github.io/tapper/` | **Backup** (and current live Assist while `redmed.live` parks). Keep publishing (`scripts/publish-github-io.sh`). |
 
 Smoke after DNS: `BASE=https://redmed.live bash scripts/smoke-pages.sh`.
@@ -39,7 +39,7 @@ Namecheap still parks public DNS.
 Repo `Roooted1776/Roooted1776.github.io` already exists. Re-publish:
 
 1. GitHub → that repo → Actions → **Publish tapper** → Run workflow
-   (checks out frisky and runs `scripts/publish-github-io.sh`).
+   (checks out this repo and runs `scripts/publish-github-io.sh`).
 2. Or locally: `./scripts/publish-github-io.sh /path/to/Roooted1776.github.io`, then commit and push `main`.
 3. Smoke: `BASE=https://roooted1776.github.io bash scripts/smoke-pages.sh`
 
@@ -58,7 +58,7 @@ Namecheap keeps the registration invoice; DNS answers come from Cloudflare.
 Create an API token: [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens)
 
 - Template **Edit zone DNS**, plus permission **Zone → Zone Settings → Edit** (SSL).
-- Account: the one with `account_id` in `wrangler.jsonc` (`a2d8a74738a0280eb9d5a3e77acd59ea`).
+- Account: `a2d8a74738a0280eb9d5a3e77acd59ea` (override with `CLOUDFLARE_ACCOUNT_ID`).
 
 ```bash
 export CLOUDFLARE_API_TOKEN=…   # also add as Cloud Agent / CI secret when ready
