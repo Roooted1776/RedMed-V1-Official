@@ -12,7 +12,7 @@ Ops is separate from the Assist band write path. **Never** put ICE profiles, Ass
 | **Backup Assist** | `Roooted1776.github.io` via `scripts/publish-github-io.sh` |
 | **VPS** | Hostinger KVM `2010795` / `srv2010795.hstgr.cloud` / `2.25.249.204` — Docker/Traefik for **ops tools only** |
 | **Supabase** | Project `mohxobgyjkcmkqxijgeg` (`RedMed Secure Data`) — ops/metadata only; no PHI |
-| **MCP** | In-repo `mcp/redmed-mcp` (v0.2) + Cursor Hostinger product MCPs |
+| **MCP** | In-repo `mcp/redmed-mcp` (v0.3, allow-listed SSH) + Cursor Hostinger product MCPs |
 
 ## VPS (ops only)
 

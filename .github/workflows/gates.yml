@@ -1,0 +1,72 @@
+# Fast, always-on gates for every push/PR (ubuntu, no secrets).
+# pages-deploy.yml and ios-build.yml are path-filtered; this one is not,
+# so a change anywhere still has to pass the Assist invariants and the
+# ops MCP product-wall tests before it can merge.
+name: Gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gates-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  assist:
+    name: Assist invariants
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - run: bash scripts/sync-tapper.sh
+      - run: node scripts/test-d-codec.mjs
+      - run: node scripts/test-nfc-hardware.mjs
+      - run: node scripts/test-sw-offline.mjs
+      - run: node scripts/test-worker-device.mjs
+
+  mcp:
+    name: Ops MCP product wall
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: mcp/redmed-mcp
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - run: npm test
+      - run: npm audit --omit=dev --audit-level=high
+
+  secrets-and-phi:
+    name: No secrets or band payloads in tree
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - name: Refuse committed keys and real #d= payloads
+        run: |
+          set -euo pipefail
+          fail=0
+          # Private keys / common token shapes.
+          if git grep -nIE -- '-----BEGIN (RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{50,}|sk_live_[A-Za-z0-9]{20,}|eyJhbGciOi[A-Za-z0-9._-]{40,}' -- ':!*.md'; then
+            echo "::error::secret-shaped string committed"; fail=1
+          fi
+          # A long base64url blob after #d= in a committed file is almost
+          # certainly a real band profile. Test fixtures must stay short.
+          if git grep -nIE -- '#d=[A-Za-z0-9_-]{200,}' -- ':!scripts/test-d-codec.mjs'; then
+            echo "::error::long #d= payload committed (possible real profile)"; fail=1
+          fi
+          exit $fail

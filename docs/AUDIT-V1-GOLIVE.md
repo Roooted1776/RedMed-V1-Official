@@ -12,7 +12,7 @@
 | Origin `195.35.60.70` + Host `redmed.live` | **Parking HTML** | Must attach/deploy real static files |
 | Backup `roooted1776.github.io/tapper/` | **Yes** | Live Assist while custom domain parks |
 | Owner iOS | Compile yes / NFC no | Flags parked; restore docs ready |
-| Ops MCP (`mcp/redmed-mcp`) | **Landed** | Product wall: no ICE/`#d=`/PHI |
+| Ops MCP (`mcp/redmed-mcp`) | **v0.3 hardened** | Allow-listed SSH, wall regex fixed, host key pinned, tests in `gates.yml` |
 | Supabase `mohxobgyjkcmkqxijgeg` | Empty | Ops only — keep free of medical data |
 | VPS `2010795` | Ops only | Not Assist origin |
 
@@ -32,7 +32,7 @@
 2. Cloudflare DNS script + Namecheap Custom NS
 3. Smoke: `BASE=https://redmed.live bash scripts/smoke-pages.sh`
 4. AASA JSON (not parking) at `/apple-app-site-association` + `.well-known/`
-5. Mirror-push history to `RedMed-V1-Official` if Cloud Agent token lacks git push (use `scripts/mirror-to-v1.sh` on a Mac)
+5. ~~Mirror-push history~~ Done 2026-09-26: frisky full history merged into V1 `main` (non-force, `--allow-unrelated-histories`). Macs: `git remote set-url origin https://github.com/Roooted1776/RedMed-V1-Official.git && git fetch && git reset --keep origin/main`
 6. CI secrets on V1 remote: `HOSTINGER_API_TOKEN`, `CLOUDFLARE_API_TOKEN`
 7. Paid Apple Program → NFC + Associated Domains restore → App Store (`docs/APP-STORE.md`)
 

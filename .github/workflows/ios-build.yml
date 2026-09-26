@@ -20,6 +20,9 @@ on:
       - '.github/workflows/ios-build.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ios-build-${{ github.ref }}
   cancel-in-progress: true
@@ -31,6 +34,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
 
       - name: Show toolchain
         run: xcodebuild -version

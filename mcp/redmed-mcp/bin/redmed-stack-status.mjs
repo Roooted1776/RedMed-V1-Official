@@ -2,7 +2,7 @@
 /**
  * Read-only RedMed stack status for ops. Never prints #d= or profile bodies.
  */
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import https from 'node:https';
 import http from 'node:http';
 
@@ -47,7 +47,7 @@ function fetchHead(url, headers = {}) {
 
 function dig(type, name) {
   try {
-    return execSync(`dig +short ${name} ${type}`, { encoding: 'utf8' }).trim().split('\n').filter(Boolean);
+    return execFileSync('dig', ['+short', name, type], { encoding: 'utf8', timeout: 10000 }).trim().split('\n').filter(Boolean);
   } catch {
     return [];
   }

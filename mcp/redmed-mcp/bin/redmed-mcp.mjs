@@ -9,24 +9,17 @@ import { z } from 'zod';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { wallCheck, redactFragments } from '../lib/wall.mjs';
+import { ACTIONS, UNITS, buildCommand } from '../lib/ops-commands.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const FORBIDDEN =
-  /\b(#d=|ice\s*profile|medical\s*card|phi|health\s*record|patient\s*data)\b/i;
-
-const BLOCKED_SSH =
-  /\b(rm\s+-rf\s+\/|mkfs|dd\s+if=|shutdown|reboot|userdel|passwd\s|iptables\s+-F|ufw\s+reset)\b/i;
-
-function wallCheck(text) {
-  if (text && FORBIDDEN.test(text)) {
-    return 'Blocked by RedMed product wall: do not pass Assist #d= / ICE / PHI through MCP.';
-  }
-  return null;
-}
+// Raw root shell is off by default. Opt in per session only when you are
+// at the keyboard: REDMED_SSH_ALLOW_RAW=1.
+const ALLOW_RAW = process.env.REDMED_SSH_ALLOW_RAW === '1';
 
 const server = new McpServer({
   name: 'redmed-mcp',
-  version: '0.2.0',
+  version: '0.3.0',
 });
 
 server.tool(
@@ -38,7 +31,7 @@ server.tool(
     const r = spawnSync(process.execPath, [script], { encoding: 'utf8', timeout: 45000 });
     const out = (r.stdout || '') + (r.stderr || '');
     return {
-      content: [{ type: 'text', text: out || `exit ${r.status}` }],
+      content: [{ type: 'text', text: redactFragments(out) || `exit ${r.status}` }],
     };
   },
 );
@@ -70,62 +63,76 @@ server.tool(
   },
 );
 
+function runSsh(command) {
+  const host = process.env.REDMED_SSH_HOST || '2.25.249.204';
+  const key = process.env.REDMED_SSH_KEY || `${process.env.HOME}/.ssh/hostinger_vps`;
+  const user = process.env.REDMED_SSH_USER || 'root';
+  try {
+    const out = execFileSync(
+      'ssh',
+      [
+        '-i', key,
+        '-o', 'BatchMode=yes',
+        // Pin the host key in ~/.ssh/known_hosts once (ssh-keyscan + verify
+        // fingerprint in hPanel). accept-new would trust a MITM on first use.
+        '-o', `StrictHostKeyChecking=${process.env.REDMED_SSH_STRICT || 'yes'}`,
+        '-o', 'ConnectTimeout=15',
+        '--',
+        `${user}@${host}`,
+        command,
+      ],
+      { encoding: 'utf8', timeout: 60000, maxBuffer: 2 * 1024 * 1024 },
+    );
+    return { content: [{ type: 'text', text: redactFragments(out).slice(0, 100_000) }] };
+  } catch (e) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: redactFragments(`SSH failed: ${e.message}\n${e.stdout || ''}\n${e.stderr || ''}`),
+        },
+      ],
+      isError: true,
+    };
+  }
+}
+
 server.tool(
-  'hostinger_ssh_exec',
-  'Run a non-destructive command on the RedMed ops VPS. Destructive patterns are refused. Never use for Assist deploy of #d= data.',
+  'hostinger_ops',
+  'Read-only, allow-listed ops command on the RedMed VPS (uptime, disk, docker, traefik, unit status/journal, ports, failed SSH logins). Never touches Assist #d= data.',
   {
-    command: z.string().describe('Shell command to run on the VPS'),
+    action: z.enum(Object.keys(ACTIONS)),
+    container: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$/).optional(),
+    unit: z.enum(UNITS).optional(),
+    tail: z.number().int().min(1).max(500).optional(),
   },
-  async ({ command }) => {
-    const blocked = wallCheck(command);
-    if (blocked) {
-      return { content: [{ type: 'text', text: blocked }], isError: true };
-    }
-    if (BLOCKED_SSH.test(command)) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: 'Blocked: command matches destructive pattern. Confirm with Max and use an explicit allow-list path.',
-          },
-        ],
-        isError: true,
-      };
-    }
-    const host = process.env.REDMED_SSH_HOST || '2.25.249.204';
-    const key = process.env.REDMED_SSH_KEY || `${process.env.HOME}/.ssh/hostinger_vps`;
-    const user = process.env.REDMED_SSH_USER || 'root';
+  async (params) => {
+    let command;
     try {
-      const out = execFileSync(
-        'ssh',
-        [
-          '-i',
-          key,
-          '-o',
-          'BatchMode=yes',
-          '-o',
-          'StrictHostKeyChecking=accept-new',
-          '-o',
-          'ConnectTimeout=15',
-          `${user}@${host}`,
-          command,
-        ],
-        { encoding: 'utf8', timeout: 60000, maxBuffer: 2 * 1024 * 1024 },
-      );
-      return { content: [{ type: 'text', text: out.slice(0, 100_000) }] };
+      command = buildCommand(params.action, params);
     } catch (e) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `SSH failed: ${e.message}\n${e.stdout || ''}\n${e.stderr || ''}`,
-          },
-        ],
-        isError: true,
-      };
+      return { content: [{ type: 'text', text: String(e.message) }], isError: true };
     }
+    return runSsh(command);
   },
 );
+
+if (ALLOW_RAW) {
+  server.tool(
+    'hostinger_ssh_exec',
+    'RAW shell on the ops VPS (enabled by REDMED_SSH_ALLOW_RAW=1). Runs as REDMED_SSH_USER. Human must review every command. Never for Assist #d= data.',
+    {
+      command: z.string().max(2000).describe('Shell command to run on the VPS'),
+    },
+    async ({ command }) => {
+      const blocked = wallCheck(command);
+      if (blocked) {
+        return { content: [{ type: 'text', text: blocked }], isError: true };
+      }
+      return runSsh(command);
+    },
+  );
+}
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
