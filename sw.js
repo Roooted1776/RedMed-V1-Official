@@ -25,14 +25,13 @@
  *
  * Fix #1 (Critical): putShell now clones all copies BEFORE reading body text
  *   so no clone is made from a consumed/locked stream.
- * Fix #4 (High): precache now catches shell precache failure gracefully so SW
- *   install does not abort on first-offline visit. On that failure the last
- *   good shell is carried over from an older CACHE bucket first — activate
- *   deletes those buckets, and a stale card beats no card for an offline EMT.
+ * Install succeeds only after a validated shell is saved. If downloads fail,
+ * carry over a validated older shell; otherwise reject installation and leave
+ * the existing worker in control. A never-visited offline phone has no worker.
  * Fix #7 (Medium): putShell deduplicates SHELL_KEYS to avoid double-writing
  *   the same cache entry when reqOrUrl already appears in SHELL_KEYS.
  */
-var CACHE = 'redmed-tapper-v178';
+var CACHE = 'redmed-tapper-v179';
 // In-scope /tapper/ copies only. This worker's scope is ./ under /tapper/,
 // so ../assets/ is never intercepted — precaching it only delayed install
 // (skipWaiting waits on the whole list) and duplicated the same bytes.
@@ -59,10 +58,10 @@ function networkReload(reqOrUrl) {
 
 // Fix #1 + #7: clone all copies BEFORE consuming body; deduplicate keys.
 function putShell(cache, reqOrUrl, res) {
-  if (!res || !res.ok || (res.type !== 'basic' && res.type !== 'cors')) return Promise.resolve();
+  if (!res || !res.ok || (res.type !== 'basic' && res.type !== 'cors')) return Promise.resolve(false);
   var ct = (res.headers.get('content-type') || '').toLowerCase();
   if (ct && ct.indexOf('text/html') === -1 && ct.indexOf('application/xhtml') === -1) {
-    return Promise.resolve();
+    return Promise.resolve(false);
   }
   // Deduplicate: build the full key list once, removing duplicates.
   var reqKey = typeof reqOrUrl === 'string' ? reqOrUrl : reqOrUrl.url;
@@ -74,12 +73,12 @@ function putShell(cache, reqOrUrl, res) {
   var copies = allKeys.map(function () { return res.clone(); });
   var reader = res.clone();
   return reader.text().then(function (body) {
-    if (body.indexOf('data-tab="medical"') === -1) return;
+    if (body.indexOf('data-tab="medical"') === -1) return false;
     var writes = allKeys.map(function (key, i) {
       return cache.put(key, copies[i]);
     });
-    return Promise.all(writes).catch(function () { /* quota / opaque */ });
-  }).catch(function () { /* unreadable body */ });
+    return Promise.all(writes).then(function () { return true; });
+  }).catch(function () { return false; /* unreadable body / storage failure */ });
 }
 
 function putAsset(cache, reqOrUrl, res) {
@@ -94,47 +93,45 @@ function precacheRequiredShell(cache, i) {
   var url = REQUIRED_SHELLS[i];
   return networkReload(url)
     .then(function (res) {
-      if (res && res.ok) return putShell(cache, url, res);
-      return precacheRequiredShell(cache, i + 1);
+      return putShell(cache, url, res);
     })
-    .catch(function () {
-      return precacheRequiredShell(cache, i + 1);
+    .catch(function () { return false; })
+    .then(function (saved) {
+      return saved ? true : precacheRequiredShell(cache, i + 1);
     });
 }
 
-// Copy the first shell found in an older bucket onto every SHELL_KEY here.
+// Prefer the newest older bucket, validating each candidate before copying.
 function carryOverShell(cache) {
   return caches.keys().then(function (keys) {
-    var older = keys.filter(function (k) { return /^redmed-tapper-v/.test(k) && k !== CACHE; });
+    var older = keys.filter(function (k) { return /^redmed-tapper-v\d+$/.test(k) && k !== CACHE; });
+    older.sort(function (a, b) {
+      return Number(b.split('-v')[1]) - Number(a.split('-v')[1]);
+    });
     return older.reduce(function (found, k) {
       return found.then(function (hit) {
         if (hit) return hit;
         return caches.open(k).then(function (old) {
-          return Promise.all(SHELL_KEYS.map(function (key) {
-            return old.match(key, { ignoreSearch: true });
-          })).then(function (hits) {
-            for (var i = 0; i < hits.length; i++) {
-              if (hits[i]) return hits[i];
-            }
-            return null;
-          });
+          return SHELL_KEYS.reduce(function (previous, key) {
+            return previous.then(function (saved) {
+              if (saved) return true;
+              return old.match(key, { ignoreSearch: true }).then(function (res) {
+                return putShell(cache, key, res);
+              }).catch(function () { return false; });
+            });
+          }, Promise.resolve(false));
         });
       });
-    }, Promise.resolve(null));
-  }).then(function (hit) {
-    if (!hit) return;
-    return Promise.all(SHELL_KEYS.map(function (key) {
-      return cache.put(key, hit.clone());
-    }));
-  }).catch(function () { /* quota / storage unavailable */ });
+    }, Promise.resolve(false));
+  }).catch(function () { return false; /* storage unavailable */ });
 }
 
-// Fix #4: catch shell precache rejection so SW install does not abort when
-// both shell URLs are unreachable on a first-time offline visit.
+// Never activate an empty cache over a previously working offline shell.
 function precache(cache) {
   return precacheRequiredShell(cache, 0)
     .catch(function () { return carryOverShell(cache); })
-    .then(function () {
+    .then(function (saved) {
+      if (!saved) throw new Error('No validated RedMed shell cached; refusing installation');
       return Promise.all(ASSETS.map(function (url) {
         return networkReload(url).then(function (res) {
           return putAsset(cache, url, res);
@@ -164,10 +161,10 @@ function refreshShell(cache, req) {
   return networkReload(req)
     .then(function (res) {
       if (res && res.ok) {
-        if (isShellRequest(req))
-          putShell(cache, req, res.clone());
-        else putAsset(cache, req, res.clone());
-        return res;
+        var write = isShellRequest(req)
+          ? putShell(cache, req, res.clone())
+          : putAsset(cache, req, res.clone());
+        return write.then(function () { return res; });
       }
       return null;
     })
@@ -193,7 +190,7 @@ function offlineShellResponse() {
 // navigations); only ok responses are cached. null = network unreachable.
 function refreshAsset(cache, req) {
   return fetch(req).then(function (res) {
-    if (res && res.ok) putAsset(cache, req, res.clone());
+    if (res && res.ok) return putAsset(cache, req, res.clone()).then(function () { return res; });
     return res || null;
   }).catch(function () {
     return null;
@@ -274,9 +271,9 @@ self.addEventListener('fetch', function (event) {
           : Promise.resolve(null);
         return preloaded.then(function (pre) {
           if (pre && pre.ok) {
-            caches.open(CACHE).then(function (cache) {
-              putShell(cache, req, pre.clone());
-            });
+            event.waitUntil(caches.open(CACHE).then(function (cache) {
+              return putShell(cache, req, pre.clone());
+            }));
             return pre;
           }
           return refresh.then(function (res) {

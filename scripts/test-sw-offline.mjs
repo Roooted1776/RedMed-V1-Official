@@ -70,9 +70,17 @@ class MockCacheStorage {
   }
 }
 
-function loadWorker({ online, routes = {}, seed }) {
+function loadWorker({ online, routes = {}, failWrites = false }) {
   const listeners = {};
   const caches = new MockCacheStorage();
+  if (failWrites) {
+    const open = caches.open.bind(caches);
+    caches.open = async (name) => {
+      const cache = await open(name);
+      cache.put = async () => { throw new Error('QuotaExceededError'); };
+      return cache;
+    };
+  }
   const net = { online, routes };
   const fetch = async (req) => {
     const url = keyOf(req, false);
@@ -92,7 +100,7 @@ function loadWorker({ online, routes = {}, seed }) {
   const sandbox = { self, caches, fetch, URL, Response, Promise, Error, TypeError, console };
   vm.createContext(sandbox);
   vm.runInContext(SRC, sandbox);
-  return { listeners, caches, net, CACHE: sandbox.CACHE, seed };
+  return { listeners, caches, net, CACHE: sandbox.CACHE };
 }
 
 async function install(w) {
@@ -152,11 +160,11 @@ const LIVE = { [TAPPER + 'index.html']: SHELL('NEW'), [TAPPER]: SHELL('NEW'), [T
   assert('old shell carried over — offline tap still paints the card', res && res.status === 200 && body.includes('OLD'), body.slice(0, 80));
 }
 
-// 3. Never-cached phone, offline: readable offline page, not a browser error.
+// 3. An uncached worker must not install. Its fallback only helps a worker
+// already controlling a page after cache eviction, not a first-ever visit.
 {
   const w = loadWorker({ online: false });
-  assert('first install with no network and no old shell still resolves', await ok(install(w)));
-  await activate(w);
+  assert('first install without a cached shell rejects', !(await ok(install(w))));
   const { res } = await request(w, TAPPER);
   const body = res ? await res.text() : '';
   assert('uncached offline tap → 503 offline page', res && res.status === 503 && body.includes('not saved on this phone'));
@@ -168,8 +176,7 @@ const LIVE = { [TAPPER + 'index.html']: SHELL('NEW'), [TAPPER]: SHELL('NEW'), [T
   const w = loadWorker({ online: false });
   const old = await w.caches.open('redmed-tapper-v1');
   await old.put('/tapper/BrandLogo.png', new BasicResponse('png', { headers: { 'content-type': 'image/png' } }));
-  await install(w);
-  await activate(w);
+  assert('old bucket containing only assets cannot satisfy install', !(await ok(install(w))));
   const { res } = await request(w, TAPPER);
   assert('no shell in old bucket → offline page, not a logo served as HTML', res && res.status === 503);
 }
@@ -216,6 +223,46 @@ const LIVE = { [TAPPER + 'index.html']: SHELL('NEW'), [TAPPER]: SHELL('NEW'), [T
 // 8. Copies stay byte-identical to root (sync-tapper.sh lockstep).
 for (const copy of ['tapper/sw.js', 'owner/RedMed/sw.js']) {
   assert(`${copy} matches root sw.js`, readFileSync(join(ROOT, copy), 'utf8') === SRC);
+}
+
+// 9. HTTP 200 alone does not prove a usable shell (parking / redirect pages).
+{
+  const w = loadWorker({ online: true, routes: {
+    [TAPPER + 'index.html']: '<html>Domain parking</html>',
+    [TAPPER]: SHELL('FALLBACK'),
+  } });
+  assert('invalid first shell tries the alternate shell URL', await ok(install(w)));
+  w.net.online = false;
+  const { res } = await request(w, TAPPER);
+  assert('alternate validated shell persisted', (await res.text()).includes('FALLBACK'));
+}
+{
+  const w = loadWorker({ online: true, routes: {
+    [TAPPER + 'index.html']: '<html>Domain parking</html>',
+    [TAPPER]: '<html>Redirecting</html>',
+  } });
+  assert('200 parking pages cannot satisfy install', !(await ok(install(w))));
+}
+{
+  const w = loadWorker({ online: true, routes: LIVE, failWrites: true });
+  assert('cache write failure cannot satisfy install', !(await ok(install(w))));
+}
+{
+  const w = loadWorker({ online: false });
+  const bad = await w.caches.open('redmed-tapper-v177');
+  await bad.put('/tapper/', new BasicResponse('<html>Parking</html>', { headers: { 'content-type': 'text/html' } }));
+  const good = await w.caches.open('redmed-tapper-v176');
+  await good.put('/tapper/', new BasicResponse(SHELL('GOOD'), { headers: { 'content-type': 'text/html' } }));
+  assert('carry-over skips invalid cached HTML', await ok(install(w)));
+  const { res } = await request(w, TAPPER);
+  assert('carry-over uses validated older shell', (await res.text()).includes('GOOD'));
+}
+{
+  const w = loadWorker({ online: false });
+  const old = await w.caches.open('redmed-tapper-v177');
+  await old.put('/tapper/', new BasicResponse('png', { headers: { 'content-type': 'image/png' } }));
+  assert('mis-keyed image cannot satisfy carry-over', !(await ok(install(w))));
+  assert('failed install preserves old cache bucket', (await w.caches.keys()).includes('redmed-tapper-v177'));
 }
 
 if (failed) {
