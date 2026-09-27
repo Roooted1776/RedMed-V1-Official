@@ -387,7 +387,7 @@ assert('GPS skips sub-5m jitter', /function metersBetween\(lat1, lon1, lat2, lon
 }
 
 const sw = readFileSync(join(ROOT, 'sw.js'), 'utf8');
-assert('sw cache v179', sw.includes("CACHE = 'redmed-tapper-v179'"));
+assert('sw cache v180', sw.includes("CACHE = 'redmed-tapper-v180'"));
 {
   const assetsBlock = sw.match(/var ASSETS = \[([\s\S]*?)\];/);
   assert('sw does not precache out-of-scope assets', !!(assetsBlock && !assetsBlock[1].includes('../')));
