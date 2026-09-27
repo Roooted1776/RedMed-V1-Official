@@ -17,4 +17,11 @@
   RewriteEngine On
   RewriteRule ^apple-app-site-association$ - [T=application/json]
   RewriteRule ^\.well-known/apple-app-site-association$ - [T=application/json]
+
+  # Root + legacy stub URLs -> the Assist shell, server-side (same list as
+  # _redirects, which only Cloudflare Pages reads). Without this, redmed.live/
+  # answers 200 and only a JS stub redirects, so link previews and no-JS
+  # browsers stop on "Open emergency card". #d= never reaches the server; the
+  # browser keeps it across the 301. Query strings pass through.
+  RewriteRule ^(index\.html|tapper\.html|card\.html|get\.html|redmed-emergency\.html|get/?|get/index\.html)?$ /tapper/ [R=301,L]
 </IfModule>

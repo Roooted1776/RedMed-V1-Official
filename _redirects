@@ -1,4 +1,5 @@
-# Cloudflare Pages redirects.
+# Cloudflare Pages redirects. Hostinger (redmed.live) ignores this file:
+# .htaccess carries the same root/stub -> /tapper/ 301s for Apache.
 # Hash fragments (#d=) are client-only and survive these hops.
 #
 # Canonical passerby shell stays under /tapper/ (SW + AppConfig.medicalCardBaseURL).
