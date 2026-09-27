@@ -8,7 +8,9 @@ if [[ $# -gt 1 || ( $# -eq 1 && "$1" != "--live" ) ]]; then
   exit 2
 fi
 cmp sw.js tapper/sw.js
+cmp sw.js owner/RedMed/sw.js
 node scripts/test-d-codec.mjs
+node scripts/test-nfc-hardware.mjs
 node scripts/test-sw-offline.mjs
 node scripts/test-product-independence.mjs
 if [[ "${1:-}" == "--live" ]]; then

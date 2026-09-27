@@ -9,13 +9,11 @@ One clone per machine. `frisky` is archived (`docs/FRISKY-ARCHIVE.md`).
 
 ## Product wall (ops vs Assist)
 
-Assist `#d=` fragments and rescuer reads must **never** pass through:
+Assist `#d=` / ICE profiles / Owner medical Keychain data must **never** pass through:
 
 - any MCP (none ship in this repository)
+- Supabase (`mohxobgyjkcmkqxijgeg` — ops/metadata only)
 - Hostinger VPS (`2010795` / `2.25.249.204`) shell or Traefik routes
-- the public tap page (`tapper/` does not call Supabase)
-
-Supabase project `mohxobgyjkcmkqxijgeg` has two schemas. `redmed_ops` is release evidence only. `redmed_owner` is the signed-in wearer copy (RLS, `auth.uid()`), written by the Owner app — not by an MCP, the VPS, or `tapper/`. See `docs/adr/002-owner-account-sync.md`.
 
 Assist origin stays Hostinger **static** + Cloudflare DNS/SSL (`docs/domain.md`). VPS is ops-only.
 
@@ -24,7 +22,7 @@ Assist origin stays Hostinger **static** + Cloudflare DNS/SSL (`docs/domain.md`)
 | Agent | Role | How it lands code |
 | --- | --- | --- |
 | **Grok (xAI)** | Owner-side agent. GitHub connector on `Roooted1776`. Reads/writes this repo, opens/merges PRs, keeps `main` current. | Commits via GitHub as `Roooted1776`. Do not invent a separate Grok GitHub user. |
-| **Cursor Agent** | Cloud + local IDE agent. Linux Cloud Agent covers the static Hostinger / **Assist** shell (`tapper/` path) only. MacBook Air / Mini **My Machines** workers (`macbook-air`, `mac-mini`) run tool calls on that Mac for iOS / Xcode — see `docs/DUAL-MAC.md` §0. | PRs from `cursor/*` or `main-*` branches. **Owner** app is `Roooted1776/RedMed-iOS`, macOS/Xcode, not this Linux Cloud Agent. |
+| **Cursor Agent** | Cloud + local IDE agent. Linux Cloud Agent covers the static Hostinger / **Assist** shell (`tapper/` path) only. MacBook Air / Mini **My Machines** workers (`macbook-air`, `mac-mini`) run tool calls on that Mac for iOS / Xcode — see `docs/DUAL-MAC.md` §0. | PRs from `cursor/*` or `main-*` branches. **Owner** app (`owner/`) is macOS/Xcode, not the Linux Cloud Agent. |
 | **Owner (Max)** | Source of truth for product calls. | One clone per Mac of `Roooted1776/RedMed-V1-Official` `main`. |
 
 Grok is in this repo. Treat instructions here as binding when Grok edits RedMed.
@@ -36,13 +34,13 @@ Two folders, two audiences — never cross owner-only features into Assist.
 | Surface | Folder / URL | Audience | Scope |
 | --- | --- | --- | --- |
 | **Assist** | `tapper/` → `https://redmed.live/tapper/` | The person **tapping** the band (passerby / responder) | Tap pages, band `#d=` decode, RedMed · 911 · Aid web shell only. No NFC tab, Edit, Face ID, Keychain, or App Store flows. No-auth, no-ads. Folder + URL path stay `tapper/` so already-written bands keep working. |
-| **Owner** | `Roooted1776/RedMed-iOS` (`owner/`) | The person with the **app on their phone** (App Store wearer) | Native iOS / SwiftUI (`com.redmed.app`). Profile, Edit, NFC Write/Scan, Face ID chrome, Keychain, optional Supabase account sync, HealthKit import. **Not** HIPAA-certified. |
+| **Owner** | `owner/` | The person with the **app on their phone** (App Store wearer) | Native iOS / SwiftUI (`com.redmed.app`). Profile, Edit, NFC Write/Scan, Face ID chrome, Keychain, HealthKit import. **Not** HIPAA-certified — local-only ICE card. |
 
 - **Assist (static Hostinger shell)** — Product write base `https://redmed.live/tapper/` (`docs/domain.md`). Stage with `scripts/stage-site.sh` → `dist/passerby`; deploy with `node scripts/deploy-hostinger-static.mjs redmed.live` (`HOSTINGER_API_TOKEN`). Serves `tapper/`, redirect stubs (`index.html`, `redmed-emergency.html`, …), `sw.js`, `Document/`, `assets/`, `.htaccess` (AASA Content-Type on Apache). No app build. No RedMed server / DB. Local: `python3 -m http.server`. CI: `.github/workflows/pages-deploy.yml`. Before merge: `bash scripts/sync-tapper.sh`, `node scripts/test-d-codec.mjs`, and `node scripts/test-product-independence.mjs`. No MCP and no Cloudflare Worker in this tree (product wall above).
-- **Owner (native iOS app)** — public git `Roooted1776/RedMed-iOS`, project `owner/RedMed.xcodeproj`. macOS only. That repo’s `ios-build.yml` runs on `macos-latest`. Xcode copies pinned `Vendor/tapper/index.html` into the bundle as `tapper.html` for NFC Preview only — that copy is a read-only pin of this repo’s `tapper/index.html`, not a second shell fork. Wire format lockstep is `contracts/d-codec-fixtures.json`.
+- **Owner (native iOS app)** — `owner/RedMed.xcodeproj`. macOS only. `ios-build.yml` on `macos-latest`. Xcode copies `tapper/index.html` into the bundle as `tapper.html` for NFC Preview only — that copy is read-only embed, not a second shell fork.
 - **Own-band / Assist SOS** — SOS exists so helpers can find someone on a **dark rainy night after a motorist ejects from a vehicle**: **full sound + full light**. It arms only when the helper toggles **SOS · Locate Me**, or when collision is detected using **US Crash Detection** timing (Apple Support 104959: 10s alert + 30s countdown → `tel:` unless Stop) — not Apple's Crash Detection API. Band tap never auto-arms SOS. After the owner writes their custom band and has RedMed installed, Associated Domains (Universal Links) claims the tap — never a `redmed://` handoff carrying `#d=` (custom schemes are not exclusive; any app registering `redmed` would get the profile). NFC write ships only with Associated Domains (enforced by `test-nfc-hardware.mjs`). No distance / BLE ranging.
 
-Keep `sw.js` and `tapper/sw.js` CACHE versions in lockstep. The iOS repo vendors the same `sw.js` bytes when the Preview pin is bumped.
+Keep `sw.js`, `tapper/sw.js`, and `owner/RedMed/sw.js` CACHE versions in lockstep.
 
 ## Git identity
 
@@ -58,16 +56,15 @@ Gmail for automations: Cursor Gmail MCP, not a separate Grok Gmail plugin.
 - Face ID is UI-only. Keychain stays `WhenPasscodeSetThisDeviceOnly` with no biometry ACL.
 - Assist at `https://redmed.live/tapper/` is no-auth, no-ads. `#d=` codec lockstep tests must stay green.
 - SOS = full sound + full light; arms only on SOS toggle or US Crash Detection collision timing — never on band tap alone. Owner phone with RedMed + written band: applinks (Universal Links) claim the tap — no `redmed://band#d=` handoff. No fake band-distance ranging.
-- Band is factory blank NDEF-unlocked NXP NTAG216 — no permanent lock bytes, ever. `Roooted1776/RedMed-iOS` `scripts/test-nfc-hardware.mjs` (51 checks) must stay green.
+- Band is factory blank NDEF-unlocked NXP NTAG216 — no permanent lock bytes, ever. `scripts/test-nfc-hardware.mjs` (51 checks) must stay green.
 - One repo, one branch for shipping: `Roooted1776/RedMed-V1-Official` `main`.
 
 ## NFC hardware contract
 
-`Roooted1776/RedMed-iOS` `scripts/test-nfc-hardware.mjs` statically enforces
-the bracelet hardware contract on Linux CI (no Xcode needed) — 51 checks,
-must all pass before that repo merges (`ios-build.yml` runs it). This repo
-does not compile Swift. Rule detail for IDE agents in the iOS repo:
-`.cursor/rules/nfc-hardware.mdc`.
+`scripts/test-nfc-hardware.mjs` statically enforces the bracelet hardware
+contract on Linux CI (no Xcode needed) — 51 checks, must all pass before
+merge (`pages-deploy.yml` and `ios-build.yml` both run it). Rule detail for
+IDE agents: `.cursor/rules/nfc-hardware.mdc`.
 
 - **Chip**: product band is **NXP NTAG216** only (13.56 MHz, ISO 14443A
   Type 2, NDEF blank unlocked). Never NTAG213/215, MIFARE, LF, or UHF.

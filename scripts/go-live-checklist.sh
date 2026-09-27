@@ -7,6 +7,7 @@ cd "$ROOT"
 echo "== In-repo gates =="
 bash scripts/sync-tapper.sh
 node scripts/test-d-codec.mjs
+node scripts/test-nfc-hardware.mjs
 node scripts/test-sw-offline.mjs
 node scripts/test-product-independence.mjs
 bash scripts/stage-site.sh

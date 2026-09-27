@@ -2,7 +2,7 @@
 
 **Not submitting.** No paid App Store listing / Connect app yet. Leave NFC and HealthKit parked. Do not encode a fake `apps.apple.com` URL. Restore this checklist when a paid Program and app ID exist.
 
-**Privacy source of truth:** in-app Help → Policies → Privacy in `Roooted1776/RedMed-iOS` (`owner/RedMed/Document/Document.html`). Hosted copy: `Document/index.html`.
+**Privacy source of truth:** in-app Help → Policies → Privacy (`owner/RedMed/Document/Document.html`).
 
 This repo is **public**. Do not list a jsDelivr `@main` URL of `Roooted1776/redmed-privacy` as Connect’s privacy policy — that is a second git tree with a days-long CDN cache. Pick a tagged / hashed document on the live band host after `/tapper/` is green — **same Privacy wording as Help**, not a rewrite.
 

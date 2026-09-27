@@ -1,7 +1,7 @@
 # Hostinger static deploy for redmed.live (AppConfig.medicalCardBaseURL).
 # Product write base: https://redmed.live/tapper/ (docs/domain.md).
 # github.io remains a backup for already-written bands.
-# Static HTML only. A band tap decodes #d= in the browser. This workflow does not call Supabase.
+# No RedMed server / database — static HTML only; profile stays in #d=.
 #
 # Deploy needs HOSTINGER_API_TOKEN. Missing token skips upload; write-base
 # smoke still runs against Hostinger origin + public DNS.
@@ -22,17 +22,19 @@ on:
       - 'support/**'
       - 'privacy/**'
       - 'Document/**'
-      - 'contracts/d-codec-fixtures.json'
+      - 'owner/RedMed/Document/**'
       - 'sw.js'
       - '_headers'
       - '_redirects'
       - 'assets/**'
+      - 'owner/RedMed/AppConfig.swift'
       - 'scripts/sync-tapper.sh'
       - 'scripts/sync-document.sh'
       - 'scripts/smoke-pages.sh'
       - 'scripts/write-base-origin.py'
       - 'scripts/publish-github-io.sh'
       - 'scripts/test-d-codec.mjs'
+      - 'scripts/test-nfc-hardware.mjs'
       - 'scripts/test-sw-offline.mjs'
       - 'scripts/package.json'
       - 'scripts/package-lock.json'
@@ -53,17 +55,19 @@ on:
       - 'support/**'
       - 'privacy/**'
       - 'Document/**'
-      - 'contracts/d-codec-fixtures.json'
+      - 'owner/RedMed/Document/**'
       - 'sw.js'
       - '_headers'
       - '_redirects'
       - 'assets/**'
+      - 'owner/RedMed/AppConfig.swift'
       - 'scripts/sync-tapper.sh'
       - 'scripts/sync-document.sh'
       - 'scripts/smoke-pages.sh'
       - 'scripts/write-base-origin.py'
       - 'scripts/publish-github-io.sh'
       - 'scripts/test-d-codec.mjs'
+      - 'scripts/test-nfc-hardware.mjs'
       - 'scripts/test-sw-offline.mjs'
       - 'scripts/package.json'
       - 'scripts/package-lock.json'
@@ -91,6 +95,7 @@ jobs:
           # Xcode copies tapper/index.html → bundle tapper.html at build.
           bash scripts/sync-tapper.sh
           node scripts/test-d-codec.mjs
+          node scripts/test-nfc-hardware.mjs
           node scripts/test-sw-offline.mjs
           f=tapper/index.html
           ! grep -q 'Checking your phone' "$f" || fail "$f still has Checking your phone"
