@@ -383,6 +383,10 @@ assert('GPS skips sub-5m jitter', /function metersBetween\(lat1, lon1, lat2, lon
   assert('static CSS before SW register', cssIdx > -1 && swIdx > cssIdx);
   assert('emergency card uses named container', tapper.includes('container-name: you-card') && tapper.includes('@container you-card'));
   assert('Help on RedMed chrome', /aria-label="Help · Policies"/.test(tapper) && /<a href="\.\.\/Document\/"/.test(tapper));
+  assert('Preview hides HTML Help (native owns it)', /html\.app-preview \.rm-help-chrome/.test(tapper) && /html\.app-preview \.page-help-chrome/.test(tapper));
+  assert('no dead gpsAddress slot', !/id="gpsAddress"/.test(tapper) && !/\.gps-address/.test(tapper));
+  assert('YOU card identity rows', /id="rowDonor"/.test(tapper) && /id="rowPregnant"/.test(tapper) && /id="rowDeaf"/.test(tapper) && /id="rowNotes"/.test(tapper));
+  assert('YOU card list drops', /id="dropAllergies"/.test(tapper) && /id="dropMedications"/.test(tapper) && /id="dropConditions"/.test(tapper) && /id="dropContacts"/.test(tapper));
   assert('no Edit tab on tapper', !/id="tab-edit"/.test(tapper) && !/data-tab="edit"/.test(tapper) && !/id="tab-nfc"/.test(tapper));
   assert('hashchange keeps Aid', /if \(next !== '911' && next !== 'aid'\) next = 'medical'/.test(tapper));
   const pick = tapper.match(/function pickDevice\(w, h\) \{[\s\S]*?return 'phone';\n  \}/);
