@@ -371,7 +371,7 @@ assert('GPS skips sub-5m jitter', /function metersBetween\(lat1, lon1, lat2, lon
   const cssIdx = tapper.indexOf(cssMark);
   const swIdx = tapper.indexOf("navigator.serviceWorker");
   assert('static CSS before SW register', cssIdx > -1 && swIdx > cssIdx);
-  assert('emergency card uses named container', tapper.includes('container-name: em-card') && tapper.includes('@container em-card'));
+  assert('emergency card uses named container', tapper.includes('container-name: you-card') && tapper.includes('@container you-card'));
   assert('Help on RedMed chrome', /aria-label="Help · Policies"/.test(tapper) && /<a href="\.\.\/Document\/"/.test(tapper));
   assert('no Edit tab on tapper', !/id="tab-edit"/.test(tapper) && !/data-tab="edit"/.test(tapper) && !/id="tab-nfc"/.test(tapper));
   assert('hashchange keeps Aid', /if \(next !== '911' && next !== 'aid'\) next = 'medical'/.test(tapper));
@@ -387,7 +387,7 @@ assert('GPS skips sub-5m jitter', /function metersBetween\(lat1, lon1, lat2, lon
 }
 
 const sw = readFileSync(join(ROOT, 'sw.js'), 'utf8');
-assert('sw cache v179', sw.includes("CACHE = 'redmed-tapper-v179'"));
+assert('sw cache v180', sw.includes("CACHE = 'redmed-tapper-v180'"));
 {
   const assetsBlock = sw.match(/var ASSETS = \[([\s\S]*?)\];/);
   assert('sw does not precache out-of-scope assets', !!(assetsBlock && !assetsBlock[1].includes('../')));
