@@ -30,6 +30,10 @@ jobs:
       - run: node scripts/test-d-codec.mjs
       - run: node scripts/test-sw-offline.mjs
       - run: node scripts/test-product-independence.mjs
+      - run: node scripts/test-nfc-hardware.mjs
+      - run: node scripts/test-ios-codec.mjs
+      - run: node scripts/test-cloud-sync.mjs
+      - run: node scripts/test-emergency-location.mjs
 
   secrets-and-phi:
     name: No secrets or band payloads in tree
