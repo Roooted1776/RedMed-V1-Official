@@ -686,11 +686,6 @@ function redmedAssetURL(file) {
   body.app-embed .rm-status.rm-status-link:not(.linked) {
     color: var(--accent);
   }
-  /* Owner parked NFC: grey "Band Not Checked" (RedMedView statusColor). */
-  html.app-embed .rm-status.rm-status-link.unlinked-quiet:not(.linked),
-  body.app-embed .rm-status.rm-status-link.unlinked-quiet:not(.linked) {
-    color: var(--muted);
-  }
   html.app-embed .rm-status.rm-status-link::after,
   body.app-embed .rm-status.rm-status-link::after {
     content: '›';
@@ -3065,22 +3060,13 @@ function redmedAssetURL(file) {
       // Passerby: a decoded #d= is a loaded URL, not a verified NTAG216 write.
       // Owner Preview / embed keep "Linked Bracelet" (Swift __REDMED_BRACELET_LINKED).
       var linkedLabel = (isAppPreview() || isAppEmbed()) ? 'Linked Bracelet' : 'Medical ID Loaded';
-      // Owner Preview / embed: Swift passes its own unlinked title (parked
-      // NFC reads "Band Not Checked") so this header matches the native one.
-      var ownerUnlinked = window.__REDMED_UNLINKED_TITLE;
-      var unlinkedLabel = (isAppPreview() || isAppEmbed()) && typeof ownerUnlinked === 'string' && ownerUnlinked
-        ? ownerUnlinked
-        : 'Not Linked';
-      statusEl.textContent = linked ? linkedLabel : unlinkedLabel;
+      statusEl.textContent = linked ? linkedLabel : 'Not Linked';
       statusEl.classList.toggle('linked', linked);
-      // Parked Owner status is grey, not an error red the owner can't clear.
-      statusEl.classList.toggle('unlinked-quiet',
-        !linked && (isAppPreview() || isAppEmbed()) && window.__REDMED_UNLINKED_ALERT === false);
       if (isAppEmbed()) {
         statusEl.classList.add('rm-status-link');
         statusEl.setAttribute('role', 'link');
         statusEl.setAttribute('tabindex', '0');
-        statusEl.setAttribute('aria-label', (linked ? 'Linked Bracelet' : unlinkedLabel) + ' — open NFC');
+        statusEl.setAttribute('aria-label', (linked ? 'Linked Bracelet' : 'Not Linked') + ' — open NFC');
       } else {
         statusEl.classList.remove('rm-status-link');
         statusEl.removeAttribute('role');
