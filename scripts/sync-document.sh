@@ -70,6 +70,10 @@ grep -q '/Document/' privacy/index.html
 # era, HIPAA heading must not look like a badge, versions lockstep with consent.
 # Legal body is not rewritten here — these are fail-closed greps.
 SRC_HTML="$DST/index.html"
+if grep -q 'Roooted1776/frisky' "$SRC_HTML"; then
+  echo "FAIL $SRC_HTML still cites archived Roooted1776/frisky — use RedMed-V1-Official" >&2
+  exit 1
+fi
 if grep -q 'docs/SECURITY.md' "$SRC_HTML"; then
   echo "FAIL $SRC_HTML still cites docs/SECURITY.md — point at Help → Security, not the pointer file" >&2
   exit 1
