@@ -259,7 +259,11 @@ class ProfileData: ObservableObject {
     var hasData: Bool { state.hasData }
 
     /// YOU-card identity filled (Name, birth date, blood type). Lists may stay empty.
-    var isEmergencyProfileConfigured: Bool { state.isEmergencyProfileConfigured }
+    var isEmergencyProfileConfigured: Bool {
+        hasData
+            && !birthDate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !bloodType.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 
     /// Main header "Linked Bracelet" — real CoreNFC write + complete YOU card.
     /// Never from pack/simulate; hardware kill switch also forces Not linked.
@@ -269,7 +273,21 @@ class ProfileData: ObservableObject {
 
     /// Any RedMed profile content (PHI in RAM). Used for privacy cover,
     /// NFC hints, and funnel vs YOU-card chrome — not a Face ID view gate.
-    var hasSensitiveProfileData: Bool { state.hasSensitiveProfileData }
+    var hasSensitiveProfileData: Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || !birthDate.isEmpty
+            || !bloodType.isEmpty
+            || isOrganDonor
+            || isPregnant
+            || isDeafOrVisionImpaired
+            || !allergies.isEmpty
+            || !medications.isEmpty
+            || !conditions.isEmpty
+            || !notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            || contacts.contains {
+                !$0.name.isEmpty || !$0.relationship.isEmpty || !$0.phone.isEmpty
+            }
+    }
 
     init(persisting: Bool = true) {
         self.persists = persisting
@@ -383,12 +401,7 @@ class ProfileData: ObservableObject {
             notes = record.notes
         }
         cloudConflict = nil
-        // persist() intentionally no-ops when the new state has no sensitive
-        // data, to avoid ever blanking Keychain from an empty draft. Only
-        // mark the pull clean when it actually landed — otherwise Keychain
-        // still holds stale data and the next sync pass should retry rather
-        // than believe this row is settled.
-        guard persist(sync: false, restampToday: false) else { return }
+        _ = persist(sync: false, restampToday: false)
         ProfileCloudSync.markClean(stamp: record.updatedAt)
     }
 
