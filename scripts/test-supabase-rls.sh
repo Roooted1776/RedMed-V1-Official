@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # Apply the redmed_owner migrations to a throwaway local Postgres with a
-# minimal Supabase auth shim, then run the behavioural RLS test.
+# minimal Supabase auth shim, then run the behavioural RLS test. Every
+# migration runs twice (idempotence). Three starting points:
 #
-#   live   the migrations that created the live schema, once, in order
-#          (20260926193000 / 20260926194500 are plain CREATE, not re-runnable)
-#          + every later owner migration, twice (idempotence).
+#   fresh      repo migrations on an empty database (new project, CI)
+#   live       the live project's first schema (supabase/tests/live_schema_20260926.sql)
+#              + the migrations applied to it after 20260926000000
+#   live-push  that same live schema + every repo migration (`supabase db push`)
 #
-# Ops / portal migrations (redmed_ops, redmed_private) are not applied here.
-# Needs psql + a reachable Postgres.
+# All three must end in the same enforced shape. Needs psql + a reachable Postgres.
 #
 #   PGHOST=... PGPORT=... PGUSER=postgres scripts/test-supabase-rls.sh
 #
@@ -23,28 +24,27 @@ trap cleanup EXIT
 
 run() { psql -v ON_ERROR_STOP=1 -q -d "$1" -f "$2" >/dev/null; }
 
-BASE=(
-  "$MIG/20260926193000_redmed_owner_profiles.sql"
-  "$MIG/20260926194500_owner_touch_search_path.sql"
-)
-forward=()
-for f in "$MIG"/*owner*.sql; do
-  case " ${BASE[*]} " in *" $f "*) ;; *) forward+=("$f") ;; esac
-done
-
 scenario() {
-  local name="$1"
+  local name="$1" base="$2"; shift 2
   local db="redmed_rls_${name//-/_}_$$"
   DBS+=("$db")
   psql -v ON_ERROR_STOP=1 -qc "create database $db" postgres
   run "$db" "$TESTS/local_auth_shim.sql"
-  for f in "${BASE[@]}"; do run "$db" "$f"; done
-  for f in "${forward[@]}"; do run "$db" "$f"; run "$db" "$f"; done
+  if [ -n "$base" ]; then run "$db" "$base"; fi
+  for f in "$@"; do run "$db" "$f"; run "$db" "$f"; done
   local out
   out="$(psql -v ON_ERROR_STOP=1 -q -d "$db" -f "$TESTS/redmed_owner_rls.sql")"
   grep -q 'all assertions passed' <<<"$out"
   echo "OK   $name"
 }
 
-scenario live
-echo "redmed_owner RLS: passed"
+all=("$MIG"/*.sql)
+after_base=()
+for f in "${all[@]}"; do
+  [ "$(basename "$f")" = "20260926000000_redmed_owner.sql" ] || after_base+=("$f")
+done
+
+scenario fresh     ""                                   "${all[@]}"
+scenario live      "$TESTS/live_schema_20260926.sql"    "${after_base[@]}"
+scenario live-push "$TESTS/live_schema_20260926.sql"    "${all[@]}"
+echo "redmed_owner RLS: 3 scenarios passed"

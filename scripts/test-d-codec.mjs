@@ -397,8 +397,7 @@ assert('GPS skips sub-5m jitter', /function metersBetween\(lat1, lon1, lat2, lon
 }
 
 const sw = readFileSync(join(ROOT, 'sw.js'), 'utf8');
-// Version is pinned once, in contracts/d-codec-fixtures.json (swCache above).
-assert('sw cache matches fixtures', sw.includes(`CACHE = '${fixtures.swCache}'`));
+assert('sw cache v180', sw.includes("CACHE = 'redmed-tapper-v180'"));
 {
   const assetsBlock = sw.match(/var ASSETS = \[([\s\S]*?)\];/);
   assert('sw does not precache out-of-scope assets', !!(assetsBlock && !assetsBlock[1].includes('../')));

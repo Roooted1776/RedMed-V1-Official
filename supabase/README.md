@@ -20,16 +20,6 @@ Apply the versioned SQL through the Supabase migration tool, not an ad hoc appli
 
 After applying, inspect the schema's grants and run the security advisor. A clean advisor result is not a compliance certification or proof that the whole application is secure.
 
-## Owner schema (`redmed_owner`)
-
-`20260926193000` / `20260926194500` created the live wearer schema. `20260927120000` adds `delete_my_account()` (the Owner app's in-app account deletion RPC) and `20260927120100` brings the tables to the app contract: own-row `*_own` policies, no anon schema or table access, append-only `band_writes` (no UPDATE; delete stays for Erase All User Data), and a server-stamped `updated_at` on insert and update. Both are idempotent.
-
-- `scripts/test-cloud-sync.mjs` checks the contract statically (CI).
-- `scripts/test-supabase-rls.sh` applies the owner migrations to a throwaway local Postgres and runs `tests/redmed_owner_rls.sql`. Never point it at a Supabase project.
-- `tests/owner-profiles.sql` checks grants and isolation with an administrative connection after the migrations are applied; fixtures roll back.
-
-Applying these to the live project needs the owner's explicit approval.
-
 ## Lifecycle
 
 Keep release evidence through the pilot. Before automated monitoring begins, define retention, a dedicated writer role, and a tested backup/restore procedure; do not give a long-lived VPS process a project-wide admin connection.
