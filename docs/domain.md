@@ -31,8 +31,10 @@ band URL `#d=` fragment only — the browser decodes it on the phone.
 
 Smoke after DNS: `BASE=https://redmed.live bash scripts/smoke-pages.sh`.
 Origin check (DNS independent): `BASE=http://195.35.60.70 HOST_HEADER=redmed.live bash scripts/smoke-pages.sh`.
-CI (`Pages tapper deploy`) also hard-smokes the github.io backup and soft-warns while
-Namecheap still parks public DNS.
+CI (`Pages tapper deploy`) hard-smokes the github.io backup and soft-warns while
+public DNS is still Namecheap parking or Hostinger `dns-parking` NS (hCDN often
+403s GitHub Actions IPs on those edges). Hard-fail public `redmed.live` smoke only
+after Cloudflare NS or Hostinger plan A (`195.35.60.70`).
 
 ## Publish github.io (backup host)
 
