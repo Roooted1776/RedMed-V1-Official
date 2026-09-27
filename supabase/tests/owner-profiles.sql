@@ -11,6 +11,9 @@ begin
   if has_schema_privilege('anon', 'redmed_owner', 'CREATE') then
     raise exception 'anon can create in redmed_owner';
   end if;
+  if has_schema_privilege('anon', 'redmed_owner', 'USAGE') then
+    raise exception 'anon has usage on redmed_owner';
+  end if;
   if has_table_privilege('anon', 'redmed_owner.profiles', 'SELECT,INSERT,UPDATE,DELETE') then
     raise exception 'anon has table privileges on profiles';
   end if;
@@ -24,10 +27,16 @@ begin
     if not has_table_privilege('authenticated', 'redmed_owner.profiles', client_role) then
       raise exception 'authenticated missing % on profiles', client_role;
     end if;
+  end loop;
+  -- band_writes is append-only: no UPDATE.
+  foreach client_role in array array['SELECT', 'INSERT', 'DELETE'] loop
     if not has_table_privilege('authenticated', 'redmed_owner.band_writes', client_role) then
       raise exception 'authenticated missing % on band_writes', client_role;
     end if;
   end loop;
+  if has_table_privilege('authenticated', 'redmed_owner.band_writes', 'UPDATE') then
+    raise exception 'band_writes is updatable';
+  end if;
   if (select count(*) from pg_class c
       join pg_namespace n on n.oid = c.relnamespace
       where n.nspname = 'redmed_owner' and c.relkind = 'r'
@@ -103,4 +112,4 @@ begin
 end;
 $test$;
 rollback;
-select 'PASS: wearer grants, forced RLS, cross-user isolation, hash constraints; fixtures rolled back' as result;
+select 'PASS: wearer grants, append-only band_writes, forced RLS, cross-user isolation, hash constraints; fixtures rolled back' as result;
