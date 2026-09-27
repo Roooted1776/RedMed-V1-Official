@@ -20,8 +20,14 @@ const pbx = read('owner/RedMed.xcodeproj/project.pbxproj');
 const baseXC = read('owner/Config/RedMed.xcconfig');
 const gitignore = read('.gitignore');
 const migDir = join(ROOT, 'supabase/migrations');
-const sql = readdirSync(migDir).filter((f) => f.endsWith('.sql')).sort()
-  .map((f) => readFileSync(join(migDir, f), 'utf8')).join('\n');
+const migFiles = readdirSync(migDir).filter((f) => f.endsWith('.sql')).sort();
+const readMig = (f) => readFileSync(join(migDir, f), 'utf8');
+const sql = migFiles.map(readMig).join('\n');
+// Forward migrations that bring the live schema (20260926193000) to the app contract.
+const DELETE_ACCOUNT_MIG = '20260927120000_redmed_owner_delete_account.sql';
+const RECONCILE_MIG = '20260927120100_redmed_owner_reconcile.sql';
+// The reconcile and everything after it: the shape the database ends in.
+const sqlFromReconcile = migFiles.filter((f) => f >= RECONCILE_MIG).map(readMig).join('\n');
 
 let total = 0;
 let failed = 0;
@@ -96,10 +102,13 @@ assert('schema usage anon revoked', sql.includes('revoke all on schema redmed_ow
 for (const verb of ['select', 'insert', 'update', 'delete']) {
   assert(`profiles ${verb} policy own row`, new RegExp(`profiles_${verb}_own[\\s\\S]*?for ${verb} to authenticated[\\s\\S]*?id = \\(select auth\\.uid\\(\\)\\)`).test(sql));
 }
-assert('band_writes append-only', !/create policy band_writes_update/.test(sql) && sql.includes('grant select, insert, delete on redmed_owner.band_writes to authenticated'));
+assert('band_writes append-only', !/create policy band_writes_update/.test(sqlFromReconcile)
+  && !/grant[^;]*\bupdate\b[^;]*on redmed_owner\.band_writes/.test(sqlFromReconcile)
+  && sql.includes('grant select, insert, delete on redmed_owner.band_writes to authenticated'));
 
-// --- Live reconcile (live schema predates 20260926000000; see supabase/tests/live_schema_20260926.sql) ---
-const reconcile = readFileSync(join(migDir, '20260926020000_redmed_owner_reconcile.sql'), 'utf8');
+// --- Reconcile: 20260926193000 (live) granted band_writes UPDATE + anon schema USAGE ---
+assert('reconcile migration present', migFiles.includes(RECONCILE_MIG));
+const reconcile = migFiles.includes(RECONCILE_MIG) ? readMig(RECONCILE_MIG) : '';
 assert('reconcile drops the live update policy', reconcile.includes('drop policy if exists band_writes_update on redmed_owner.band_writes'));
 assert('reconcile revokes UPDATE on band_writes', reconcile.includes('revoke all on redmed_owner.band_writes from public, anon, authenticated;')
   && reconcile.includes('grant select, insert, delete on redmed_owner.band_writes to authenticated;'));
@@ -109,14 +118,24 @@ assert('reconcile stamps updated_at on insert too', reconcile.includes('before i
 for (const live of ['profiles_select', 'profiles_insert', 'profiles_update', 'profiles_delete', 'band_writes_select', 'band_writes_insert', 'band_writes_delete']) {
   assert(`reconcile drops live policy ${live}`, reconcile.includes(`drop policy if exists ${live} on redmed_owner.`));
 }
-assert('reconcile runs after delete_my_account', readdirSync(migDir).sort().indexOf('20260926020000_redmed_owner_reconcile.sql')
-  > readdirSync(migDir).sort().indexOf('20260926010000_redmed_owner_delete_account.sql'));
-assert('RLS runner covers fresh, live, and live-push', /scenario fresh[\s\S]*scenario live [\s\S]*scenario live-push/.test(read('scripts/test-supabase-rls.sh')));
+assert('reconcile runs after the live schema and delete_my_account',
+  migFiles.includes(DELETE_ACCOUNT_MIG)
+  && migFiles.indexOf(RECONCILE_MIG) > migFiles.indexOf(DELETE_ACCOUNT_MIG)
+  && migFiles.indexOf(RECONCILE_MIG) > migFiles.indexOf('20260926194500_owner_touch_search_path.sql'));
+{
+  const runner = read('scripts/test-supabase-rls.sh');
+  assert('RLS runner applies live base once, owner migrations twice',
+    runner.includes('20260926193000_redmed_owner_profiles.sql') && /\*owner\*\.sql/.test(runner)
+    && /run "\$db" "\$f"; run "\$db" "\$f"/.test(runner) && /^scenario live$/m.test(runner));
+}
 assert('band_writes sha256 shape', sql.includes("packed_url_sha256 ~ '^[0-9a-f]{64}$'"));
 assert('band_writes NTAG216 cap', sql.includes('byte_length between 1 and 850'));
 assert('updated_at trigger', sql.includes('new.updated_at := now()') && sql.includes('before insert or update on redmed_owner.profiles'));
 assert('trigger fn pins search_path', sql.includes("set search_path = ''"));
-assert('no raw band URL column', !/packed_url\s+text(?!_)/.test(sql) && !/\bfragment\b/.test(sql));
+{
+  const code = sql.replace(/--.*$/gm, ''); // comments may say "fragment"; columns may not
+  assert('no raw band URL column', !/packed_url\s+text(?!_)/.test(code) && !/\bfragment\b/.test(code));
+}
 
 // --- Account management ---
 assert('delete_my_account is security definer with pinned search_path',
