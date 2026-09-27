@@ -22,7 +22,7 @@ Keep medical information on the existing Owner/band path. The product, website, 
 
 ## Implemented locally in this pass
 
-- **Offline readiness:** worker v179 only completes installation after successfully storing a validated shell. Invalid HTTP-200 content, cache failures and invalid old cache entries no longer count as success.
+- **Offline readiness:** worker cache version stays in lockstep with `contracts/d-codec-fixtures.json` `swCache` (install only after a validated shell). Invalid HTTP-200 content, cache failures and invalid old cache entries no longer count as success.
 - **Regression coverage:** seven previously failing cache assertions now pass; service-worker copies remain in lockstep. Older valid shell recovery remains supported.
 - **Cache persistence:** background refresh promises include cache writes, including navigation-preload persistence.
 - **Developer commands:** `make setup`, `make check`, `make release-check`, `make stage`.

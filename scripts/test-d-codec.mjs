@@ -295,6 +295,16 @@ assert('fixture max payload', fixtures.maxPayload === MAX_PAYLOAD);
 assert('fixture max str', fixtures.maxStr === MAX_STR);
 assert('fixture max list', fixtures.maxList === MAX_LIST);
 assert('fixture write base', fixtures.writeBase === WRITE_BASE);
+assert('fixture swCache', typeof fixtures.swCache === 'string' && /^redmed-tapper-v\d+$/.test(fixtures.swCache));
+{
+  const rootSW = readFileSync(join(ROOT, 'sw.js'), 'utf8');
+  const tapperSW = readFileSync(join(ROOT, 'tapper/sw.js'), 'utf8');
+  const ownerSW = readFileSync(join(ROOT, 'owner/RedMed/sw.js'), 'utf8');
+  const needle = `var CACHE = '${fixtures.swCache}';`;
+  assert('sw.js CACHE matches fixtures.swCache', rootSW.includes(needle));
+  assert('tapper/sw.js CACHE matches fixtures.swCache', tapperSW.includes(needle));
+  assert('owner/RedMed/sw.js CACHE matches fixtures.swCache', ownerSW.includes(needle));
+}
 assert('KEY_LABEL in tapper', tapper.includes(`KEY_LABEL = '${KEY_LABEL}'`));
 assert('AES 0x02 tapper', /AES_VERSION = 0x02/.test(tapper));
 assert('zlib 0x01 tapper', /ZLIB_VERSION = 0x01/.test(tapper));
