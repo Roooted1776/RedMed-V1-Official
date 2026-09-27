@@ -1,0 +1,25 @@
+---
+description: Review every change like /code-review before it ships
+alwaysApply: true
+---
+
+# Always code-review
+
+After any code change, before committing, pushing, or opening/updating a PR,
+review the diff with a code-review mindset and report the findings.
+
+- Findings first, ordered by severity: bugs, behavioral regressions,
+  security / product-wall breaks, missing tests. Style comes last, if at all.
+- Cite file and line for each finding and say what the user-visible effect is.
+- RedMed specifics to check every time:
+  - Assist (`tapper/`): no Supabase, MCP, VPS, sign-in, Accept, or NFC; `#d=`
+    codec and SOS invariants intact (see `AGENTS.md`).
+  - Anything a stranger reads on the band card must not state a medical fact
+    the band doesn't actually carry (e.g. "No" for an unset field).
+  - Shell layout change → `CACHE` bumped in both `sw.js` and `tapper/sw.js`.
+  - Gates: `bash scripts/sync-tapper.sh`, `node scripts/test-d-codec.mjs`,
+    `node scripts/test-product-independence.mjs`.
+- When the user asks only for a review, do not change code. Otherwise, fix
+  what's clearly in scope and list the rest in the PR body under
+  "Known issues".
+- If there are no findings, say so in one line.
