@@ -242,11 +242,10 @@ struct ShareLocationCard: View {
             }
         }
         // Real motion-detected crash (never manual SOS) auto-opens this same
-        // composer once the crash countdown ends without Stop — still one
-        // tap (Send) to actually go out, iOS allows nothing less. `onAppear`
-        // catches a countdown that ended before this card mounted (911 tab
-        // wasn't up yet); `onChange` catches one that ends while the card is
-        // already on screen. Either way
+        // composer — still one tap (Send) to actually go out, iOS allows
+        // nothing less. `onAppear` catches a crash that armed just before this
+        // card mounted (911 tab wasn't up yet); `onChange` catches one that
+        // arms while the card is already on screen. Either way
         // `consumePendingCrashAutoShare()` only returns true once.
         .onAppear { checkPendingCrashAutoShare() }
         .onChange(of: survivalAlarm.pendingCrashAutoShare) { _, pending in

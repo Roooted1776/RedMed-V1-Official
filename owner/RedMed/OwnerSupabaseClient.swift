@@ -239,21 +239,24 @@ actor OwnerSupabaseClient {
 
     func deleteAccountCopy() async throws {
         let session = try await validSession()
-        // Sequential on purpose: a failed band_writes delete stops before the
-        // profile row, never leaving a cancelled-in-flight half erase.
-        for path in [
-            "/rest/v1/band_writes?user_id=eq.\(session.userId)",
-            "/rest/v1/profiles?id=eq.\(session.userId)",
-        ] {
-            let (_, response) = try await request(
-                path: path,
-                method: "DELETE",
-                body: nil,
-                session: session,
-                profile: "redmed_owner"
-            )
-            try Self.requireOK(response)
-        }
+        async let bandWrites = request(
+            path: "/rest/v1/band_writes?user_id=eq.\(session.userId)",
+            method: "DELETE",
+            body: nil,
+            session: session,
+            profile: "redmed_owner"
+        )
+        async let profiles = request(
+            path: "/rest/v1/profiles?id=eq.\(session.userId)",
+            method: "DELETE",
+            body: nil,
+            session: session,
+            profile: "redmed_owner"
+        )
+        let (_, bandWritesResponse) = try await bandWrites
+        let (_, profilesResponse) = try await profiles
+        try Self.requireOK(bandWritesResponse)
+        try Self.requireOK(profilesResponse)
     }
 
     /// Deletes the sign-in itself (`redmed_owner.delete_my_account`). The
