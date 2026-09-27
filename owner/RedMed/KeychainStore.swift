@@ -124,14 +124,10 @@ enum KeychainStore {
         if updateStatus == errSecItemNotFound {
             return addUnlocked(data, account: account, service: service)
         }
-        if updateStatus == errSecAuthFailed
-            || updateStatus == errSecInteractionNotAllowed
-            || updateStatus == errSecNoSuchAttr
-            || updateStatus == errSecParam {
-            return replaceViaStaging(data, account: account, service: service, authContext: authContext)
-        }
-
-        return false
+        // Any other update failure (old biometry ACL row, or a status this
+        // list doesn't name) still falls back to the safe staged migration
+        // rather than silently dropping the save.
+        return replaceViaStaging(data, account: account, service: service, authContext: authContext)
     }
 
     // MARK: - Load

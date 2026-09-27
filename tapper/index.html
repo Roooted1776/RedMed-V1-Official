@@ -1965,6 +1965,12 @@ function redmedAssetURL(file) {
 
     </div>
 
+    <!-- Single source of truth for the #d= payload size cap, read by both the
+         early-paint decode below and the full decode further down — a real
+         global (not a script-local var) so neither copy can drift from the
+         other. Match Swift ProfileNFCCodec.maxEncodedLength (NTAG-scale). -->
+    <script>window.__REDMED_MAX_PAYLOAD = 8192;</script>
+
     <!-- Treat-first: start #d= decrypt as soon as YOU-card DOM exists — do not
          wait for 911 / Aid HTML or the rest of the shell script. SOS / wake /
          geo stay off this path. -->
@@ -2122,7 +2128,7 @@ function redmedAssetURL(file) {
           var b64 = raw.replace(/-/g, '+').replace(/_/g, '/');
           while (b64.length % 4) b64 += '=';
           var bin = atob(b64);
-          if (bin.length > 8192) return null;
+          if (bin.length > window.__REDMED_MAX_PAYLOAD) return null;
           return Uint8Array.from(bin, function (ch) { return ch.charCodeAt(0); });
         } catch (e5) { return null; }
       }
@@ -2516,7 +2522,8 @@ function redmedAssetURL(file) {
   }
 
   // Match Swift ProfileNFCCodec.maxEncodedLength (NTAG-scale; fail closed above).
-  var MAX_PAYLOAD = 8192;
+  // Shared with the early-paint decode via window.__REDMED_MAX_PAYLOAD.
+  var MAX_PAYLOAD = window.__REDMED_MAX_PAYLOAD;
   var MAX_INFLATED = 65536;
   var MAX_LIST = 40;
   var MAX_STR = 200;
