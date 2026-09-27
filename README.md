@@ -1,11 +1,11 @@
 # RedMed V1 Official
 
-Medical ID band + iPhone app. **No RedMed profile server. No PHI database.**
+Medical ID band + iPhone app. The band card is still the `#d=` fragment. A signed-in wearer copy can live in Supabase `redmed_owner`. **Not HIPAA-certified.** The public tap page does not look the profile up.
 
 | Surface | Path | Audience |
 |---------|------|----------|
 | **Assist** | [`tapper/`](tapper/) → `https://redmed.live/tapper/` | Person who taps the band |
-| **Owner** | [`owner/`](owner/) | Wearer with the App Store app (`com.redmed.app`) |
+| **Owner** | [`Roooted1776/RedMed-iOS`](https://github.com/Roooted1776/RedMed-iOS) | Wearer with the App Store app (`com.redmed.app`) |
 
 Canonical git remote: **`Roooted1776/RedMed-V1-Official`** (migrated from `frisky`; history preserved when mirrored). Ship branch: `main`.
 
@@ -24,15 +24,16 @@ make stage          # static-only deploy bundle
 ```
 
 A passing build is not launch approval. Public-origin, physical-band and
-clinical-content gates remain separate. `supabase/` contains an ops-only
-release-ledger migration; it must never become a medical-profile database.
+clinical-content gates remain separate. `supabase/` keeps the ops release
+ledger in `redmed_ops`. Wearer rows, when account sync is on, live only in
+`redmed_owner` and are not what a band tap reads.
 
 ## Write base
 
 **`https://redmed.live/tapper/`** — Hostinger static origin + Cloudflare DNS/SSL.  
 Backup for already-written bands: `https://roooted1776.github.io/tapper/`.
 
-Profile data lives only in the band URL `#d=` fragment (browser decodes on device). Owner profiles stay in Keychain on-device.
+A band tap reads only the URL `#d=` fragment (the browser decodes on device). The Owner app keeps Keychain on-device and, when account sync is on, a signed-in row in Supabase. Rewriting the cloud row does not rewrite the band.
 
 ## Quick start (Assist)
 
@@ -44,8 +45,8 @@ python3 -m http.server 8787
 # Pre-merge gates
 bash scripts/sync-tapper.sh
 node scripts/test-d-codec.mjs
-node scripts/test-nfc-hardware.mjs
 node scripts/test-sw-offline.mjs
+node scripts/test-product-independence.mjs
 
 # Stage + deploy to Hostinger
 bash scripts/stage-site.sh
@@ -73,8 +74,8 @@ Do not market “write from the app” until Tag Reading + Write The Band on bla
 ## Ops (not the band host)
 
 - VPS / Traefik / Docker: **ops only** — never Assist `#d=` origin ([`docs/OPS.md`](docs/OPS.md)).
-- No MCP in this repository. Assist, the website, Owner, and Supabase do not call one. Product wall: no ICE / `#d=` / PHI through an MCP, Supabase, or the VPS.
-- Supabase project `RedMed Secure Data` (`mohxobgyjkcmkqxijgeg`): ops/metadata only — **zero medical profiles**.
+- No MCP in this repository. Assist, the website, and the band tap do not call one. Product wall: no `#d=` fragment through an MCP or the VPS. The public tap page does not query Supabase.
+- Supabase project `RedMed Secure Data` (`mohxobgyjkcmkqxijgeg`): `redmed_ops` is the release ledger. `redmed_owner` is the signed-in wearer copy. Not a HIPAA certification.
 - Side repos: `Roooted1776.github.io` (Assist backup), `redmed-privacy` (do **not** use as Connect Privacy URL — use live `/Document/`).
 
 One public site: Hostinger static at `https://redmed.live/tapper/`. Cloudflare is DNS and SSL only. Do not add a Worker. `github.io` is only the backup for bands already written to that host.

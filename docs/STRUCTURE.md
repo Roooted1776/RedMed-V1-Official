@@ -24,8 +24,8 @@ No brand PNGs at repo root — canonical in `assets/`, shell-relative copies in 
 ```text
 RedMed-V1-Official/
 ├── README.md · AGENTS.md · MAX.md
-├── owner/                 # App Store wearer app (SwiftUI) + Document/ policy source
-├── RedMed-Xcode → owner/  # compatibility symlink only (do not recreate as a real folder)
+├── (Owner app moved)      # Roooted1776/RedMed-iOS — owner/RedMed.xcodeproj
+├── contracts/             # shared #d= fixtures (lockstep with the iOS repo)
 ├── tapper/                # tap pages only — passerby shell, no owner-app features
 ├── supabase/              # ops release ledger only — no medical profiles, no MCP
 ├── Document/              # hosted Help: index.html = full policy; Document.html = redirect
@@ -62,25 +62,20 @@ RedMed-V1-Official/
 | `docs/spec-exhibit-a-po-qc-rider.html` | Printable bilingual EN/中文 rider (sign; do not commit the filled copy) |
 | `docs/FOUNDER-WHY.md` | Careful founder-why paste (categories only) — About / station insert / Arrival Day Pack |
 
-Hosted `/Document/` stays lockstep with `owner/RedMed/Document/` via `scripts/sync-document.sh`: `Document/index.html` is the full policy; `Document/Document.html` is a thin hash-preserving redirect to `/Document/` (one tree, no twin full copy). Band tap Help opens `/Document/` straight — no start screen. `/privacy` redirects there.
+Hosted `/Document/` is `Document/index.html`. `Document/Document.html` is a thin hash-preserving redirect to `/Document/`. Band tap Help opens `/Document/` straight. The in-app copy is authored in `Roooted1776/RedMed-iOS`. `/privacy` redirects to `/Document/`.
 
 ## Surfaces (tapper vs owner)
 
 | | `tapper/` | `owner/` |
 | --- | --- | --- |
 | **Who** | Stranger who tapped the band | Wearer with the App Store app |
-| **What** | Web tap pages (`/tapper/#d=…`), 911 · Aid | SwiftUI app: Edit, NFC, Keychain, Face ID |
+| **What** | Web tap pages (`/tapper/#d=…`), 911 · Aid | SwiftUI app in `Roooted1776/RedMed-iOS`: Edit, NFC, Keychain, optional account sync |
 | **Claims** | No ads, no auth, no trackers | General Wellness ICE card — **not** HIPAA-certified |
 | **Do not put here** | NFC tab, Edit, owner Keychain, App Store copy | Passerby-only redirect stubs, Worker device hints |
 
-Xcode bundles `tapper/index.html` as read-only `tapper.html` for NFC Preview — one source file, not a fork.
+The iOS repo pins `Vendor/tapper/index.html` from this repo’s `tapper/index.html` and bundles it as `tapper.html` for NFC Preview. Bumping the pin is an explicit commit. The tap page does not call Supabase.
 
-## Code organization (logical)
+## Owner app
 
-Xcode groups under target **RedMed**. Disk stays flat under `owner/RedMed/`
-except policies: `Document/Document.html` + `Document/legal-doc.css` (Xcode group
-`Document`, path = Document). `Bundle.main` loads by basename; WKWebView read
-access is the Document folder so the stylesheet resolves. Legacy
-`RedMed/Help.html` is a hash-preserving redirect stub (not bundled).
-
-Pull `main` on whichever Mac you are about to open Xcode on.
+The Xcode project is `owner/RedMed.xcodeproj` in `Roooted1776/RedMed-iOS`.
+Open that repo on a Mac. This tree does not build the app.

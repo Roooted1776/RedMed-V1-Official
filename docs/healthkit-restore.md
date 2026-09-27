@@ -25,7 +25,7 @@ while parked so Review does not see an unused Health purpose string.
 
 ## Restore (paid Program)
 
-1. Add `com.apple.developer.healthkit` = `true` back to
+1. In `Roooted1776/RedMed-iOS`, add `com.apple.developer.healthkit` = `true` back to
    `owner/RedMed/RedMed.entitlements`.
 2. Flip `AppConfig.healthKitImportEnabled` to `true`.
 3. Add `NSHealthShareUsageDescription` to `Info.plist`:

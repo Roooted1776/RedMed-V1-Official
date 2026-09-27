@@ -123,8 +123,10 @@ green.
 
 ### Covered-entity creep if stations ask RedMed to host PHI?
 
-**Yes — walk.** Today’s posture: no profile server, no BA, Help says
-operator is outside covered-entity / BA for the wearer’s local profile.
+**Yes — walk.** A signed-in wearer can keep their own copy in Supabase.
+RedMed still does not host PHI for a station, hospital, or rescuer lookup,
+and it is not a business associate. Help says the operator is outside
+covered-entity / BA status. This is not a HIPAA certification.
 If a station asks RedMed to **host, maintain, or receive** bracelet /
 patient PHI (portal, inbox “send us their allergies,” shared drive,
 vendor short-link SaaS), that is covered-entity / BA creep. Refuse. Do not

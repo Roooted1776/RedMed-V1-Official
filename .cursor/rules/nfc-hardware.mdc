@@ -6,8 +6,9 @@ alwaysApply: false
 
 # NFC hardware contract
 
-Enforced statically by `scripts/test-nfc-hardware.mjs` (51 checks, runs on
-Linux CI — no Xcode needed). Run it after touching any file this rule globs.
+Enforced in `Roooted1776/RedMed-iOS` by `scripts/test-nfc-hardware.mjs`
+(51 checks, Linux CI, no Xcode). This web repo does not contain the Swift
+sources. Do not weaken the NTAG216 contract from the Assist shell.
 
 ## NTAG216-only
 

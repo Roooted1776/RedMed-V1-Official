@@ -1,6 +1,6 @@
 # RedMed operations database
 
-This is a release-evidence ledger, not a medical-profile backend. Assist, Owner, and the static site have no dependency on it. It has no MCP component and no MCP gate. Nothing in this schema is written or read by an MCP.
+`redmed_ops` is a release-evidence ledger. It has no patient columns. Assist does not read it. The signed-in wearer copy is a different schema, `redmed_owner` (`docs/adr/002-owner-account-sync.md`). The public tap page does not query either schema. Nothing here is written or read by an MCP.
 
 ## Contract
 

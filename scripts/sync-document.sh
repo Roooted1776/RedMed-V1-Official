@@ -1,21 +1,26 @@
 #!/usr/bin/env bash
 # Keep hosted /Document/ lockstep with the in-app Help source of truth.
-# Source: owner/RedMed/Document/{Document.html,legal-doc.css}
+# Authoring source: Roooted1776/RedMed-iOS owner/RedMed/Document/.
 # Host:   Document/index.html (full policy) + Document.html (thin #hash redirect)
-#         + legal-doc.css
+#         + legal-doc.css. If the iOS tree is not beside this script, the
+#         hosted copy in this repo is what redmed.live serves.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
 SRC=owner/RedMed/Document
 DST=Document
-
-test -f "$SRC/Document.html"
-test -f "$SRC/legal-doc.css"
-
 mkdir -p "$DST"
-cp "$SRC/Document.html" "$DST/index.html"
-cp "$SRC/legal-doc.css" "$DST/legal-doc.css"
+
+# Authoring source lives in the iOS repo. When that tree is checked out beside
+# this script, refresh the hosted copy. Otherwise the hosted Document/index.html
+# in this repo is what redmed.live serves.
+if [[ -f "$SRC/Document.html" && -f "$SRC/legal-doc.css" ]]; then
+  cp "$SRC/Document.html" "$DST/index.html"
+  cp "$SRC/legal-doc.css" "$DST/legal-doc.css"
+fi
+test -f "$DST/index.html"
+test -f "$DST/legal-doc.css"
 
 # Hosted Document.html is a stub so /Document/Document.html and /Document/
 # stay one policy tree (index.html), not two full copies that can drift.
@@ -64,7 +69,7 @@ grep -q '/Document/' privacy/index.html
 # Honesty trio (audit P2/P3/P4): Help/Document must not cite the empty-file
 # era, HIPAA heading must not look like a badge, versions lockstep with consent.
 # Legal body is not rewritten here — these are fail-closed greps.
-SRC_HTML="$SRC/Document.html"
+SRC_HTML="$DST/index.html"
 if grep -q 'docs/SECURITY.md' "$SRC_HTML"; then
   echo "FAIL $SRC_HTML still cites docs/SECURITY.md — point at Help → Security, not the pointer file" >&2
   exit 1
@@ -77,9 +82,33 @@ grep -q 'HIPAA — not a covered entity' "$SRC_HTML" || {
   echo "FAIL $SRC_HTML missing Security heading HIPAA — not a covered entity" >&2
   exit 1
 }
-CONSENT="$(sed -n 's/^[[:space:]]*static let currentVersion = "\([^"]*\)".*/\1/p' owner/RedMed/ConsentGateView.swift)"
+grep -q 'signed-in wearer copy' "$SRC_HTML" || {
+  echo "FAIL $SRC_HTML missing signed-in wearer copy disclosure" >&2
+  exit 1
+}
+grep -q 'Supabase' "$SRC_HTML" || {
+  echo "FAIL $SRC_HTML missing Supabase disclosure" >&2
+  exit 1
+}
+grep -q 'tap page does not look the profile up' "$SRC_HTML" || {
+  echo "FAIL $SRC_HTML missing tap-page disclosure" >&2
+  exit 1
+}
+grep -q 'public fragment' "$SRC_HTML" || {
+  echo "FAIL $SRC_HTML missing public fragment disclosure" >&2
+  exit 1
+}
+grep -q 'not a HIPAA certification' "$SRC_HTML" || {
+  echo "FAIL $SRC_HTML missing not-a-HIPAA-certification line" >&2
+  exit 1
+}
+if [[ -f owner/RedMed/ConsentGateView.swift ]]; then
+  CONSENT="$(sed -n 's/^[[:space:]]*static let currentVersion = "\([^"]*\)".*/\1/p' owner/RedMed/ConsentGateView.swift)"
+else
+  CONSENT="$(python3 -c 'import json; print(json.load(open("contracts/d-codec-fixtures.json"))["consentVersion"])')"
+fi
 if [[ -z "$CONSENT" ]]; then
-  echo "FAIL could not read ConsentSettings.currentVersion" >&2
+  echo "FAIL could not read consent version" >&2
   exit 1
 fi
 if grep -E '<strong>Version</strong> ' "$SRC_HTML" | grep -vqF "$CONSENT"; then
@@ -101,4 +130,8 @@ if grep -qiE 'HIPAA certified|HIPAA-aligned product|HIPAA compliant' docs/SECURI
   exit 1
 fi
 
-echo "OK Document host lockstep with $SRC (index=full, Document.html=redirect; consent $CONSENT)"
+if [[ -f "$SRC/Document.html" ]]; then
+  echo "OK Document host lockstep with $SRC (index=full, Document.html=redirect; consent $CONSENT)"
+else
+  echo "OK hosted Document/index.html (iOS authoring tree not checked out; consent $CONSENT)"
+fi

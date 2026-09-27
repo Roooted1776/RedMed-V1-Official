@@ -25,7 +25,7 @@ Do not add a profile backend. Do not require login to view a tapped card. Do not
 | Location | On as part of Agree (no in-app toggle). When-In-Use on first Find Help / hospital GPS use — not after Face ID. GPS start/stop are Find Help only. Off switch is iOS Settings |
 | Owner tabs | RedMed · 911 · Aid · NFC; scanners / tapper get RedMed · 911 · Aid (no NFC) |
 | NFC Preview + Scan | Preview uses `fullScreenCover(item:)` after pack — no empty-cover race. In-repo CoreNFC parked (`nfcHardwareEnabled = false`, no TAG entitlement, no usage string); restore via `docs/NFC-RESTORE.md`. Portal Tag Reading still required for device Write. Storefront “write from the app” stays off until Write is proven on blank NTAG216 — blank chips + Share honesty until then (`docs/ADVERTISING.md`) |
-| Passerby shell | One file `tapper/index.html`; Xcode copies it to the app bundle as `tapper.html` at build; repo-root `tapper.html` redirects to `/tapper/` |
+| Passerby shell | One file `tapper/index.html`; the iOS repo pins it as `Vendor/tapper/index.html` and copies that to `tapper.html` at build; repo-root `tapper.html` redirects to `/tapper/` |
 | Offline shell | SW cache precaches HTML + pheart / BrandLogo / BrandWordmark |
 | Band URI contract | Write only `medicalCardBaseURL + #d=` base64url; vendor/social/short URLs rejected |
 | AES-GCM on chip | Public client key by design (EMS decrypts with no account) |
@@ -34,7 +34,7 @@ Do not add a profile backend. Do not require login to view a tapped card. Do not
 | Snapshot / pasteboard | Privacy cover + secure pasteboard clear on background |
 | Consent | `ConsentGateView` on first launch or policy bump (**4.16**); Agree + checkbox only on that page (no Face ID there); Face ID runs after Agree and on every cold re-entry (cream over warm Main; restore races underneath); When-In-Use on first GPS use when still notDetermined (not after Face ID); same-session resume does not re-prompt; never on tapper |
 | Apple Health import | Parked (`healthKitImportEnabled = false`) |
-| iOS CI | Push/PR on `owner/**` (unsigned Simulator compile). Manual `workflow_dispatch` still works. No XCTest |
+| iOS CI | `Roooted1776/RedMed-iOS` `ios-build.yml` (unsigned Simulator compile). No XCTest |
 | `#d=` codec | `node scripts/test-d-codec.mjs` — AES / zlib / compact / URI lockstep |
 | Open PRs | Squash only into `main` |
 

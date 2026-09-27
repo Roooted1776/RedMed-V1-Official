@@ -1,8 +1,10 @@
 # Security policy
 
-RedMed has no profile server and no PHI database. The band profile lives only
-in the URL `#d=` fragment (decoded in the browser) and, for the Owner app, in
-the iOS Keychain on-device.
+A band tap still has no lookup server. The rescuer copy is only the URL `#d=`
+fragment, decoded in the browser. The Owner app keeps the same profile in the
+iOS Keychain and, when account sync is on, in Supabase schema `redmed_owner`
+for that signed-in wearer. That account is not a HIPAA certification. The tap
+page does not read it.
 
 ## Report a vulnerability
 
@@ -15,8 +17,8 @@ Do not open public issues containing live keys or real `#d=` payloads.
 
 - XSS or script injection via `#d=` rendering in `tapper/`
 - Service worker cache poisoning or `#d=` reaching any HTTP log, cache key, or server
-- Keychain bypass or Face ID gate bypass in `owner/`
+- Keychain bypass or Face ID gate bypass in `Roooted1776/RedMed-iOS`
 - Universal Link / custom-scheme hijack of a band tap
-- Sending Assist `#d=` or Owner ICE data through an MCP, Supabase, or VPS
+- Assist `#d=` or wearer rows through an MCP or the VPS, or a tap-page read of Supabase
 
 Full policy text: Help → Policies → Security in the app, or `/Document/#security`.
