@@ -386,11 +386,12 @@ private struct OwnerYouCard: View {
             Divider().overlay(Color.redmedDivider)
             youRow(label: "Blood Type", value: profile.bloodType.trimmingCharacters(in: .whitespacesAndNewlines))
             Divider().overlay(Color.redmedDivider)
-            youRow(label: "Organ Donor", value: profile.isOrganDonor ? "Yes" : "No")
+            // Unset stays "—" (youRow empty path) — never "No" for a default-off flag.
+            youRow(label: "Organ Donor", value: profile.isOrganDonor ? "Yes" : "")
             Divider().overlay(Color.redmedDivider)
-            youRow(label: "Pregnant", value: profile.isPregnant ? "Yes" : "No")
+            youRow(label: "Pregnant", value: profile.isPregnant ? "Yes" : "")
             Divider().overlay(Color.redmedDivider)
-            youRow(label: "Deaf / Vision Impaired", value: profile.isDeafOrVisionImpaired ? "Yes" : "No")
+            youRow(label: "Deaf / Vision Impaired", value: profile.isDeafOrVisionImpaired ? "Yes" : "")
             Divider().overlay(Color.redmedDivider)
             youRow(label: "Notes", value: profile.notes.trimmingCharacters(in: .whitespacesAndNewlines))
         }

@@ -1920,9 +1920,9 @@ function redmedAssetURL(file) {
           <div class="row" id="rowNameRow"><span class="k">Name</span><span class="v" id="rowName">—</span></div>
           <div class="row" id="rowDobRow"><span class="k">Birth Date</span><span class="v empty" id="rowDob">—</span></div>
           <div class="row row-blood" id="rowBloodRow"><span class="k">Blood Type</span><span class="v empty" id="rowBlood">—</span></div>
-          <div class="row row-donor" id="rowDonorRow"><span class="k">Organ Donor</span><span class="v" id="rowDonor">No</span></div>
-          <div class="row row-pregnant" id="rowPregnantRow"><span class="k">Pregnant</span><span class="v" id="rowPregnant">No</span></div>
-          <div class="row row-deaf" id="rowDeafRow"><span class="k">Deaf / Vision Impaired</span><span class="v" id="rowDeaf">No</span></div>
+          <div class="row row-donor" id="rowDonorRow"><span class="k">Organ Donor</span><span class="v empty" id="rowDonor">—</span></div>
+          <div class="row row-pregnant" id="rowPregnantRow"><span class="k">Pregnant</span><span class="v empty" id="rowPregnant">—</span></div>
+          <div class="row row-deaf" id="rowDeafRow"><span class="k">Deaf / Vision Impaired</span><span class="v empty" id="rowDeaf">—</span></div>
           <div class="row" id="rowNotesRow"><span class="k">Notes</span><span class="v empty" id="rowNotes">—</span></div>
         </div>
         <div class="list-grid" id="youLists">
@@ -2045,9 +2045,10 @@ function redmedAssetURL(file) {
         setTxt('rowName', name || 'RedMed');
         setTxt('rowDob', p.dob);
         setTxt('rowBlood', p.blood);
-        setTxt('rowDonor', p.donor ? 'Yes' : 'No');
-        setTxt('rowPregnant', p.pregnant ? 'Yes' : 'No');
-        setTxt('rowDeaf', p.deafOrVisionImpaired ? 'Yes' : 'No');
+        // Unset flags stay "—" — never "No" (unset ≠ confirmed negative).
+        setTxt('rowDonor', p.donor ? 'Yes' : '');
+        setTxt('rowPregnant', p.pregnant ? 'Yes' : '');
+        setTxt('rowDeaf', p.deafOrVisionImpaired ? 'Yes' : '');
         setTxt('rowNotes', p.notes || '');
         var bloodRow = document.getElementById('rowBloodRow');
         if (bloodRow) bloodRow.classList.toggle('has-blood', !!blood);
@@ -3076,9 +3077,10 @@ function redmedAssetURL(file) {
     setRow('rowName', rawName || 'RedMed');
     setRow('rowDob', formatDob(p.dob));
     setRow('rowBlood', p.blood);
-    setRow('rowDonor', p.donor ? 'Yes' : 'No');
-    setRow('rowPregnant', p.pregnant ? 'Yes' : 'No');
-    setRow('rowDeaf', p.deafOrVisionImpaired ? 'Yes' : 'No');
+    // Unset flags stay "—" — never "No" (unset ≠ confirmed negative).
+    setRow('rowDonor', p.donor ? 'Yes' : '');
+    setRow('rowPregnant', p.pregnant ? 'Yes' : '');
+    setRow('rowDeaf', p.deafOrVisionImpaired ? 'Yes' : '');
     setRow('rowNotes', p.notes || '');
     var bloodRow = document.getElementById('rowBloodRow');
     if (bloodRow) bloodRow.classList.toggle('has-blood', !!rawBlood);

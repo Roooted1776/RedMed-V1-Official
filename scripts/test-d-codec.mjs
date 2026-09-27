@@ -497,6 +497,16 @@ assert('paintedFromBand requires content', tapperSrc.includes('paintedFromBand =
 assert('treat-first early vitals script', tapperSrc.includes('__redmedEarlyVitals') && tapperSrc.includes('Treat-first:'));
 assert('hashchange re-decodes #d=', tapperSrc.includes('decodeProfile().then(function (p)') && tapperSrc.includes('hashchange'));
 assert('no redmed:// #d= handoff (non-exclusive scheme leaks PHI)', !tapperSrc.includes("'redmed://band'") && !tapperSrc.includes('handoffToInstalledApp') && !/location\.href\s*=\s*['"]redmed:\/\/band/.test(tapperSrc));
+assert(
+  'unset donor/pregnant/deaf never paint No',
+  !/setRow\('rowDonor',\s*p\.donor\s*\?\s*'Yes'\s*:\s*'No'\)/.test(tapperSrc)
+    && !/setTxt\('rowDonor',\s*p\.donor\s*\?\s*'Yes'\s*:\s*'No'\)/.test(tapperSrc)
+    && /setRow\('rowDonor',\s*p\.donor\s*\?\s*'Yes'\s*:\s*''\)/.test(tapperSrc)
+    && /setTxt\('rowDonor',\s*p\.donor\s*\?\s*'Yes'\s*:\s*''\)/.test(tapperSrc)
+    && /setRow\('rowPregnant',\s*p\.pregnant\s*\?\s*'Yes'\s*:\s*''\)/.test(tapperSrc)
+    && /setRow\('rowDeaf',\s*p\.deafOrVisionImpaired\s*\?\s*'Yes'\s*:\s*''\)/.test(tapperSrc)
+    && !/<span class="v"[^>]*id="rowDonor">No<\/span>/.test(tapperSrc)
+);
 assert('band tap never auto-arms SOS', !tapperSrc.includes('handoffToInstalledAppThenMaybeArm') && !tapperSrc.includes('function shouldAutoArm'));
 assert('SOS full sound and light', tapperSrc.includes('sos-light-flash') && tapperSrc.includes('gain.gain.value = 1') && tapperSrc.includes('Band tap does not arm SOS') && tapperSrc.includes('dark rainy night'));
 assert('SOS only toggle or US crash', tapperSrc.includes('US Crash Detection') && tapperSrc.includes('US_CRASH_ALERT_S = 10') && tapperSrc.includes('US_CRASH_COUNTDOWN_S = 30'));
