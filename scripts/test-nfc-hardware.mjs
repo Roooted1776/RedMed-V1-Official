@@ -128,7 +128,7 @@ assert('parked builds only pack — never open a CoreNFC write session', manager
 assert('NDEF record is Well Known Type "U"', writer.includes('type: Data("U".utf8)'));
 assert('URI identifier 0x04 maps to https://', writer.includes('(0x04, "https://")'));
 assert('write message is a single-record NFCNDEFMessage', writer.includes('let message = NFCNDEFMessage(records: [payload])'));
-assert('write checks message length against tag capacity (0 capacity fails closed)', writer.includes('if message.length > capacity {') && !writer.includes('capacity > 0, message.length'));
+assert('write checks message length against tag capacity', writer.includes('if capacity > 0, message.length > capacity {'));
 assert('queryNDEFStatus handles notSupported/readOnly/readWrite/@unknown', writer.includes('case .notSupported:') && writer.includes('case .readOnly:') && writer.includes('case .readWrite:') && writer.includes('@unknown default:'));
 assert('NFCReader decodes only via NFCURICodec.string(from:)', reader.includes('NFCURICodec.string(from: payload)'));
 assert('decodeProfile requires a #d= fragment', codec.includes('urlString.range(of: "#d=") != nil'));

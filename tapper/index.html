@@ -691,11 +691,6 @@ function redmedAssetURL(file) {
   body.app-embed .rm-status.rm-status-link:not(.linked) {
     color: var(--accent);
   }
-  /* Owner parked NFC: grey "Band Not Checked" (RedMedView statusColor). */
-  html.app-embed .rm-status.rm-status-link.unlinked-quiet:not(.linked),
-  body.app-embed .rm-status.rm-status-link.unlinked-quiet:not(.linked) {
-    color: var(--muted);
-  }
   html.app-embed .rm-status.rm-status-link::after,
   body.app-embed .rm-status.rm-status-link::after {
     content: '›';
@@ -1961,12 +1956,6 @@ function redmedAssetURL(file) {
 
     </div>
 
-    <!-- Single source of truth for the #d= payload size cap, read by both the
-         early-paint decode below and the full decode further down — a real
-         global (not a script-local var) so neither copy can drift from the
-         other. Match Swift ProfileNFCCodec.maxEncodedLength (NTAG-scale). -->
-    <script>window.__REDMED_MAX_PAYLOAD = 8192;</script>
-
     <!-- Treat-first: start #d= decrypt as soon as YOU-card DOM exists — do not
          wait for 911 / Aid HTML or the rest of the shell script. SOS / wake /
          geo stay off this path. -->
@@ -2124,7 +2113,7 @@ function redmedAssetURL(file) {
           var b64 = raw.replace(/-/g, '+').replace(/_/g, '/');
           while (b64.length % 4) b64 += '=';
           var bin = atob(b64);
-          if (bin.length > window.__REDMED_MAX_PAYLOAD) return null;
+          if (bin.length > 8192) return null;
           return Uint8Array.from(bin, function (ch) { return ch.charCodeAt(0); });
         } catch (e5) { return null; }
       }
@@ -2517,8 +2506,7 @@ function redmedAssetURL(file) {
   }
 
   // Match Swift ProfileNFCCodec.maxEncodedLength (NTAG-scale; fail closed above).
-  // Shared with the early-paint decode via window.__REDMED_MAX_PAYLOAD.
-  var MAX_PAYLOAD = window.__REDMED_MAX_PAYLOAD;
+  var MAX_PAYLOAD = 8192;
   var MAX_INFLATED = 65536;
   var MAX_LIST = 40;
   var MAX_STR = 200;
@@ -3067,22 +3055,13 @@ function redmedAssetURL(file) {
       // Passerby: a decoded #d= is a loaded URL, not a verified NTAG216 write.
       // Owner Preview / embed keep "Linked Bracelet" (Swift __REDMED_BRACELET_LINKED).
       var linkedLabel = (isAppPreview() || isAppEmbed()) ? 'Linked Bracelet' : 'Medical ID Loaded';
-      // Owner Preview / embed: Swift passes its own unlinked title (parked
-      // NFC reads "Band Not Checked") so this header matches the native one.
-      var ownerUnlinked = window.__REDMED_UNLINKED_TITLE;
-      var unlinkedLabel = (isAppPreview() || isAppEmbed()) && typeof ownerUnlinked === 'string' && ownerUnlinked
-        ? ownerUnlinked
-        : 'Not Linked';
-      statusEl.textContent = linked ? linkedLabel : unlinkedLabel;
+      statusEl.textContent = linked ? linkedLabel : 'Not Linked';
       statusEl.classList.toggle('linked', linked);
-      // Parked Owner status is grey, not an error red the owner can't clear.
-      statusEl.classList.toggle('unlinked-quiet',
-        !linked && (isAppPreview() || isAppEmbed()) && window.__REDMED_UNLINKED_ALERT === false);
       if (isAppEmbed()) {
         statusEl.classList.add('rm-status-link');
         statusEl.setAttribute('role', 'link');
         statusEl.setAttribute('tabindex', '0');
-        statusEl.setAttribute('aria-label', (linked ? 'Linked Bracelet' : unlinkedLabel) + ' — open NFC');
+        statusEl.setAttribute('aria-label', (linked ? 'Linked Bracelet' : 'Not Linked') + ' — open NFC');
       } else {
         statusEl.classList.remove('rm-status-link');
         statusEl.removeAttribute('role');

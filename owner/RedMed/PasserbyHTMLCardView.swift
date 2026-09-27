@@ -305,18 +305,6 @@ enum PasserbyShellStaging {
     }
 }
 
-/// Owner's own unlinked label and color for the hosted tapper header, so
-/// Preview and the YOU embed never show a red "Not Linked" while the native
-/// RedMed header shows a grey "Band Not Checked". The title is always one of
-/// two fixed ASCII strings.
-enum PasserbyOwnerLabels {
-    static var unlinkedTitleJS: String {
-        let alert = AppConfig.NFCWriteCopy.unlinkedIsAlert ? "true" : "false"
-        return "window.__REDMED_UNLINKED_TITLE='\(AppConfig.NFCWriteCopy.unlinkedTitle)';"
-            + "window.__REDMED_UNLINKED_ALERT=\(alert);"
-    }
-}
-
 @MainActor
 enum PasserbyWebViewPool {
     /// Warm-webview state for one shell kind (embed vs. full/preview). A
@@ -379,7 +367,6 @@ enum PasserbyWebViewPool {
         let task = Task<WKWebView?, Never> { @MainActor in
             if Task.isCancelled { return .none }
 
-            let unlinkedJS = PasserbyOwnerLabels.unlinkedTitleJS
             let preparedHTML: String? = await Task.detached(priority: .userInitiated) {
                 guard var html = PasserbyShellCache.shellHTML() else {
                     return nil
@@ -392,7 +379,6 @@ enum PasserbyWebViewPool {
                       window.__REDMED_APP_PREVIEW=1;
                       window.__REDMED_APP_EMBED=1;
                       window.__REDMED_BRACELET_LINKED=false;
-                      \(unlinkedJS)
                       try{document.documentElement.classList.add('app-embed');}catch(e0){}
                       </script>
 
@@ -402,7 +388,6 @@ enum PasserbyWebViewPool {
                       <script>
                       window.__REDMED_APP_PREVIEW=1;
                       window.__REDMED_BRACELET_LINKED=false;
-                      \(unlinkedJS)
                       try{document.documentElement.classList.add('app-preview');}catch(e1){}
                       </script>
 
@@ -663,7 +648,6 @@ private struct PasserbyHTMLWebView: UIViewRepresentable {
         <script>
         window.__REDMED_APP_PREVIEW=1;
         window.__REDMED_BRACELET_LINKED=\(linkedJS);
-        \(PasserbyOwnerLabels.unlinkedTitleJS)
         \(profileJS)
         \(embedJS)
         (function(){
