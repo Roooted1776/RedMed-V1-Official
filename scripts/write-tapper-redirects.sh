@@ -55,12 +55,12 @@ EOF
 )
 
 mkdir -p get
-for f in index.html tapper.html card.html get.html get/index.html redmed-emergency.html; do
+for f in tapper.html card.html get.html get/index.html redmed-emergency.html; do
   printf '%s\n' "$STUB" > "$f"
 done
 
 # Guard: stubs must never become a second shell.
-for f in index.html tapper.html card.html get.html get/index.html redmed-emergency.html; do
+for f in tapper.html card.html get.html get/index.html redmed-emergency.html; do
   ! grep -q 'data-tab="medical"' "$f"
   grep -q '/tapper/' "$f"
   grep -q "new URL('/tapper/', location.origin)" "$f"

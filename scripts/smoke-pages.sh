@@ -241,7 +241,6 @@ def main() -> int:
     ok &= check("/get.html", "/tapper/")
     ok &= check("/card.html", "/tapper/")
     ok &= check("/redmed-emergency.html", "/tapper/")
-    ok &= check("/index.html", "tapper/")
     # Brand photos live under assets/ (canonical) + tapper/ (shell-relative).
     ok &= check("/assets/BrandLogo.png")
     ok &= check("/assets/BrandWordmark.png")

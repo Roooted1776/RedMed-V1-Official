@@ -8,37 +8,49 @@
 <meta name="referrer" content="no-referrer">
 <title>RedMed</title>
 <style>html,body{background:#fff7f7!important;margin:0}</style>
-<!-- Legacy / root URL. Canonical scanner shell is /tapper/ — preserve #d=.
-     Fix #3: use URL construction to safely compose the destination. -->
-<script>
-(function () {
-  var dest = new URL('/tapper/', location.origin);
-  dest.search = location.search;
-  location.replace(dest.pathname + dest.search + location.hash);
-})();
-</script>
+<!-- Root landing page. Does NOT auto-redirect to /tapper/ (that was undone —
+     see git history around PR #21 and its revert). The band / NFC tap shell
+     lives at /tapper/ and is reached directly via the band URL
+     (redmed.live/tapper/#d=...), not through this page. Replace this body
+     with real marketing content. -->
 <style>
   body {
     margin: 0;
     min-height: 100vh;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
     background: #fff7f7;
     color: #1c1917;
+    text-align: center;
+    padding: 48px 24px;
   }
+  main { max-width: 480px; }
+  img.wordmark { height: 32px; margin-bottom: 28px; }
+  h1 { font-size: 1.5rem; margin: 0 0 12px; }
+  p { line-height: 1.5; margin: 0 0 16px; }
+  .lede { font-size: 1.05rem; color: #1c1917; }
+  .fine { font-size: 0.9rem; color: #6b6462; }
   a { color: #e11d48; font-weight: 600; text-decoration: none; }
   a:focus-visible { outline: 2px solid #e11d48; outline-offset: 3px; }
+  footer { margin-top: 32px; font-size: 0.8rem; color: #9a938f; }
+  footer a { color: #9a938f; font-weight: 500; }
+  footer a:hover, footer a:focus-visible { color: #e11d48; }
 </style>
 </head>
 <body>
-  <p><a id="fallback" href="/tapper/">Open emergency card</a></p>
-  <script>
-    var dest = new URL('/tapper/', location.origin);
-    dest.search = location.search;
-    document.getElementById("fallback").href = dest.pathname + dest.search + location.hash;
-  </script>
-  <!-- Fix #9: clearer noscript message -->
-  <noscript><p>JavaScript is required to open this emergency card. Please enable JavaScript in your browser settings, then reload this page.</p></noscript>
+  <main>
+    <img class="wordmark" src="/assets/BrandWordmark.png" alt="RedMed" width="160" height="32">
+    <h1>Emergency info, one tap away.</h1>
+    <p class="lede">RedMed puts a person's medical information on a small NFC band. Tapping it with any modern
+      phone opens their emergency card instantly &mdash; no app, no account, no sign-in.</p>
+    <p class="fine">Tapped someone's actual RedMed band? Hold your phone near it again, or open the link it
+      gave you &mdash; that page lives at <code>redmed.live/tapper/</code>, not here.</p>
+  </main>
+  <footer>
+    <a href="/Document/">Privacy</a> &middot; <a href="mailto:help.RedMed@gmail.com">Support</a>
+  </footer>
 </body>
 </html>

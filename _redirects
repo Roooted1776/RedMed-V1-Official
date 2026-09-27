@@ -2,15 +2,14 @@
 # Hash fragments (#d=) are client-only and survive these hops.
 #
 # Canonical passerby shell stays under /tapper/ (SW + AppConfig.medicalCardBaseURL).
-# Root -> /tapper/ so getredmed.com/ and redmed.pages.dev/ both land on the shell.
+# Root stays whatever index.html serves (landing page). Legacy stub URLs
+# below still redirect to the canonical passerby shell.
 # Brand PNGs live under /assets/ (and /tapper/ for shell-relative loads).
 #
 # Fix #6: changed canonical shell redirects from 302 -> 301 (permanent).
 # Fix #11: added /tapper -> /tapper/ 301 for no-trailing-slash case.
 
 # Canonical shell — permanent redirects so browsers/CDN cache them.
-/ /tapper/ 301
-/index.html /tapper/ 301
 /tapper.html /tapper/ 301
 /card.html /tapper/ 301
 /get.html /tapper/ 301
