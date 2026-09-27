@@ -23,7 +23,7 @@ Operator  → Hostinger operations, outside this repository
 ## Responsibilities
 
 - **Assist, `tapper/`:** unauthenticated medical-card viewer, no ads, no tracking SDKs, no cloud profile lookup. Keep the permanent URL path for existing bands.
-- **Owner, `Roooted1776/RedMed-iOS`:** editing, consent, local storage, optional signed-in sync, preview, explicit NFC write and read-back. Do not enable parked capabilities without entitlement and physical-device verification. Do not point the public tap page at the wearer row.
+- **Owner, `owner/`:** editing, consent, local storage, optional signed-in sync, preview, explicit NFC write and read-back. Do not enable parked capabilities without entitlement and physical-device verification. Do not point the public tap page at the wearer row.
 - **MCP:** not a module of this repository. Operator tooling stays outside Assist, Owner, the static origin, and `redmed_ops`. Never send real band URLs or medical content to an MCP.
 - **Supabase, `supabase/`:** bounded release evidence in `redmed_ops`, not patients, accounts for responders, or condition histories.
 - **Hostinger VPS:** ops services and future synthetic monitoring. A VPS restart must not take down the Assist origin.

@@ -1,0 +1,498 @@
+import CoreMotion
+import Foundation
+import SwiftUI
+
+/// Shared crash thresholds — nonisolated so the off-main motion engine can read them.
+/// Tuned to ignore walking, running, eating, phone handling, sex / masturbation,
+/// and other rhythmic daily motion. Vehicle crash / high-speed impact only.
+private enum CrashMotionThresholds {
+    /// Vehicle-level linear peak (g). Daily human motion stays well below this.
+    static let crashPeakG: Double = 16.0
+    /// After true freefall, slightly lower peak still counts (ejection).
+    static let postFreefallPeakG: Double = 13.0
+    /// Only this extreme peak can arm during recent human-activity / hand-busy windows.
+    static let overrideBusyPeakG: Double = 24.0
+    /// Near-zero user accel = freefall / ballistic (longer than a hand dip).
+    static let freefallMaxG: Double = 0.20
+    static let freefallMinSeconds: TimeInterval = 0.22
+    static let freefallImpactWindow: TimeInterval = 0.40
+    /// Broad human-activity band: walking, sex, masturbation, eating, phone handling.
+    static let humanActivityMinG: Double = 0.45
+    static let humanActivityMaxG: Double = 10.0
+    static let humanActivitySpikeCount: Int = 2
+    static let humanActivityWindow: TimeInterval = 12.0
+    /// How long a human/rhythm/hand busy lockout lasts (covers pauses in intimacy).
+    static let busyHoldSeconds: TimeInterval = 14.0
+    /// Hand / wrist rock — low enough to catch sex / masturbation / gestures.
+    static let handSpinRadPerSec: Double = 2.0
+    /// Repeating thrust / stroke cadence (seconds between human-band peaks).
+    static let rhythmMinInterval: TimeInterval = 0.12
+    static let rhythmMaxInterval: TimeInterval = 2.0
+    static let rhythmHitCount: Int = 3
+    /// Sustained human-band motion longer than this → busy (not a single bump).
+    static let sustainedHumanSeconds: TimeInterval = 1.2
+    static let minJerkGPerSecond: Double = 140.0
+    static let sampleHz: Double = 50.0
+    static let cooldownSeconds: TimeInterval = 90
+}
+
+/// US Crash Detection call delay (Apple Support 104959, United States).
+/// 10s alert + 30s countdown, then emergency call. Timing only — not Apple's
+/// Crash Detection API, not FDA-cleared, not a certified medical device.
+enum USCrashDetectionCall {
+    static let alertSeconds: TimeInterval = 10
+    static let countdownSeconds: TimeInterval = 30
+    static var dialDelaySeconds: TimeInterval { alertSeconds + countdownSeconds }
+    /// Past the deadline by more than this (app was suspended) → no auto-dial.
+    static let lateDialGraceSeconds: TimeInterval = 5
+}
+
+/// Survival alarm arming: crash / severe impact (CoreMotion) or Find Help SOS
+/// (owner + tapper / in-app scanner). Passerby `tapper.html` mirrors thresholds
+/// via DeviceMotion. Arms full brightness + max system volume + locator siren.
+/// Cancel on Aid or Stop SOS on Find Help.
+/// SOS tap opens `tel:` immediately (no in-app prompt, no countdown).
+/// Crash follows `USCrashDetectionCall` (10s alert + 30s countdown) then the
+/// same `tel:` unless Stop. Not Apple's sensor fusion / API. NFC band-tap
+/// auto-arm is siren only on the Safari / no-app path (Associated Domains
+/// keeps installed RedMed out of that path).
+/// Motion path ignores running, walking, eating, sex / masturbation / intimate
+/// motion, rhythmic daily activity, and hand/wrist handling.
+///
+/// Motion samples run on a private serial queue (not the main thread) so Face ID /
+/// first tabs stay responsive. UI + brightness/volume/siren hop to main.
+/// Arm/disarm uses a generation token so a late arm Task cannot restart the alarm
+/// after Stop / disarm.
+/// Main starts monitoring once owner tabs are up. SOS / survival hold is
+/// separate — stopMonitoring does not cancel an armed siren. Face ID gates
+/// post-Agree / Edit / Save / Erase — not viewing
+/// the YOU card; crash motion is not gated on a YOU-view unlock.
+/// Scene policy: keep listening through `.inactive`; hard-stop on
+/// `.background`. That inactive keep-listening path is the only
+/// “still around for a moment” window — no post-Home grace (parked;
+/// see `docs/DO-NOT.md`). Lock / force-quit / never-launched is Apple
+/// Crash Detection on supported hardware — RedMed does not sense those.
+
+@MainActor
+final class CrashMotionGuard: ObservableObject {
+    static let shared = CrashMotionGuard()
+
+    @Published private(set) var isArmed = false
+    /// Seconds until crash autodial. Nil when idle, after SOS (already dialed),
+    /// or after the crash delay has fired.
+    @Published private(set) var crashDialRemaining: TimeInterval? = nil
+    /// Set once per real motion-detected crash arm (never for manual SOS).
+    /// Lives here, not on `ShareLocationCard`'s own @State, because the tab
+    /// mount that follows `redMedSurvivalArmed` happens on a later SwiftUI
+    /// render pass — a per-view flag could miss the change or double-read
+    /// the already-true value at init. `ShareLocationCard` calls
+    /// `consumePendingCrashAutoShare()` from both `onAppear` and `onChange`
+    /// so it catches the flag whichever comes first, and only ever once.
+    @Published private(set) var pendingCrashAutoShare: Bool = false
+
+    /// One-shot read: true only the first time this is called after a crash
+    /// armed. Safe to call from `onAppear` and `onChange` both.
+    func consumePendingCrashAutoShare() -> Bool {
+        guard pendingCrashAutoShare else { return false }
+        pendingCrashAutoShare = false
+        return true
+    }
+
+    /// Off-main motion state + CoreMotion — never touches UIKit / @Published.
+    private let engine = MotionEngine()
+    private var crashDialTask: Task<Void, Never>?
+
+    private init() {}
+
+    /// Start when owner Main is up. Cold launch stays light.
+    func startMonitoring() {
+        LocatorBeacon.warmAlarmCache()
+        engine.startMonitoring { [weak self] generation in
+            Task { @MainActor in
+                self?.applyArm(generation: generation, source: .crash)
+            }
+        }
+    }
+
+    /// Stop CoreMotion on true background. Does not disarm an in-progress SOS hold.
+    func stopMonitoring() {
+        engine.stopMonitoring()
+    }
+
+    /// False-positive / SOS cancel — restores brightness/volume/siren holds.
+    /// Paints Stop → SOS first; MPVolumeView / AVAudioSession tear-down wait a turn
+    /// (same hitch as arm if they run in the button press). Cancels a pending crash dial.
+    func disarm() {
+        crashDialTask?.cancel()
+        crashDialTask = nil
+        crashDialRemaining = nil
+        engine.invalidateArm()
+        // A false-positive stopped before ShareLocationCard ever consumed
+        // this must not surface at some unrelated later 911-tab visit.
+        pendingCrashAutoShare = false
+        guard isArmed else { return }
+        isArmed = false
+        Task { @MainActor in
+            await Task.yield()
+            // Re-armed while we were waiting — leave the new hold alone.
+            guard !self.isArmed else { return }
+            BrightnessBoost.endSurvival()
+            VolumeBoost.endSurvival()
+            LocatorBeacon.endSurvival()
+        }
+    }
+
+    /// Find Help SOS — `tel:` immediately (no in-app prompt, no countdown), then
+    /// the same survival hold as crash (siren + max volume + full brightness).
+    /// Claims the arm token on the calling MainActor — does not wait on the
+    /// CoreMotion serial queue (that hop made the SOS button feel lagged).
+    func armSOS() {
+        // UI only calls this when disarmed; still refuse a second dial if a
+        // stale caller races after crash already armed the hold.
+        guard !isArmed else { return }
+        let generation = engine.claimArmGeneration()
+        PublicEmergencyAid.dial()
+        applyArm(generation: generation, source: .sos)
+    }
+
+    private enum ArmSource {
+        case sos
+        case crash
+    }
+
+    private func applyArm(generation: UInt64, source: ArmSource) {
+        // Drop stale arm Tasks invalidated by disarm / Stop the alarm.
+        guard engine.isArmGenerationCurrent(generation) else { return }
+        guard !isArmed else { return }
+        isArmed = true
+        // Paint Stop SOS / jump to 911 first — MPVolumeView + AVAudioSession hitch
+        // the main thread if they run in the same turn as the button press.
+        NotificationCenter.default.post(name: .redMedSurvivalArmed, object: nil)
+        Task { @MainActor in
+            await Task.yield()
+            guard self.engine.isArmGenerationCurrent(generation), self.isArmed else { return }
+            BrightnessBoost.beginSurvival()
+            VolumeBoost.beginSurvival()
+            LocatorBeacon.beginSurvival()
+        }
+        if source == .crash {
+            startCrashDialCountdown(generation: generation)
+            pendingCrashAutoShare = true
+        } else {
+            crashDialRemaining = nil
+        }
+    }
+
+    private func startCrashDialCountdown(generation: UInt64) {
+        crashDialTask?.cancel()
+        let total = USCrashDetectionCall.dialDelaySeconds
+        crashDialRemaining = total
+        crashDialTask = Task { @MainActor in
+            let started = Date()
+            while !Task.isCancelled {
+                let left = total - Date().timeIntervalSince(started)
+                guard self.engine.isArmGenerationCurrent(generation), self.isArmed else { return }
+                if left <= 0 {
+                    self.crashDialRemaining = nil
+                    // Dial only on time and on screen. A countdown that ran out
+                    // while RedMed was backgrounded / suspended must not place a
+                    // late 911 call on resume; the alarm stays armed and Call 911
+                    // is one tap away.
+                    let onTime = left > -USCrashDetectionCall.lateDialGraceSeconds
+                    if onTime, UIApplication.shared.applicationState == .active {
+                        PublicEmergencyAid.dial()
+                    }
+                    return
+                }
+                self.crashDialRemaining = left
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+            }
+        }
+    }
+
+    /// Serial CoreMotion evaluator — motion fields stay on `queue`; arm flag under `lock`.
+    private final class MotionEngine: @unchecked Sendable {
+        private let queue: OperationQueue = {
+            let q = OperationQueue()
+            q.name = "RedMed.CrashMotion"
+            q.maxConcurrentOperationCount = 1
+            // Utility so 50 Hz evaluate does not contend with tab hops / scroll.
+            q.qualityOfService = .utility
+            return q
+        }()
+        private let lock = NSLock()
+
+        private var manager: CMMotionManager?
+        private var isMonitoring = false
+        private var motionArmed = false
+        private var armGeneration: UInt64 = 0
+        private var freefallSince: Date?
+        private var freefallEndedAt: Date?
+        private var lastMagnitude: Double = 0
+        private var recentHumanPeaks: [Date] = []
+        private var recentHandSpins: [Date] = []
+        private var humanBurstStart: Date?
+        private var busyUntil: Date?
+        private var lastArmAt: Date?
+        private var onArm: ((UInt64) -> Void)?
+
+        func startMonitoring(onArm: @escaping (UInt64) -> Void) {
+            queue.addOperation { [weak self] in
+                guard let self else { return }
+                self.onArm = onArm
+                guard !self.isMonitoring else { return }
+                let motion = self.manager ?? CMMotionManager()
+                self.manager = motion
+                guard motion.isDeviceMotionAvailable else { return }
+                self.isMonitoring = true
+                self.resetTransientState()
+                motion.deviceMotionUpdateInterval = 1.0 / CrashMotionThresholds.sampleHz
+                motion.startDeviceMotionUpdates(using: .xArbitraryZVertical, to: self.queue) { [weak self] sample, _ in
+                    guard let self, let sample else { return }
+                    self.evaluate(sample)
+                }
+            }
+        }
+
+        func stopMonitoring() {
+            queue.addOperation { [weak self] in
+                guard let self else { return }
+                guard self.isMonitoring else { return }
+                self.isMonitoring = false
+                self.manager?.stopDeviceMotionUpdates()
+                self.resetTransientState()
+            }
+        }
+
+        func invalidateArm() {
+            lock.lock()
+            armGeneration &+= 1
+            motionArmed = false
+            lock.unlock()
+            queue.addOperation { [weak self] in
+                self?.resetTransientState()
+            }
+        }
+
+        /// Explicit SOS — claim generation on the caller (MainActor) without
+        /// waiting for the motion queue. Crash path arms via `startMonitoring`'s
+        /// `onArm` callback instead.
+        func claimArmGeneration() -> UInt64 {
+            lock.lock()
+            defer { lock.unlock() }
+            if motionArmed {
+                return armGeneration
+            }
+            motionArmed = true
+            armGeneration &+= 1
+            // Same cooldown clock as crash `armNow` — otherwise Stop after SOS
+            // left lastArmAt nil and a busy-handling spike could re-arm crash
+            // with no 90s gate.
+            lastArmAt = Date()
+            return armGeneration
+        }
+
+        /// Non-blocking — safe to call from MainActor.
+        func isArmGenerationCurrent(_ generation: UInt64) -> Bool {
+            lock.lock()
+            defer { lock.unlock() }
+            return motionArmed && armGeneration == generation
+        }
+
+        private func armNow() {
+            let generation: UInt64
+            lock.lock()
+            if motionArmed {
+                lock.unlock()
+                return
+            }
+            motionArmed = true
+            armGeneration &+= 1
+            generation = armGeneration
+            lastArmAt = Date()
+            lock.unlock()
+
+            freefallSince = nil
+            freefallEndedAt = nil
+            lastMagnitude = 0
+            recentHumanPeaks.removeAll(keepingCapacity: true)
+            recentHandSpins.removeAll(keepingCapacity: true)
+            humanBurstStart = nil
+            busyUntil = nil
+            onArm?(generation)
+        }
+
+        private func resetTransientState() {
+            freefallSince = nil
+            freefallEndedAt = nil
+            lastMagnitude = 0
+            recentHumanPeaks.removeAll(keepingCapacity: true)
+            recentHandSpins.removeAll(keepingCapacity: true)
+            humanBurstStart = nil
+            busyUntil = nil
+        }
+
+        private func markBusy(at now: Date) {
+            let until = now.addingTimeInterval(CrashMotionThresholds.busyHoldSeconds)
+            if let existing = busyUntil {
+                busyUntil = max(existing, until)
+            } else {
+                busyUntil = until
+            }
+            freefallSince = nil
+            freefallEndedAt = nil
+            humanBurstStart = nil
+        }
+
+        /// Sex / masturbation / jogging / similar — repeating human-band peaks.
+        private func isRhythmicHumanActivity(now: Date) -> Bool {
+            let peaks = recentHumanPeaks.filter {
+                now.timeIntervalSince($0) <= CrashMotionThresholds.humanActivityWindow
+            }
+            guard peaks.count >= CrashMotionThresholds.rhythmHitCount + 1 else { return false }
+            var hits = 0
+            for i in 1..<peaks.count {
+                let dt = peaks[i].timeIntervalSince(peaks[i - 1])
+                if dt >= CrashMotionThresholds.rhythmMinInterval
+                    && dt <= CrashMotionThresholds.rhythmMaxInterval {
+                    hits += 1
+                    if hits >= CrashMotionThresholds.rhythmHitCount { return true }
+                }
+            }
+            return false
+        }
+
+        private func evaluate(_ motion: CMDeviceMotion) {
+            lock.lock()
+            let alreadyArmed = motionArmed
+            let lastArm = lastArmAt
+            lock.unlock()
+            if alreadyArmed { return }
+            if let last = lastArm, Date().timeIntervalSince(last) < CrashMotionThresholds.cooldownSeconds {
+                return
+            }
+
+            let accel = motion.userAcceleration
+            let magnitude = sqrt(accel.x * accel.x + accel.y * accel.y + accel.z * accel.z)
+            let rot = motion.rotationRate
+            let spin = sqrt(rot.x * rot.x + rot.y * rot.y + rot.z * rot.z)
+            let dt = 1.0 / CrashMotionThresholds.sampleHz
+            let jerk = abs(magnitude - lastMagnitude) / dt
+            lastMagnitude = magnitude
+            let now = Date()
+
+            if magnitude >= CrashMotionThresholds.humanActivityMinG && magnitude <= CrashMotionThresholds.humanActivityMaxG {
+                recentHumanPeaks.append(now)
+                if humanBurstStart == nil { humanBurstStart = now }
+            } else if let start = humanBurstStart,
+                      now.timeIntervalSince(start) > CrashMotionThresholds.humanActivityWindow {
+                humanBurstStart = nil
+            }
+            recentHumanPeaks.removeAll { now.timeIntervalSince($0) > CrashMotionThresholds.humanActivityWindow }
+
+            // Sustained / rhythmic / repeated human-band motion → busy window.
+            // Fall through so overrideBusyPeakG (24g) can still arm a real crash.
+            if let start = humanBurstStart,
+               now.timeIntervalSince(start) >= CrashMotionThresholds.sustainedHumanSeconds,
+               !recentHumanPeaks.isEmpty {
+                markBusy(at: now)
+            }
+
+            if isRhythmicHumanActivity(now: now) {
+                markBusy(at: now)
+            }
+
+            if recentHumanPeaks.count >= CrashMotionThresholds.humanActivitySpikeCount {
+                markBusy(at: now)
+            }
+
+            if spin >= CrashMotionThresholds.handSpinRadPerSec {
+                recentHandSpins.append(now)
+                recentHandSpins.removeAll { now.timeIntervalSince($0) > CrashMotionThresholds.humanActivityWindow }
+                if magnitude < CrashMotionThresholds.overrideBusyPeakG {
+                    markBusy(at: now)
+                    return
+                }
+            } else {
+                recentHandSpins.removeAll { now.timeIntervalSince($0) > CrashMotionThresholds.humanActivityWindow }
+            }
+
+            let isBusy = (busyUntil.map { now < $0 } ?? false)
+                || !recentHandSpins.isEmpty
+                || recentHumanPeaks.count >= CrashMotionThresholds.humanActivitySpikeCount
+                || isRhythmicHumanActivity(now: now)
+
+            if magnitude <= CrashMotionThresholds.freefallMaxG {
+                if freefallSince == nil { freefallSince = now }
+            } else if let since = freefallSince {
+                if now.timeIntervalSince(since) >= CrashMotionThresholds.freefallMinSeconds {
+                    freefallEndedAt = now
+                }
+                freefallSince = nil
+            }
+
+            let inPostFreefallWindow: Bool = {
+                guard let ended = freefallEndedAt else { return false }
+                if now.timeIntervalSince(ended) > CrashMotionThresholds.freefallImpactWindow {
+                    freefallEndedAt = nil
+                    return false
+                }
+                return true
+            }()
+
+            guard jerk >= CrashMotionThresholds.minJerkGPerSecond else { return }
+
+            let requiredPeak = isBusy ? CrashMotionThresholds.overrideBusyPeakG : CrashMotionThresholds.crashPeakG
+            if magnitude >= requiredPeak {
+                armNow()
+                return
+            }
+
+            if !isBusy, inPostFreefallWindow, magnitude >= CrashMotionThresholds.postFreefallPeakG {
+                armNow()
+            }
+        }
+    }
+}
+
+/// Cancel on Aid — under the pane grid (above owner quiet prayer when present).
+/// Outside LazyVGrid so pane expand/collapse is undisturbed.
+struct CrashSurvivalCancelCard: View {
+    @ObservedObject private var monitor = CrashMotionGuard.shared
+
+    var body: some View {
+        if monitor.isArmed {
+            Button {
+                RedMedHaptics.medium()
+                // No spring around disarm — volume/brightness tear-down must not
+                // sit inside an animation transaction (same hitch as SOS arm).
+                var t = Transaction()
+                t.animation = nil
+                withTransaction(t) {
+                    monitor.disarm()
+                }
+            } label: {
+                HStack {
+                    Text("Stop The Alarm")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.redmedDark)
+                    Spacer()
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(.redmedAccent)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(Color.redmedBg)
+                .clipShape(RoundedRectangle(cornerRadius: RedMedChrome.boxRadius))
+                .overlay(
+                    RoundedRectangle(cornerRadius: RedMedChrome.boxRadius)
+                        .strokeBorder(Color.redmedDivider, lineWidth: 1)
+                )
+            }
+            .buttonStyle(RedMedPressStyle(haptic: nil))
+            .padding(.top, 5)
+            .transaction { $0.animation = nil }
+        }
+    }
+}

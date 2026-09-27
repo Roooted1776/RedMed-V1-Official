@@ -2,7 +2,7 @@
 
 Keep these **false / empty** until paid Apple Developer Program + portal capabilities exist. Do not flip flags in a Cloud Agent Linux session.
 
-The switches live in `Roooted1776/RedMed-iOS` (`owner/RedMed/`).
+The switches live in `owner/RedMed/`.
 
 | Switch | Location | Restore |
 |--------|----------|---------|
@@ -19,7 +19,7 @@ The switches live in `Roooted1776/RedMed-iOS` (`owner/RedMed/`).
 1. Portal Tag Reading on `com.redmed.app`
 2. In-repo flag + entitlement + usage string together
 3. Device Write The Band on blank **NTAG216** with read-back verify
-4. In `Roooted1776/RedMed-iOS`: `node scripts/test-nfc-hardware.mjs` → 51/51
+4. `node scripts/test-nfc-hardware.mjs` → 51/51
 5. Associated Domains only after AASA is live JSON on `https://redmed.live`
 
 Until then: blank chips + Share honesty only ([`ADVERTISING.md`](ADVERTISING.md)).
