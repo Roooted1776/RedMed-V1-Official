@@ -667,8 +667,6 @@ enum ProfileNFCCodec {
     /// Hard cap on inflated legacy payloads (bracelet / `#d=` JSON is tiny).
     private static let maxInflatedBytes = 64 * 1024
 
-    /// zlib inflate into a fixed 64 KiB destination — never allocate unbounded output.
-    /// Same wire wrapper `DecompressionStream('deflate')` / Foundation `.zlib` expect.
     /// Legacy bands were deflated by `CompressionStream('deflate')`, which is
     /// zlib-wrapped (RFC 1950: 2-byte header + 4-byte Adler-32). Apple's
     /// `COMPRESSION_ZLIB` is raw DEFLATE (RFC 1951), so strip the wrapper the
@@ -699,6 +697,7 @@ enum ProfileNFCCodec {
         return (b << 16) | a
     }
 
+    /// Raw DEFLATE inflate into a fixed 64 KiB destination — never allocate unbounded output.
     private static func rawInflate(_ data: Data) -> Data? {
         let data = Data(data)
         guard !data.isEmpty else { return nil }
@@ -719,7 +718,8 @@ enum ProfileNFCCodec {
                 )
             }
         }
-        guard decoded > 0, decoded <= maxInflatedBytes else { return nil }
+        // A full buffer means output was truncated at the cap — refuse it.
+        guard decoded > 0, decoded < maxInflatedBytes else { return nil }
         destination.count = decoded
         return destination
     }
