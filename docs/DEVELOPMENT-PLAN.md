@@ -12,7 +12,7 @@ Keep medical information on the existing Owner/band path. The product, website, 
 
 | Area | Observation | Meaning |
 |---|---|---|
-| Repository | Assist `Roooted1776/RedMed-V1-Official`; Owner `Roooted1776/RedMed-iOS` | Web and iOS are separate gits. Codec lockstep is `contracts/d-codec-fixtures.json` |
+| Repository | `Roooted1776/RedMed-V1-Official` | Assist is `tapper/`. Owner is `owner/RedMed.xcodeproj`. Codec lockstep is `contracts/d-codec-fixtures.json` |
 | GitHub CI | Gates passed on `a7740a2` | Local code checks are not proof of live hosting |
 | Public Assist | Parking page at `https://redmed.live/tapper/` | P0; do not approve new encoded-band launch |
 | Supabase | `RedMed Secure Data` active; no public tables or migration history at inspection | Ops ledger is a new, explicitly scoped change |

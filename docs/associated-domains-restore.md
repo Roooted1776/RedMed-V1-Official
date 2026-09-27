@@ -29,7 +29,7 @@ app no longer ingests `redmed://band` either. Universal Links are the only
 band-tap path into the app. SOS never auto-arms from band tap.
 
 **Ship rule:** NFC write (`nfcHardwareEnabled`) and Associated Domains need
-the same paid Program, so they ship together. In `Roooted1776/RedMed-iOS`,
+the same paid Program, so they ship together. In `owner/RedMed`,
 `scripts/test-nfc-hardware.mjs` fails if `nfcHardwareEnabled` is true without
 `associatedDomainsEnabled` + `applinks:` in the entitlements.
 

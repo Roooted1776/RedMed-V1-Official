@@ -4,6 +4,6 @@
 2. On the Mac you will open Xcode (MacBook Air **or** Mini): Fetch → Pull **`main`** of `Roooted1776/RedMed-V1-Official` only. One clone per machine. Hub is GitHub HTTPS — see [`DUAL-MAC.md`](DUAL-MAC.md) (My Machines workers: `macbook-air` / `mac-mini`).
 3. Delete the feature branch after merge. Do not keep parallel remotes (`wire-privacy-info-target` is unsafe).
 4. Before **every Archive**: Xcode → `PrivacyInfo.xcprivacy` → File inspector → Target Membership → **RedMed**.
-5. The iPhone app is `Roooted1776/RedMed-iOS`, project `owner/RedMed.xcodeproj`. Clone that repo on the Mac. This repo is the Assist shell.
+5. The iPhone app is `owner/RedMed.xcodeproj` in this repo. Open that project on the Mac.
 
 See `docs/DO-NOT.md`.

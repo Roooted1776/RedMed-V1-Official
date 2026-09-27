@@ -15,6 +15,10 @@
 
 # Xcode — per-user state. Committing these makes every project open replay a
 # stale window/editor layout and makes every merge conflict on a binary blob.
+# Local wearer-sync key. Copy owner/Config/Supabase.xcconfig.example; never commit it.
+**/Supabase.xcconfig
+Secrets.xcconfig
+*.local.xcconfig
 xcuserdata/
 *.xcuserstate
 *.xcuserdatad/

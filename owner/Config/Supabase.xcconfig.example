@@ -1,0 +1,7 @@
+// Copy to Config/Supabase.xcconfig (gitignored) and fill in.
+// Host only. No scheme, no trailing slash: xcconfig reads `//` as a comment.
+SUPABASE_HOST = mohxobgyjkcmkqxijgeg.supabase.co
+// Publishable (anon) key only. Never the service_role / secret key.
+SUPABASE_PUBLISHABLE_KEY = sb_publishable_REPLACE_ME
+// YES turns on wearer account sync for this build. Stays NO in git.
+REDMED_PROFILE_SYNC = YES

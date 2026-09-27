@@ -1,0 +1,15 @@
+// Base settings for the RedMed target. Committed.
+//
+// Wearer account sync reads two Info.plist keys that come from here:
+//   SUPABASE_URL             = https://$(SUPABASE_HOST)
+//   SUPABASE_PUBLISHABLE_KEY = $(SUPABASE_PUBLISHABLE_KEY)
+// Both stay empty in git. Put real values in Config/Supabase.xcconfig
+// (gitignored). Copy Supabase.xcconfig.example to start.
+//
+// xcconfig treats `//` as a comment, so the URL is split into scheme + host.
+
+SUPABASE_HOST =
+SUPABASE_PUBLISHABLE_KEY =
+REDMED_PROFILE_SYNC = NO
+
+#include? "Supabase.xcconfig"

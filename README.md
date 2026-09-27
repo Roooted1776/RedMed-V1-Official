@@ -5,7 +5,7 @@ Medical ID band + iPhone app. The band card is still the `#d=` fragment. A signe
 | Surface | Path | Audience |
 |---------|------|----------|
 | **Assist** | [`tapper/`](tapper/) → `https://redmed.live/tapper/` | Person who taps the band |
-| **Owner** | [`Roooted1776/RedMed-iOS`](https://github.com/Roooted1776/RedMed-iOS) | Wearer with the App Store app (`com.redmed.app`) |
+| **Owner** | [`owner/`](owner/) | Wearer with the App Store app (`com.redmed.app`) |
 
 Canonical git remote: **`Roooted1776/RedMed-V1-Official`** (migrated from `frisky`; history preserved when mirrored). Ship branch: `main`.
 
@@ -45,6 +45,7 @@ python3 -m http.server 8787
 # Pre-merge gates
 bash scripts/sync-tapper.sh
 node scripts/test-d-codec.mjs
+node scripts/test-nfc-hardware.mjs
 node scripts/test-sw-offline.mjs
 node scripts/test-product-independence.mjs
 

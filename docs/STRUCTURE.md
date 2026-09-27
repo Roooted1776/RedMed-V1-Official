@@ -24,7 +24,7 @@ No brand PNGs at repo root — canonical in `assets/`, shell-relative copies in 
 ```text
 RedMed-V1-Official/
 ├── README.md · AGENTS.md · MAX.md
-├── (Owner app moved)      # Roooted1776/RedMed-iOS — owner/RedMed.xcodeproj
+├── owner/                 # Owner Xcode app — RedMed.xcodeproj (RedMed-Xcode → owner)
 ├── contracts/             # shared #d= fixtures (lockstep with the iOS repo)
 ├── tapper/                # tap pages only — passerby shell, no owner-app features
 ├── supabase/              # ops release ledger only — no medical profiles, no MCP
@@ -62,20 +62,19 @@ RedMed-V1-Official/
 | `docs/spec-exhibit-a-po-qc-rider.html` | Printable bilingual EN/中文 rider (sign; do not commit the filled copy) |
 | `docs/FOUNDER-WHY.md` | Careful founder-why paste (categories only) — About / station insert / Arrival Day Pack |
 
-Hosted `/Document/` is `Document/index.html`. `Document/Document.html` is a thin hash-preserving redirect to `/Document/`. Band tap Help opens `/Document/` straight. The in-app copy is authored in `Roooted1776/RedMed-iOS`. `/privacy` redirects to `/Document/`.
+Hosted `/Document/` is `Document/index.html`. `Document/Document.html` is a thin hash-preserving redirect to `/Document/`. Band tap Help opens `/Document/` straight. The in-app copy is `owner/RedMed/Document/`. `/privacy` redirects to `/Document/`.
 
 ## Surfaces (tapper vs owner)
 
 | | `tapper/` | `owner/` |
 | --- | --- | --- |
 | **Who** | Stranger who tapped the band | Wearer with the App Store app |
-| **What** | Web tap pages (`/tapper/#d=…`), 911 · Aid | SwiftUI app in `Roooted1776/RedMed-iOS`: Edit, NFC, Keychain, optional account sync |
+| **What** | Web tap pages (`/tapper/#d=…`), 911 · Aid | SwiftUI app in `owner/`: Edit, NFC, Keychain, optional account sync |
 | **Claims** | No ads, no auth, no trackers | General Wellness ICE card — **not** HIPAA-certified |
 | **Do not put here** | NFC tab, Edit, owner Keychain, App Store copy | Passerby-only redirect stubs, Worker device hints |
 
-The iOS repo pins `Vendor/tapper/index.html` from this repo’s `tapper/index.html` and bundles it as `tapper.html` for NFC Preview. Bumping the pin is an explicit commit. The tap page does not call Supabase.
+Xcode copies `tapper/index.html` into the app as `tapper.html` for NFC Preview. The tap page does not call Supabase.
 
 ## Owner app
 
-The Xcode project is `owner/RedMed.xcodeproj` in `Roooted1776/RedMed-iOS`.
-Open that repo on a Mac. This tree does not build the app.
+The Xcode project is `owner/RedMed.xcodeproj`. Open it on a Mac. `RedMed-Xcode` points at `owner/`.
