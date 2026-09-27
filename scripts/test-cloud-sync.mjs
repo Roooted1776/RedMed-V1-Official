@@ -74,6 +74,18 @@ assert('erase is durable + blocks pull', sync.includes('pendingEraseKey') && /if
 assert('sign-in resets bookkeeping', /func didSignIn[\s\S]*?resetBookkeeping\(\)/.test(sync));
 assert('availability needs key + opt-in', sync.includes('(AppConfig.profileSyncEnabled || SupabaseConfig.buildOptIn) && SupabaseConfig.isConfigured'));
 
+// Linked is device-local CoreNFC verify — pull must not overwrite from the account row.
+{
+  const profile = read('owner/RedMed/ProfileData.swift');
+  const applyFn = (/func applyCloudRecord\(_ record: OwnerProfileRecord\) \{[\s\S]*?\n    \}/.exec(profile) || [''])[0];
+  assert('applyCloudRecord exists', applyFn.includes('func applyCloudRecord'));
+  assert(
+    'applyCloudRecord never adopts braceletLinked from the account row',
+    applyFn.length > 0 && !/braceletLinked\s*=\s*record\.braceletLinked/.test(applyFn)
+  );
+  assert('cloudFields still reports local braceletLinked', /func cloudFields\(\)[\s\S]*?braceletLinked:\s*braceletLinked/.test(profile));
+}
+
 // --- Server schema ---
 for (const t of ['profiles', 'band_writes']) {
   assert(`${t}: RLS enabled`, sql.includes(`alter table redmed_owner.${t} enable row level security`));

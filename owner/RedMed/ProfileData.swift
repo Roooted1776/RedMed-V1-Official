@@ -392,7 +392,8 @@ class ProfileData: ObservableObject {
             contacts = record.contacts.map {
                 EmergencyContact(name: $0.name, relationship: $0.relationship, phone: $0.phone)
             }
-            braceletLinked = record.braceletLinked
+            // Linked is this-iPhone CoreNFC verify only — never adopt from the
+            // account row (another device / parked build could set true).
             isOrganDonor = record.isOrganDonor
             isPregnant = record.isPregnant
             isDeafOrVisionImpaired = record.isDeafOrVisionImpaired
