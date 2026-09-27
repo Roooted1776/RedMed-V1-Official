@@ -69,6 +69,16 @@ final class NFCWriter: NSObject, ObservableObject {
 /// even when the screen is off or locked (iPhone XS+). Apple's URI helper can
 /// drop the fragment, which opens bare `/tapper/` instead of the card.
 enum NFCURICodec {
+    /// NFC Forum URI Record (RTD-URI) identifier codes this app writes and
+    /// reads back. Single source of truth for both directions so encode and
+    /// decode can never drift out of sync.
+    static let uriPrefixCodes: [(UInt8, String)] = [
+        (0x01, "http://www."),
+        (0x02, "https://www."),
+        (0x03, "http://"),
+        (0x04, "https://")
+    ]
+
     static func payload(for urlString: String) -> NFCNDEFPayload? {
         if let payload = wellKnownURIRecord(urlString) {
             return payload
@@ -83,15 +93,9 @@ enum NFCURICodec {
     /// NFC Forum URI Record (RTD-URI): identifier code + UTF-8 remainder.
     /// `0x04` = `https://` so BTR treats this as a website, not a custom scheme.
     static func wellKnownURIRecord(_ urlString: String) -> NFCNDEFPayload? {
-        let prefixes: [(UInt8, String)] = [
-            (0x02, "https://www."),
-            (0x01, "http://www."),
-            (0x04, "https://"),
-            (0x03, "http://")
-        ]
         var identifier: UInt8 = 0x00
         var remainder = urlString
-        for (code, prefix) in prefixes {
+        for (code, prefix) in uriPrefixCodes {
             if urlString.count >= prefix.count,
                urlString.lowercased().hasPrefix(prefix) {
                 identifier = code
@@ -118,14 +122,8 @@ enum NFCURICodec {
             let code = payload.payload[payload.payload.startIndex]
             let rest = payload.payload.dropFirst()
             if let body = String(data: Data(rest), encoding: .utf8) {
-                let prefixes: [UInt8: String] = [
-                    0x00: "",
-                    0x01: "http://www.",
-                    0x02: "https://www.",
-                    0x03: "http://",
-                    0x04: "https://"
-                ]
-                return (prefixes[code] ?? "") + body
+                let prefix = uriPrefixCodes.first { $0.0 == code }?.1 ?? ""
+                return prefix + body
             }
         }
         if let url = payload.wellKnownTypeURIPayload() {
@@ -189,7 +187,9 @@ extension NFCWriter: NFCNDEFReaderSessionDelegate {
                         return
                     }
                     let message = NFCNDEFMessage(records: [payload])
-                    if capacity > 0, message.length > capacity {
+                    // No `capacity > 0` escape hatch: a tag reporting 0 capacity
+                    // (e.g. unformatted) must fail closed, not skip the cap.
+                    if message.length > capacity {
                         session.invalidate(
                             errorMessage: "Profile is \(message.length) bytes; this tag only holds \(capacity). Shorten RedMed. Product band is NXP NTAG216."
                         )
