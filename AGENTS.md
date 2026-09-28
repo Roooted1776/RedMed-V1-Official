@@ -9,15 +9,27 @@ One clone per machine. `frisky` is archived (`docs/FRISKY-ARCHIVE.md`).
 
 ## Product wall (ops vs Assist)
 
-Assist `#d=` fragments and rescuer reads must **never** pass through:
+Since 2026-09-28, `https://redmed.live` is served by the Hostinger VPS
+(`2010795` / `2.25.249.204`) itself: a `redmed-portal` container behind
+Traefik (TLS via Traefik's Let's Encrypt resolver), DNS pointed there
+directly from Namecheap (no Cloudflare). This is a static-file / reverse-proxy
+role only — the wall below is about **data**, not about which host answers
+the TCP connection.
+
+Assist `#d=` fragments (a URL *fragment* — browsers never send it in the
+HTTP request) and rescuer reads must **never** be received, logged,
+processed, or stored by:
 
 - any MCP (none ship in this repository)
-- Hostinger VPS (`2010795` / `2.25.249.204`) shell or Traefik routes
-- the public tap page (`tapper/` does not call Supabase)
+- the Hostinger VPS shell, Traefik logs/middleware, or any app code running there
+- the public tap page's own network calls (`tapper/` does not call Supabase)
 
 Supabase project `mohxobgyjkcmkqxijgeg` has two schemas. `redmed_ops` is release evidence only. `redmed_owner` is the signed-in wearer copy (RLS, `auth.uid()`), written by the Owner app — not by an MCP, the VPS, or `tapper/`. See `docs/adr/002-owner-account-sync.md`.
 
-Assist origin stays Hostinger **static** + Cloudflare DNS/SSL (`docs/domain.md`). VPS is ops-only.
+The VPS may serve Assist's static files (HTML/JS/CSS — no server logic
+touches `#d=`). It must never gain a database, session store, or logging
+config that captures request fragments, query strings with profile data, or
+`redmed_owner` rows. See `docs/domain.md` for the current DNS/TLS setup.
 
 ## Who can work this repo
 
@@ -38,7 +50,7 @@ Two folders, two audiences — never cross owner-only features into Assist.
 | **Assist** | `tapper/` → `https://redmed.live/tapper/` | The person **tapping** the band (passerby / responder) | Tap pages, band `#d=` decode, RedMed · 911 · Aid web shell only. No NFC tab, Edit, Face ID, Keychain, or App Store flows. No-auth, no-ads. Folder + URL path stay `tapper/` so already-written bands keep working. |
 | **Owner** | `owner/` | The person with the **app on their phone** (App Store wearer) | Native iOS / SwiftUI (`com.redmed.app`). Profile, Edit, NFC Write/Scan, Face ID chrome, Keychain, optional Supabase account sync, HealthKit import. **Not** HIPAA-certified. |
 
-- **Assist (static Hostinger shell)** — Product write base `https://redmed.live/tapper/` (`docs/domain.md`). Stage with `scripts/stage-site.sh` → `dist/passerby`; deploy with `node scripts/deploy-hostinger-static.mjs redmed.live` (`HOSTINGER_API_TOKEN`). Serves `tapper/`, redirect stubs (`index.html`, `redmed-emergency.html`, …), `sw.js`, `Document/`, `assets/`, `.htaccess` (AASA Content-Type on Apache). No app build. No RedMed server / DB. Local: `python3 -m http.server`. CI: `.github/workflows/pages-deploy.yml`. Before merge: `bash scripts/sync-tapper.sh`, `node scripts/test-d-codec.mjs`, and `node scripts/test-product-independence.mjs`. No MCP and no Cloudflare Worker in this tree (product wall above).
+- **Assist (static shell)** — Product write base `https://redmed.live/tapper/` (`docs/domain.md`). Live origin is the Hostinger VPS `redmed-portal` container behind Traefik (not the shared Hostinger static-hosting plan `scripts/deploy-hostinger-static.mjs` targets — that plan does not exist on this account's API token; the script + `.github/workflows/pages-deploy.yml` Hostinger-upload step are currently non-functional and kept only for `roooted1776.github.io` backup parity / future use). Serves `tapper/`, redirect stubs (`index.html`, `redmed-emergency.html`, …), `sw.js`, `Document/`, `assets/`. No app build. No RedMed server / DB behind the static content itself. Local: `python3 -m http.server`. Before merge: `bash scripts/sync-tapper.sh`, `node scripts/test-d-codec.mjs`, and `node scripts/test-product-independence.mjs`. No MCP in this tree (product wall above).
 - **Owner (native iOS app)** — `owner/RedMed.xcodeproj` in this repo. macOS only. `ios-build.yml` runs on `macos-latest`. Xcode copies `tapper/index.html` into the bundle as `tapper.html` for NFC Preview. `RedMed-Xcode` is a symlink to `owner/`. Wire format lockstep is `contracts/d-codec-fixtures.json`.
 - **Own-band / Assist SOS** — SOS exists so helpers can find someone on a **dark rainy night after a motorist ejects from a vehicle**: **full sound + full light**. It arms only when the helper toggles **SOS · Locate Me**, or when collision is detected using **US Crash Detection** timing (Apple Support 104959: 10s alert + 30s countdown → `tel:` unless Stop) — not Apple's Crash Detection API. Band tap never auto-arms SOS. After the owner writes their custom band and has RedMed installed, Associated Domains (Universal Links) claims the tap — never a `redmed://` handoff carrying `#d=` (custom schemes are not exclusive; any app registering `redmed` would get the profile). NFC write ships only with Associated Domains (enforced by `test-nfc-hardware.mjs`). No distance / BLE ranging.
 
@@ -57,6 +69,7 @@ Gmail for automations: Cursor Gmail MCP, not a separate Grok Gmail plugin.
 - No HIPAA-certified / fake App Store ID claims.
 - Face ID is UI-only. Keychain stays `WhenPasscodeSetThisDeviceOnly` with no biometry ACL.
 - Assist at `https://redmed.live/tapper/` is no-auth, no-ads. `#d=` codec lockstep tests must stay green.
+- VPS serves Assist as static files only — no server code, DB, or log config may read/store `#d=` or `redmed_owner` data (product wall above).
 - SOS = full sound + full light; arms only on SOS toggle or US Crash Detection collision timing — never on band tap alone. Owner phone with RedMed + written band: applinks (Universal Links) claim the tap — no `redmed://band#d=` handoff. No fake band-distance ranging.
 - Band is factory blank NDEF-unlocked NXP NTAG216 — no permanent lock bytes, ever. `scripts/test-nfc-hardware.mjs` (51 checks) must stay green.
 - One repo, one branch for shipping: `Roooted1776/RedMed-V1-Official` `main`.

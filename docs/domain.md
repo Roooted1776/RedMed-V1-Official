@@ -1,19 +1,21 @@
 # RedMed domain — `redmed.live`
 
-Stack (do not mix roles):
+Stack as of 2026-09-28 (do not mix roles):
 
 | Layer | Who | Job |
 |-------|-----|-----|
-| **Registrar** | Namecheap | Own the domain only. Custom nameservers → Cloudflare. |
-| **DNS + edge SSL** | Cloudflare | Authoritative DNS, orange-cloud proxy, visitor HTTPS. **Not** a Worker recreate. |
-| **Origin** | Hostinger static | File host for `tapper/` only. **No Hostinger domain product.** **No RedMed server / DB.** |
+| **Registrar + DNS** | Namecheap | BasicDNS. `@` and `www` A records point straight at the VPS. No Cloudflare in the stack. |
+| **Origin** | Hostinger VPS (`2010795` / `2.25.249.204`) | `redmed-portal` container behind Traefik. Traefik terminates TLS (Let's Encrypt, `certresolver=letsencrypt`) and serves the static Assist shell. **Static files only — no PHI processing** (see product wall, `AGENTS.md`). |
 
 Production write base:
 
 **`https://redmed.live/tapper/`**
 
-No RedMed server. No database. No HIPAA backend. Profile data stays in the
-band URL `#d=` fragment only — the browser decodes it on the phone.
+No RedMed server processes profile data. No database in the request path.
+Profile data stays in the band URL `#d=` fragment only — a URL fragment is
+never sent by the browser to any server; it's decoded client-side on the
+phone. The VPS/Traefik route is a static-file reverse proxy, same privacy
+property as any other static host.
 
 `AppConfig.medicalCardCustomDomainTBD` / `medicalCardBaseURL` is
 `https://redmed.live/tapper/`.
@@ -22,90 +24,27 @@ band URL `#d=` fragment only — the browser decodes it on the phone.
 
 | Path | Status |
 |------|--------|
-| Product HTML app | Hostinger site `u666300215`, files in `public_html` / plan IP **`195.35.60.70`**. Deploy: `bash scripts/stage-site.sh` then `node scripts/deploy-hostinger-static.mjs redmed.live` (`HOSTINGER_API_TOKEN`). Stage includes `.htaccess` for AASA Content-Type on Apache. |
-| Hostinger domain product | **None** — domains portfolio is empty. Website hostname `redmed.live` lives on the hosting plan only. |
-| Public DNS | **Parking** as of V1 go-live audit — Hostinger `dns-parking` NS / parked HTML on `https://redmed.live/tapper/`. Must finish Cloudflare NS cutover before bands use this host. |
-| Cloudflare DNS + SSL | **Cutover ready** — `node scripts/setup-cloudflare-dns.mjs` (needs `CLOUDFLARE_API_TOKEN`), then Namecheap Custom DNS → Cloudflare NS. Verify: `bash scripts/verify-cf-dns-cutover.sh`. |
-| Cloudflare Worker | **Not used.** DNS and SSL only. Do not add a Worker. |
-| Public GitHub Pages `Roooted1776.github.io/tapper/` | **Backup** (and current live Assist while `redmed.live` parks). Keep publishing (`scripts/publish-github-io.sh`). |
+| Product HTML app | Served by container `redmed-portal-live` on the Hostinger VPS, port 8090 internally, fronted by Traefik. Traefik router `redmed-live`: `` Host(`redmed.live`) || Host(`www.redmed.live`) `` → service `redmed-portal`, TLS via Let's Encrypt. |
+| DNS | Namecheap BasicDNS. `@` → `2.25.249.204`, `www` → `2.25.249.204`. NS: `dns1/dns2.registrar-servers.com`. |
+| Hostinger shared static-hosting plan (`u666300215`) | **Does not exist on this account's API token** — `scripts/deploy-hostinger-static.mjs` and the Hostinger-upload step in `.github/workflows/pages-deploy.yml` are currently dead code against this account (the token only sees the VPS subscription, zero websites). Kept only in case a real static plan is provisioned later. |
+| Cloudflare | **Not used.** Was planned for a DNS/SSL cutover (see historical section below) but abandoned in favor of DNS → VPS direct + Traefik's own TLS. |
+| Public GitHub Pages `Roooted1776.github.io/tapper/` | **Backup only.** Its `Publish tapper` workflow now syncs from `Roooted1776/RedMed-V1-Official` (fixed 2026-09-28 — it previously pointed at the archived `frisky` repo, so backup deploys were silently stale). Keep publishing so already-written bands still resolve if the VPS is ever down. |
 
 Smoke after DNS: `BASE=https://redmed.live bash scripts/smoke-pages.sh`.
-Origin check (DNS independent): `BASE=http://195.35.60.70 HOST_HEADER=redmed.live bash scripts/smoke-pages.sh`.
-CI (`Pages tapper deploy`) hard-smokes the github.io backup and soft-warns while
-public DNS is still Namecheap parking or Hostinger `dns-parking` NS (hCDN often
-403s GitHub Actions IPs on those edges). Hard-fail public `redmed.live` smoke only
-after Cloudflare NS or Hostinger plan A (`195.35.60.70`).
+Origin check (DNS independent): `curl -H "Host: redmed.live" https://2.25.249.204/tapper/` (expect a name mismatch on the TLS cert since it's issued for `redmed.live`, not the bare IP — use `-k`/`--insecure` for this specific DNS-independent check only).
 
 ## Publish github.io (backup host)
 
 Repo `Roooted1776/Roooted1776.github.io` already exists. Re-publish:
 
 1. GitHub → that repo → Actions → **Publish tapper** → Run workflow
-   (checks out this repo and runs `scripts/publish-github-io.sh`).
+   (checks out `Roooted1776/RedMed-V1-Official` and runs `scripts/publish-github-io.sh`).
 2. Or locally: `./scripts/publish-github-io.sh /path/to/Roooted1776.github.io`, then commit and push `main`.
 3. Smoke: `BASE=https://roooted1776.github.io bash scripts/smoke-pages.sh`
 
-## DNS / SSL cutover (`redmed.live`)
-
-### Goal
-
-```
-Visitor HTTPS → Cloudflare (edge cert + Always Use HTTPS)
-             → Hostinger origin 195.35.60.70 (static files only)
-Namecheap keeps the registration invoice; DNS answers come from Cloudflare.
-```
-
-### 1. Cloudflare API (agent / Max)
-
-Create an API token: [dash.cloudflare.com/profile/api-tokens](https://dash.cloudflare.com/profile/api-tokens)
-
-- Template **Edit zone DNS**, plus permission **Zone → Zone Settings → Edit** (SSL).
-- Account: `a2d8a74738a0280eb9d5a3e77acd59ea` (override with `CLOUDFLARE_ACCOUNT_ID`).
-
-```bash
-export CLOUDFLARE_API_TOKEN=…   # also add as Cloud Agent / CI secret when ready
-node scripts/setup-cloudflare-dns.mjs redmed.live
-```
-
-That script:
-
-1. Creates/finds zone `redmed.live` (full setup).
-2. Upserts proxied **A** `@` and `www` → `195.35.60.70` (orange cloud).
-3. Sets SSL/TLS encryption mode → **Flexible** (Hostinger origin serves HTTP without forcing HTTPS today — avoids redirect loops).
-4. Turns **Always Use HTTPS** on at the edge.
-5. Prints the two Cloudflare nameservers.
-
-Dashboard equivalent (if you skip the token): Onboard `redmed.live` → Free plan → same A records proxied → SSL/TLS Overview → Flexible → Edge Certificates → Always Use HTTPS = On.
-
-### 2. Namecheap (Max — registrar only)
-
-1. Domain List → **Manage** → `redmed.live`.
-2. If DNSSEC is on, turn it **off** before changing NS.
-3. Nameservers → **Custom DNS** → paste the two Cloudflare nameservers from step 1.
-4. Save. Leave Advanced DNS empty/unused — Cloudflare is authoritative after NS switch.
-5. Do **not** point Namecheap A records at Hostinger if NS already moved to Cloudflare (those records would be ignored).
-
-### 3. Verify
-
-```bash
-bash scripts/verify-cf-dns-cutover.sh
-# or piecewise:
-dig +short NS redmed.live          # *.ns.cloudflare.com
-dig +short redmed.live A           # Cloudflare anycast (or 195.35.60.70 if gray)
-BASE=https://redmed.live bash scripts/smoke-pages.sh
-```
-
-### 4. Optional later: Full (strict)
-
-After Hostinger has a valid cert for `redmed.live` (or install a Cloudflare Origin CA cert on the plan), change Cloudflare SSL mode from **Flexible** → **Full (strict)**. Day-1 Flexible is intentional so public HTTPS works while origin is HTTP-only.
-
-**Do not** recreate Worker `redmed-emergency` just for SSL — Cloudflare DNS/SSL in front of Hostinger static is enough.
-
-**Do not** buy/transfer the domain onto Hostinger — hosting already serves the hostname; domains portfolio stays empty.
-
 ## Product rules
 
-1. Smoke: `https://redmed.live/tapper/` loads RedMed · 911 · Aid. Bare `/` lands on `/tapper/` and keeps `#d=`.
+1. Smoke: `https://redmed.live/tapper/` loads RedMed · 911 · Aid. Bare `/` serves the landing page and does **not** force-redirect to `/tapper/` — legacy stub URLs (`card.html`, `get.html`, `redmed-emergency.html`, `tapper.html`) still redirect there for old bands.
 2. New NFC writes use `redmed.live` (`AppConfig.medicalCardBaseURL`).
 3. Keep github.io backup for old bands.
 4. Path stays **`/tapper/`** so SW cache keys and legacy `/get/` → `/tapper/` redirects stay coherent.
@@ -115,7 +54,21 @@ After Hostinger has a valid cert for `redmed.live` (or install a Cloudflare Orig
 | Role | URL |
 |------|-----|
 | Product HTML app (write base) | `https://redmed.live/tapper/` |
-| Hostinger origin IP | `195.35.60.70` (Host: `redmed.live`) |
+| VPS origin IP | `2.25.249.204` (Traefik, Host-based routing) |
 | Backup host (old bands) | `https://roooted1776.github.io/tapper/` |
 
-Deploy deps (one-off): `npm install --no-save axios tus-js-client` before running `scripts/deploy-hostinger-static.mjs`.
+## Historical: Cloudflare cutover (abandoned 2026-09-28)
+
+A Cloudflare DNS + edge-SSL cutover in front of a Hostinger shared static
+plan was planned and scripted (`scripts/setup-cloudflare-dns.mjs`,
+`scripts/verify-cf-dns-cutover.sh`). It was abandoned once it became clear
+that shared static plan (`u666300215`) does not actually exist on the
+account's API token, and the VPS + Traefik route above was already live and
+simpler. Those scripts are unused; do not run them without first checking
+whether this doc still reflects reality. **Do not** recreate Worker
+`redmed-emergency` — Traefik + Let's Encrypt already terminates TLS. **Do
+not** buy/transfer the domain onto Hostinger.
+
+Deploy deps for the (currently dead) Hostinger-static path (one-off):
+`npm install --no-save axios tus-js-client` before running
+`scripts/deploy-hostinger-static.mjs`.
