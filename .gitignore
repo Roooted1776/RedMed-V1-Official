@@ -51,3 +51,7 @@ mcp/.env.local
 
 # Claude Code local MCP (may embed Bearer tokens)
 .mcp.json
+
+# Local scratch previews (not product output)
+Claude outputs/
+tapper/index.preview.html
