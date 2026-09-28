@@ -129,6 +129,8 @@ jobs:
         env:
           HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
           HOSTSTINGER: ${{ secrets.HOSTSTINGER }}
+          # Plan username from docs/domain.md when domain filter misses aliases.
+          HOSTINGER_USERNAME: u666300215
         run: |
           set -euo pipefail
           if [ -z "${HOSTINGER_API_TOKEN:-}" ]; then
