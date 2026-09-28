@@ -5,7 +5,6 @@
  * Prereqs:
  *   bash scripts/stage-site.sh
  *   HOSTINGER_API_TOKEN in env (hPanel → Profile & settings → API Tokens)
- *   Optional: HOSTINGER_USERNAME (hPanel plan user) when domain lookup is ambiguous.
  *
  * Usage:
  *   npm install --no-save axios tus-js-client   # once per machine
@@ -115,12 +114,12 @@ async function listAllWebsites() {
 
 /**
  * Resolve { username, domain } for the deploy API.
- * Prefer an exact website row for the requested hostname; never invent a
- * username that is not on the token's website list (upload-urls 404s).
+ * Requires an exact website row for the requested hostname — never guesses
+ * at a "close enough" site, since a wrong guess means uploading production
+ * content to someone else's website with no way to detect it downstream.
  */
 async function resolveTarget(domain) {
   const needle = String(domain || '').toLowerCase();
-  const forcedUser = (process.env.HOSTINGER_USERNAME || '').trim();
   const all = await listAllWebsites();
 
   console.log(`Hostinger websites visible to token (${all.length}):`);
@@ -129,7 +128,9 @@ async function resolveTarget(domain) {
   }
   if (!all.length) {
     throw new Error(
-      'Hostinger websites list is empty for this token — check HOSTSTINGER / HOSTINGER_API_TOKEN scope (hosting read+write).',
+      `No Hostinger shared-hosting website is visible to this token for ${needle}. ` +
+        'This account may only hold a VPS/other product — redmed.live is actually served ' +
+        'from the Hostinger VPS + Traefik, not this deploy path (see docs/OPS.md).',
     );
   }
 
@@ -138,43 +139,8 @@ async function resolveTarget(domain) {
     return { username: exact.username, domain: siteDomain(exact) };
   }
 
-  const fuzzy = all.find(
-    (s) => siteDomain(s).includes(needle) && s?.username,
-  );
-  if (fuzzy) {
-    console.warn(`No exact ${needle}; using ${siteDomain(fuzzy)}`);
-    return { username: fuzzy.username, domain: siteDomain(fuzzy) };
-  }
-
-  if (forcedUser) {
-    const forUser = all.filter((s) => s?.username === forcedUser);
-    if (forUser.length) {
-      // Prefer a site whose domain mentions redmed / the needle; else first.
-      const preferred =
-        forUser.find((s) => siteDomain(s).includes('redmed')) ||
-        forUser.find((s) => siteDomain(s).includes(needle.split('.')[0])) ||
-        forUser[0];
-      console.warn(
-        `No website row for ${needle}; using HOSTINGER_USERNAME=${forcedUser} site ${siteDomain(preferred)}`,
-      );
-      return { username: forcedUser, domain: siteDomain(preferred) };
-    }
-    console.warn(
-      `HOSTINGER_USERNAME=${forcedUser} not in websites list — ignoring override`,
-    );
-  }
-
-  // Last resort: single CloudLinux site on the account.
-  const cloud = all.filter((s) => s?.username && siteDomain(s));
-  if (cloud.length === 1) {
-    console.warn(
-      `Only one Hostinger site on token — deploying to ${siteDomain(cloud[0])} (requested ${needle})`,
-    );
-    return { username: cloud[0].username, domain: siteDomain(cloud[0]) };
-  }
-
   throw new Error(
-    `No Hostinger website for ${needle}. Token sees: ${all.map(inventoryLine).join(' | ')}`,
+    `No exact Hostinger website match for ${needle}. Token sees: ${all.map(inventoryLine).join(' | ')}`,
   );
 }
 
