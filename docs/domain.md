@@ -31,7 +31,8 @@ property as any other static host.
 | Public GitHub Pages `Roooted1776.github.io/tapper/` | **Backup only.** Its `Publish tapper` workflow now syncs from `Roooted1776/RedMed-V1-Official` (fixed 2026-09-28 — it previously pointed at the archived `frisky` repo, so backup deploys were silently stale). Keep publishing so already-written bands still resolve if the VPS is ever down. |
 
 Smoke after DNS: `BASE=https://redmed.live bash scripts/smoke-pages.sh`.
-Origin check (DNS independent): `curl -H "Host: redmed.live" https://2.25.249.204/tapper/` (expect a name mismatch on the TLS cert since it's issued for `redmed.live`, not the bare IP — use `-k`/`--insecure` for this specific DNS-independent check only).
+Origin check (DNS independent): `curl -k -H "Host: redmed.live" https://2.25.249.204/tapper/` (expect a name mismatch on the TLS cert since it's issued for `redmed.live`, not the bare IP — use `-k`/`--insecure` for this specific DNS-independent check only).
+CI (`Pages tapper deploy`) hard-smokes public `https://redmed.live` and the github.io backup when DNS A is the VPS (`2.25.249.204`). Shared-static Hostinger upload soft-skips when the API token has zero websites.
 
 ## Publish github.io (backup host)
 

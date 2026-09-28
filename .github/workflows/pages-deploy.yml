@@ -1,10 +1,10 @@
-# Hostinger static deploy for redmed.live (AppConfig.medicalCardBaseURL).
+# Assist shell smoke + optional Hostinger shared-static upload.
 # Product write base: https://redmed.live/tapper/ (docs/domain.md).
+# Live origin (2026-09-28): Hostinger VPS Traefik → redmed-portal (2.25.249.204).
+# Shared Hostinger static upload (deploy-hostinger-static.mjs) is dead on this
+# account's API token (zero websites) — soft-skip when inventory is empty.
 # github.io remains a backup for already-written bands.
 # Static HTML only. A band tap decodes #d= in the browser. This workflow does not call Supabase.
-#
-# Deploy needs HOSTINGER_API_TOKEN. Missing token skips upload; write-base
-# smoke still runs against Hostinger origin + public DNS.
 
 name: Pages tapper deploy
 
@@ -120,49 +120,15 @@ jobs:
       - name: Hostinger secrets optional
         if: steps.hostinger.outputs.skip == 'true'
         run: |
-          echo "::warning::HOSTINGER_API_TOKEN not set — skipping Hostinger upload."
-          echo "Live band write base is https://redmed.live/tapper/ (docs/domain.md)."
-          echo "Deploy from a machine with the token: bash scripts/stage-site.sh && node scripts/deploy-hostinger-static.mjs redmed.live"
+          echo "::warning::HOSTINGER_API_TOKEN not set — skipping shared-static upload (dead path; live origin is VPS — docs/domain.md)."
+          echo "Live band write base is https://redmed.live/tapper/."
 
-      - name: List Hostinger websites (token scope check)
-        if: steps.hostinger.outputs.skip != 'true'
-        env:
-          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
-          HOSTSTINGER: ${{ secrets.HOSTSTINGER }}
-        run: |
-          set -euo pipefail
-          if [ -z "${HOSTINGER_API_TOKEN:-}" ]; then
-            HOSTINGER_API_TOKEN="$HOSTSTINGER"
-            export HOSTINGER_API_TOKEN
-          fi
-          npm ci --ignore-scripts --prefix scripts
-          node -e "
-          const axios = require('./scripts/node_modules/axios');
-          const token = process.env.HOSTINGER_API_TOKEN;
-          axios.get('https://developers.hostinger.com/api/hosting/v1/websites?per_page=100', {
-            headers: { Accept: 'application/json', Authorization: 'Bearer ' + token },
-            validateStatus: () => true,
-            timeout: 60000,
-          }).then((res) => {
-            console.log('status', res.status);
-            const rows = Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
-            console.log('count', rows.length);
-            for (const s of rows.slice(0, 40)) {
-              const d = s.domain || s.domain_name || s.vhost || '(no-domain)';
-              const u = s.username || '(no-user)';
-              const t = s.website_type || s.vhost_type || '?';
-              console.log('-', u, d, 'type=' + t, s.is_enabled === false ? 'disabled' : 'enabled');
-            }
-            if (res.status >= 400) process.exit(1);
-          });
-          "
-
-      - name: Stage + deploy passerby assets to Hostinger
+      - name: Stage + optional Hostinger shared-static upload
+        id: static_upload
         if: github.event_name != 'pull_request' && steps.hostinger.outputs.skip != 'true'
         env:
           HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
           HOSTSTINGER: ${{ secrets.HOSTSTINGER }}
-          # Hint only — deploy script ignores this if the user is not on the token's website list.
           HOSTINGER_USERNAME: u666300215
         run: |
           set -euo pipefail
@@ -171,25 +137,43 @@ jobs:
             export HOSTINGER_API_TOKEN
           fi
           bash scripts/stage-site.sh
-          # Lockfile-pinned, no lifecycle scripts — this step holds the deploy token.
-          # npm ci already ran in the list step when token present; re-run is cheap/idempotent.
           npm ci --ignore-scripts --prefix scripts
-          node scripts/deploy-hostinger-static.mjs redmed.live
+          # Account token currently sees zero shared-hosting websites (docs/domain.md).
+          # Soft-skip so VPS-origin smokes still run; do not hard-fail main.
+          set +e
+          out="$(node scripts/deploy-hostinger-static.mjs redmed.live 2>&1)"
+          code=$?
+          set -e
+          printf '%s\n' "$out"
+          if [ "$code" = 0 ]; then
+            echo "uploaded=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if echo "$out" | grep -qiE 'websites list is empty|No Hostinger website|visible to token \(0\)'; then
+            echo "::warning::Shared Hostinger static upload skipped — token has no websites (live origin is VPS Traefik, docs/domain.md)."
+            echo "uploaded=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "::error::Hostinger shared-static upload failed unexpectedly."
+          exit 1
 
-      - name: Smoke Hostinger origin (files live)
+      - name: Smoke VPS origin (Traefik / redmed-portal)
         run: |
           set -euo pipefail
-          # Hostinger plan IP serves redmed.live files even while Namecheap still parks DNS.
-          # hCDN sometimes 403s GitHub Actions IPs; treat that as a soft fail while
-          # public DNS is still parking (files are already on the plan — local smoke OK).
-          ORIGIN_IP=http://195.35.60.70
-          HOSTINGER_A=195.35.60.70
-          echo "Smoking Hostinger origin ${ORIGIN_IP} Host: redmed.live"
+          # Live Assist origin (docs/domain.md): Namecheap A → VPS Traefik.
+          VPS_IP=2.25.249.204
+          echo "Smoking VPS origin https://${VPS_IP}/tapper/ Host: redmed.live (insecure TLS name mismatch OK)"
           ok=0
           for i in 1 2 3 4 5; do
-            if BASE="${ORIGIN_IP}" HOST_HEADER=redmed.live bash scripts/smoke-pages.sh; then
-              ok=1
-              break
+            # Cert is for redmed.live, not the bare IP — curl -k for this probe only.
+            if curl -skS -m 20 -H "Host: redmed.live" "https://${VPS_IP}/tapper/" | grep -qiE 'RedMed|tapper|emergency'; then
+              # Full smoke against public DNS is the hard gate below; this proves the VPS answers.
+              CODE="$(curl -skS -o /dev/null -w '%{http_code}' -m 20 -H "Host: redmed.live" "https://${VPS_IP}/tapper/" || echo 000)"
+              echo "VPS /tapper/ → HTTP ${CODE}"
+              if [ "$CODE" = "200" ]; then
+                ok=1
+                break
+              fi
             fi
             sleep 2
           done
@@ -197,18 +181,17 @@ jobs:
             exit 0
           fi
           A_REC="$(dig +short redmed.live A | head -n 1 || true)"
-          if [ "${A_REC}" != "${HOSTINGER_A}" ]; then
-            echo "::warning::Hostinger origin ${ORIGIN_IP}/tapper/ smoke failed (often hCDN 403 from Actions). DNS A is '${A_REC:-none}' (not ${HOSTINGER_A}) — soft-fail until Cloudflare/Namecheap cutover (docs/domain.md)."
+          if [ "${A_REC}" != "${VPS_IP}" ]; then
+            echo "::warning::VPS origin probe failed and DNS A is '${A_REC:-none}' (not ${VPS_IP}) — soft-fail (docs/domain.md)."
             exit 0
           fi
-          echo "::error::Hostinger origin ${ORIGIN_IP}/tapper/ (Host: redmed.live) failed smoke after DNS pointed at Hostinger. Redeploy: node scripts/deploy-hostinger-static.mjs redmed.live"
+          echo "::error::VPS origin https://${VPS_IP}/tapper/ (Host: redmed.live) failed after DNS pointed at VPS."
           exit 1
 
       - name: Smoke github.io backup host
         run: |
           set -euo pipefail
           # Always-reachable backup for already-written bands (docs/domain.md).
-          # Hard gate so CI still proves shell content while redmed.live DNS parks.
           BASE=https://roooted1776.github.io bash scripts/smoke-pages.sh
 
       - name: Smoke public write base /tapper/
@@ -216,35 +199,26 @@ jobs:
           set -euo pipefail
           # AppConfig.medicalCardBaseURL is the URL written onto bands.
           ORIGIN="$(python3 scripts/write-base-origin.py)"
-          HOSTINGER_A=195.35.60.70
-          # Namecheap registrar parking (docs/domain.md) — SSL hangs, skip HTTPS.
+          VPS_A=2.25.249.204
+          # Namecheap registrar parking — SSL hangs, skip HTTPS.
           NAMECHEAP_PARK=162.255.119.128
           echo "Write-base origin: ${ORIGIN} (AppConfig.medicalCardBaseURL)"
-          # Check DNS BEFORE smoking HTTPS — parking used to hang this job for
-          # ~10× multi-minute SSL retries. Cloudflare proxy IPs are fine; try them.
           A_REC="$(dig +short redmed.live A | head -n 1 || true)"
           NS_REC="$(dig +short NS redmed.live | tr '\n' ' ' | sed 's/[[:space:]]*$//' || true)"
           echo "DNS A redmed.live → ${A_REC:-none}"
           echo "DNS NS redmed.live → ${NS_REC:-none}"
           if [ -z "${A_REC}" ] || [ "${A_REC}" = "${NAMECHEAP_PARK}" ]; then
-            echo "::warning::Public ${ORIGIN}/tapper/ not reachable yet — DNS A redmed.live is '${A_REC:-none}' (Namecheap parking). Need ${HOSTINGER_A} or Cloudflare proxy (docs/domain.md)."
-            echo "::warning::Skipping HTTPS smoke against parking DNS. AppConfig write base is ${ORIGIN}/tapper/ — fix DNS before encoding new bands."
+            echo "::warning::Public ${ORIGIN}/tapper/ not reachable yet — DNS A redmed.live is '${A_REC:-none}' (Namecheap parking). Need ${VPS_A} (docs/domain.md)."
             exit 0
           fi
-          # Hostinger dns-parking NS (docs/domain.md). hCDN often 403s GitHub
-          # Actions IPs on these edges — same soft-fail as origin smoke while
-          # Cloudflare cutover is unfinished. github.io smoke stays the hard gate.
           if echo "${NS_REC}" | grep -qiE 'dns-parking'; then
-            echo "::warning::Public ${ORIGIN}/tapper/ still on Hostinger dns-parking NS (${NS_REC}). Soft-fail until Cloudflare NS cutover (docs/domain.md)."
+            echo "::warning::Public ${ORIGIN}/tapper/ still on Hostinger dns-parking NS (${NS_REC}). Soft-fail (docs/domain.md)."
             CODE="$(curl -sS -o /dev/null -w '%{http_code}' -m 15 "${ORIGIN}/tapper/" || echo 000)"
             echo "Probe ${ORIGIN}/tapper/ → HTTP ${CODE} (DNS A=${A_REC})"
             exit 0
           fi
-          # Hostinger parking (hCDN 2.57.91.91 etc.) answers 200 with parked HTML.
-          # Detect by body, not IP, so a new parking IP can't masquerade as a deploy.
-          # curl -f fails on 403; keep that inside `if` so set -e does not abort.
           if curl -fsS -m 15 "${ORIGIN}/tapper/" | grep -qiE 'Parked Domain name on Hostinger|dns-parking'; then
-            echo "::warning::${ORIGIN}/tapper/ serves Hostinger parking HTML (DNS A=${A_REC}). Deploy dist/passerby + un-park the site (docs/domain.md) before encoding new bands."
+            echo "::warning::${ORIGIN}/tapper/ serves Hostinger parking HTML (DNS A=${A_REC}). Soft-fail (docs/domain.md)."
             exit 0
           fi
           ok=0
@@ -258,12 +232,11 @@ jobs:
           if [ "$ok" = 1 ]; then
             exit 0
           fi
-          # Cutover incomplete: A is neither plan IP nor Cloudflare NS, and smoke
-          # failed (often hCDN 403 from Actions). Soft-fail — do not block main.
-          if [ "${A_REC}" != "${HOSTINGER_A}" ] && ! echo "${NS_REC}" | grep -qiE 'cloudflare'; then
+          # DNS not on VPS yet and smoke failed — soft-fail.
+          if [ "${A_REC}" != "${VPS_A}" ]; then
             CODE="$(curl -sS -o /dev/null -w '%{http_code}' -m 15 "${ORIGIN}/tapper/" || echo 000)"
-            echo "::warning::Band write base ${ORIGIN}/tapper/ failed smoke (DNS A=${A_REC}, NS=${NS_REC}, HTTP ${CODE}). Soft-fail until Cloudflare/Namecheap cutover (docs/domain.md)."
+            echo "::warning::Band write base ${ORIGIN}/tapper/ failed smoke (DNS A=${A_REC}, NS=${NS_REC}, HTTP ${CODE}). Soft-fail until DNS → VPS (docs/domain.md)."
             exit 0
           fi
-          echo "::error::Band write base ${ORIGIN}/tapper/ failed smoke (DNS A=${A_REC}). Check Hostinger SSL / Cloudflare proxy / deploy."
+          echo "::error::Band write base ${ORIGIN}/tapper/ failed smoke (DNS A=${A_REC}). Check Traefik / VPS portal / TLS."
           exit 1
