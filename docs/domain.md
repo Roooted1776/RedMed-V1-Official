@@ -26,13 +26,13 @@ property as any other static host.
 |------|--------|
 | Product HTML app | Served by container `redmed-portal-live` on the Hostinger VPS, port 8090 internally, fronted by Traefik. Traefik router `redmed-live`: `` Host(`redmed.live`) || Host(`www.redmed.live`) `` → service `redmed-portal`, TLS via Let's Encrypt. |
 | DNS | Namecheap BasicDNS. `@` → `2.25.249.204`, `www` → `2.25.249.204`. NS: `dns1/dns2.registrar-servers.com`. |
-| Hostinger shared static-hosting plan (`u666300215`) | **Does not exist on this account's API token** — `scripts/deploy-hostinger-static.mjs` and the Hostinger-upload step in `.github/workflows/pages-deploy.yml` are currently dead code against this account (the token only sees the VPS subscription, zero websites). Kept only in case a real static plan is provisioned later. |
+| Hostinger shared static-hosting plan (`u666300215`) | **Does not exist on this account's API token** — the token only sees the VPS subscription, zero websites. `scripts/deploy-hostinger-static.mjs` also **refuses** `redmed.live` / `www.redmed.live` unless `REDMED_ALLOW_HOMEPAGE_REPLACE=1`, because a full archive replace would swap the live marketing homepage for the repo stub `index.html` and drop marketing files under `/assets/`. |
 | Cloudflare | **Not used.** Was planned for a DNS/SSL cutover (see historical section below) but abandoned in favor of DNS → VPS direct + Traefik's own TLS. |
 | Public GitHub Pages `Roooted1776.github.io/tapper/` | **Backup only.** Its `Publish tapper` workflow now syncs from `Roooted1776/RedMed-V1-Official` (fixed 2026-09-28 — it previously pointed at the archived `frisky` repo, so backup deploys were silently stale). Keep publishing so already-written bands still resolve if the VPS is ever down. |
 
 Smoke after DNS: `BASE=https://redmed.live bash scripts/smoke-pages.sh`.
 Origin check (DNS independent): `curl -k -H "Host: redmed.live" https://2.25.249.204/tapper/` (expect a name mismatch on the TLS cert since it's issued for `redmed.live`, not the bare IP — use `-k`/`--insecure` for this specific DNS-independent check only).
-CI (`Pages tapper deploy`) hard-smokes public `https://redmed.live` and the github.io backup when DNS A is the VPS (`2.25.249.204`). Shared-static Hostinger upload soft-skips when the API token has zero websites.
+CI (`Pages tapper deploy`) hard-smokes public `https://redmed.live` and the github.io backup when DNS A is the VPS (`2.25.249.204`). Shared-static Hostinger upload soft-skips: the script refuses a homepage replace, and the token currently has zero websites.
 
 ## Publish github.io (backup host)
 

@@ -11,13 +11,16 @@
  *   npm install --no-save axios tus-js-client   # once per machine
  *   node scripts/deploy-hostinger-static.mjs redmed.live
  *   node scripts/deploy-hostinger-static.mjs redmed.live dist/passerby
+ *
+ * redmed.live / www.redmed.live refuse this upload unless
+ * REDMED_ALLOW_HOMEPAGE_REPLACE=1. The archive is a full docroot replace.
+ * Repo index.html is a stub; the live homepage is a separate marketing page
+ * whose /assets/ bundles are not in this repo. Uploading would take / down.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
-import axios from 'axios';
-import tus from 'tus-js-client';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -26,10 +29,27 @@ const TOKEN = process.env.HOSTINGER_API_TOKEN;
 const DOMAIN = process.argv[2] || 'redmed.live';
 const STAGE_DIR = path.resolve(ROOT, process.argv[3] || 'dist/passerby');
 
+function isLiveMarketingHost(domain) {
+  const host = String(domain || '').toLowerCase().replace(/\.$/, '');
+  return host === 'redmed.live' || host === 'www.redmed.live';
+}
+
+// Refuse before zip, token use, or the Hostinger API. A missing axios install
+// must not be the only thing standing between this archive and the homepage.
+if (isLiveMarketingHost(DOMAIN) && process.env.REDMED_ALLOW_HOMEPAGE_REPLACE !== '1') {
+  console.error(
+    `REFUSING upload to ${DOMAIN} — a full static archive would replace the live marketing homepage at / and the /assets/ bundles that are not in this repo. Site left unchanged. Assist stays at /tapper/ on the VPS. Set REDMED_ALLOW_HOMEPAGE_REPLACE=1 only for a deliberate homepage replace.`,
+  );
+  process.exit(2);
+}
+
 if (!TOKEN) {
   console.error('HOSTINGER_API_TOKEN required');
   process.exit(1);
 }
+
+const { default: axios } = await import('axios');
+const { default: tus } = await import('tus-js-client');
 if (!fs.existsSync(path.join(STAGE_DIR, 'index.html'))) {
   console.error('Missing staged index.html — run: bash scripts/stage-site.sh');
   process.exit(1);
