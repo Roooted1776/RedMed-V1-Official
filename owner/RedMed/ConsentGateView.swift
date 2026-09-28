@@ -47,6 +47,11 @@ struct ConsentGateView<Content: View>: View {
     @State private var isAuthenticating = false
     @State private var didAutoPrompt = false
     @State private var unavailableReason: BiometricAuth.UnavailableReason?
+    /// Set when entry will silently fall back to the device passcode
+    /// because Face ID / Touch ID itself can't run (off for RedMed, not
+    /// enrolled, etc.) — `unavailableReason` only covers the harder case
+    /// where the combined policy can't evaluate at all.
+    @State private var biometryHint: BiometricAuth.UnavailableReason?
     @State private var checked = false
     /// Which policy section the ack sheet opens — one link per document.
     @State private var openPolicy: HelpDocument.Policy? = nil
@@ -116,6 +121,7 @@ struct ConsentGateView<Content: View>: View {
         isAuthenticating = false
         didAutoPrompt = false
         unavailableReason = nil
+        biometryHint = nil
         PolicyWebViewPool.discard()
         OwnerSessionGate.resetForConsentGate()
         var t = Transaction()
@@ -145,6 +151,16 @@ struct ConsentGateView<Content: View>: View {
                     UIApplication.shared.open(url)
                 }
                 .padding(.horizontal, RedMedChrome.pagePadX)
+            } else if let biometryHint {
+                // Entry still works (passcode), but silently — say why Face ID
+                // isn't the one running so it's discoverable and fixable.
+                Text("Using your passcode — \(biometryHint.message)")
+                    .font(.footnote.weight(.medium))
+                    .foregroundColor(.redmedMuted)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, RedMedChrome.pagePadX)
+                    .accessibilityAddTraits(.isStaticText)
             }
             // Empty cream while authenticating / auto-retrying — system Face ID sheet is the UI.
             Spacer(minLength: 0)
@@ -322,6 +338,7 @@ struct ConsentGateView<Content: View>: View {
         PolicyWebViewPool.discard()
         didAutoPrompt = false
         unavailableReason = nil
+        biometryHint = nil
         isAuthenticating = false
         // Policy-bump path deferred MainActor Keychain adopt until Agree —
         // kick it now so Face ID cream races a filled YOU (not under ack).
@@ -343,6 +360,7 @@ struct ConsentGateView<Content: View>: View {
     private func armMainAfterFaceID() {
         RedMedHaptics.success()
         SnapshotSafeCover.shared.reveal()
+        biometryHint = nil
         var t = Transaction()
         t.animation = nil
         withTransaction(t) {
@@ -372,6 +390,7 @@ struct ConsentGateView<Content: View>: View {
         guard BiometricAuth.hasKeyWindow else { return }
         #endif
         didAutoPrompt = true
+        biometryHint = BiometricAuth.biometryUnavailableReason()
         runPostAgreeFaceID()
     }
 
