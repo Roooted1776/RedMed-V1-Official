@@ -255,6 +255,27 @@ enum BiometricAuth {
         clearPark()
     }
 
+    /// Diagnostic-only probe: is Face ID / Touch ID itself usable right now?
+    /// `canEvaluatePolicy(.deviceOwnerAuthentication)` (what `authenticate`
+    /// actually gates on) succeeds whenever *either* biometrics or the
+    /// device passcode works, so a caller relying on that alone can't tell
+    /// biometrics were skipped — `evaluatePolicy` then jumps straight to
+    /// the system passcode sheet with no signal. This runs on a throwaway
+    /// context and never presents anything, so it's safe to call from
+    /// `onAppear` / before prompting, ahead of the real `authenticate` call.
+    static func biometryUnavailableReason() -> UnavailableReason? {
+        #if targetEnvironment(simulator)
+        return nil
+        #else
+        let context = LAContext()
+        var error: NSError?
+        guard !context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) else {
+            return nil
+        }
+        return unavailableReason(error)
+        #endif
+    }
+
     /// `evaluatePolicy` before a key window never presents a sheet and can
     /// hang until the hang clock. ConsentGate post-Agree Face ID waits for
     /// this (and retries on `UIWindow.didBecomeKeyNotification`).
