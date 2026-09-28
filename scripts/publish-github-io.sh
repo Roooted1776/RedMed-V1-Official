@@ -44,11 +44,11 @@ cp -f index.html tapper.html card.html get.html redmed-emergency.html sw.js \
   "$DEST/"
 cp -f .well-known/apple-app-site-association "$DEST/.well-known/apple-app-site-association"
 cp -f get/index.html "$DEST/get/index.html"
-# App Store Connect Support URL (docs/APP-STORE.md) — must be live on whatever
+# App Store Connect Support URL (docs/release/APP-STORE.md) — must be live on whatever
 # host is actually serving band writes today, not just Cloudflare Pages'
 # whole-repo deploy.
 cp -f support/index.html "$DEST/support/index.html"
-# Hosted Privacy URL (docs/APP-STORE.md) — /Document/ on the live band host,
+# Hosted Privacy URL (docs/release/APP-STORE.md) — /Document/ on the live band host,
 # same Document.html content as in-app Help. _redirects' /privacy and
 # /Document rules are Cloudflare-only syntax; GitHub Pages doesn't apply
 # them, so the real files must exist here too.

@@ -2,7 +2,7 @@
 
 One-page confirmatory assignment: **RedMed code, tapper HTML, brand, and band design → the LLC** (or a to-be-formed NJ entity). Cheap. Stops “who owns the app?” with a contractor or cousin. The live repository is `Roooted1776/RedMed-V1-Official`. The printable instrument still says frisky because that was the project name when it was written.
 
-**Print and sign:** [docs/ip-assignment.html](ip-assignment.html) → File → Print (one US Letter page). Fill blanks. Wet ink or DocuSign.
+**Print and sign:** [docs/legal/ip-assignment.html](ip-assignment.html) → File → Print (one US Letter page). Fill blanks. Wet ink or DocuSign.
 
 This file is how-to. The HTML is the instrument. Do not put a signed copy with a home address on this public repo.
 
@@ -12,7 +12,7 @@ Not legal advice. If you take money, add members, or fight someone, have NJ coun
 
 1. **Form the LLC** (do this first if you can). NJ Business Formation (njportal.com) Certificate of Formation. Single-member is fine. Pick a name that clears (`RedMed LLC`, `Red Med ID LLC`, or whatever the name search allows). ~$125. Same day if the name is free.
 2. **EIN.** IRS EIN online. Free. Same sitting.
-3. **Fill and sign** `docs/ip-assignment.html`. Assignor is Maximilian Aguilar-Aasted. Assignee is the LLC legal name and state. Schedule A: write **None** unless a cousin already wrote code or drew the logo — then they sign the contributor block too.
+3. **Fill and sign** `docs/legal/ip-assignment.html`. Assignor is Maximilian Aguilar-Aasted. Assignee is the LLC legal name and state. Schedule A: write **None** unless a cousin already wrote code or drew the logo — then they sign the contributor block too.
 4. **Keep the original** with the Certificate of Formation and a single-member operating agreement. That OA is a separate paper (not in this repo).
 5. **If the LLC is not formed yet:** you can still sign. The instrument holds the IP in trust and requires a short-form confirmation within 10 days after formation. Prefer forming first so the assignee exists.
 
@@ -27,7 +27,7 @@ Apple Developer / App ID `com.redmed.app` / GitHub stay in your personal account
 | Code | `Roooted1776/frisky`, `owner` (SwiftUI), bundle ID `com.redmed.app` |
 | Tapper | `tapper/` HTML/JS, redirects, SW, Pages host copies |
 | Brand | REDMED / RedMed / MED ID, BrandLogo, BrandWordmark, cream UI, black band trade dress |
-| Band | Adult black silicone (`#232425`), logo-print RedMed face (30×9 mm), NXP NTAG216 blank NDEF — same as `docs/band-engraving-and-nfc-sourcing.md` |
+| Band | Adult black silicone (`#232425`), logo-print RedMed face (30×9 mm), NXP NTAG216 blank NDEF — same as `docs/hardware/band-engraving-and-nfc-sourcing.md` |
 | Future | Later RedMed work by Max assigns on creation |
 
 Not transferred: wearer medical profiles (Keychain / `#d=`). Those are not yours.
@@ -41,5 +41,5 @@ AI agent commits (Cursor, Claude, etc.) are treated as work at Max’s direction
 ## After it is signed
 
 - Staple to formation papers. Not a git commit.
-- Company gate in `docs/ADVERTISING.md` still needs insurance, FDA/BAA decisions, and an invoice path before facility outbound. This paper is only ownership.
+- Company gate in `docs/growth/ADVERTISING.md` still needs insurance, FDA/BAA decisions, and an invoice path before facility outbound. This paper is only ownership.
 - Follow-up (separate PR): Help operator line → LLC name; Apple / GitHub / domains when the Company can hold them.

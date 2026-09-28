@@ -143,7 +143,7 @@ async function resolveTarget(domain) {
     throw noWebsiteError(
       `No Hostinger shared-hosting website is visible to this token for ${needle}. ` +
         'This account may only hold a VPS/other product — redmed.live is actually served ' +
-        'from the Hostinger VPS + Traefik, not this deploy path (see docs/OPS.md).',
+        'from the Hostinger VPS + Traefik, not this deploy path (see docs/release/OPS.md).',
     );
   }
 

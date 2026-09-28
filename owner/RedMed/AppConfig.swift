@@ -94,20 +94,20 @@ enum AppConfig {
     // MARK: - Paid Apple Developer Program (temporarily parked — do not delete)
     // CoreNFC Tag Reading, HealthKit, and a live App Store URL need a paid team
     // + App ID capabilities. Keep these false/nil until Max re-enables them.
-    // Restore: docs/NFC-RESTORE.md, docs/associated-domains-restore.md,
-    // docs/healthkit-restore.md. Do not remove code paths.
+    // Restore: docs/hardware/NFC-RESTORE.md, docs/hardware/associated-domains-restore.md,
+    // docs/hardware/healthkit-restore.md. Do not remove code paths.
 
     /// Product kill switch for CoreNFC write/read sessions only.
     /// Owner still always sees the NFC tab (ContentView.showsNFC); scanners never do.
     /// `true` = owner Write/Scan start real `NFCNDEFReaderSession` against blank
     /// unlocked NXP NTAG216 (ISO 14443A Type 2). Write packs live RedMed into
     /// `medicalCardBaseURL#d=` (`OwnerBandURI`). Requires NFC Tag Reading on App ID
-    /// `com.redmed.app` + paid Apple Developer — see `docs/NFC-RESTORE.md`.
+    /// `com.redmed.app` + paid Apple Developer — see `docs/hardware/NFC-RESTORE.md`.
     /// Keep this flag in lockstep with `RedMed.entitlements` + `NFCReaderUsageDescription`.
     /// `false` parks hardware sessions (Write The Band shown disabled).
-    /// Gate logic stays correct for restore — see `docs/NFC-RESTORE.md`.
+    /// Gate logic stays correct for restore — see `docs/hardware/NFC-RESTORE.md`.
     /// Parked: entitlement + `NFCReaderUsageDescription` removed (bf3ee60).
-    /// Keep flag false until restore steps in `docs/NFC-RESTORE.md`.
+    /// Keep flag false until restore steps in `docs/hardware/NFC-RESTORE.md`.
     /// No Share control — helpers open the card only by tapping the band
     /// (~1–2″); it loads in their browser.
     static let nfcHardwareEnabled = true
@@ -116,7 +116,7 @@ enum AppConfig {
     /// installed opens the app on `/tapper/` band taps instead of Safari (own
     /// wrist proximity must not hijack that iPhone). Requires Associated Domains
     /// on App ID `com.redmed.app` + paid Apple Developer — see
-    /// `docs/associated-domains-restore.md`. Keep in lockstep with the entitlement.
+    /// `docs/hardware/associated-domains-restore.md`. Keep in lockstep with the entitlement.
     /// Parked (`false`): personal/free teams cannot provision Associated Domains
     /// (same class of problem as CoreNFC). No custom-scheme fallback — Safari
     /// keeps the tap. Restore after paid Program; nfcHardwareEnabled requires
@@ -126,7 +126,7 @@ enum AppConfig {
     /// Product kill switch for the optional Apple Health import on the empty-profile
     /// funnel / Edit. `true` = `HealthKitProfileImport` may call HealthKit.
     /// Requires the HealthKit capability on App ID `com.redmed.app` + paid Apple
-    /// Developer — see `docs/healthkit-restore.md`. Parked (`false`): personal/free
+    /// Developer — see `docs/hardware/healthkit-restore.md`. Parked (`false`): personal/free
     /// teams cannot provision HealthKit (same class of problem as NFC Tag Reading),
     /// so the entitlement stays out of `RedMed.entitlements` and the
     /// "Fill From Apple Health" button stays hidden until restored.

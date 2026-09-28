@@ -22,6 +22,6 @@ cat <<'EOF'
 5. BASE=https://redmed.live bash scripts/smoke-pages.sh
 6. scripts/mirror-to-v1.sh   # if Cloud Agent cannot git-push V1
 7. CI secrets on RedMed-V1-Official: HOSTINGER_API_TOKEN, CLOUDFLARE_API_TOKEN
-8. Paid Apple Program → docs/OWNER-PARKED.md / NFC-RESTORE / associated-domains-restore
-9. Connect Privacy URL = https://redmed.live/Document/  (docs/APP-STORE.md)
+8. Paid Apple Program → docs/release/OWNER-PARKED.md / NFC-RESTORE / associated-domains-restore
+9. Connect Privacy URL = https://redmed.live/Document/  (docs/release/APP-STORE.md)
 EOF

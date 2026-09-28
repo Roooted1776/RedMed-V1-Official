@@ -1,7 +1,7 @@
 import Foundation
 
 /// Parked: no `import HealthKit`, no HealthKit.framework link.
-/// Restore with `docs/healthkit-restore.md` and `AppConfig.healthKitImportEnabled = true`.
+/// Restore with `docs/hardware/healthkit-restore.md` and `AppConfig.healthKitImportEnabled = true`.
 enum HealthKitProfileImport {
     struct Draft: Equatable {
         var birthDate: String?

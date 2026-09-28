@@ -7,5 +7,5 @@
 After `scripts/mirror-to-v1.sh` succeeds:
 
 1. Paste a short README on `frisky` pointing to V1 Official.
-2. Prefer cloning `~/Documents/RedMed-V1-Official` on both Macs (`docs/DUAL-MAC.md`).
+2. Prefer cloning `~/Documents/RedMed-V1-Official` on both Macs (`docs/release/DUAL-MAC.md`).
 3. Keep or archive `frisky` — do not maintain two diverging product trees.

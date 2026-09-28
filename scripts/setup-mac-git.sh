@@ -63,14 +63,14 @@ ok "origin = $(git remote get-url origin)"
 
 extra="$(git remote | grep -v '^origin$' || true)"
 if [[ -n "$extra" ]]; then
-  die "extra remotes: ${extra}. Remove them (only origin). See docs/DUAL-MAC.md"
+  die "extra remotes: ${extra}. Remove them (only origin). See docs/release/DUAL-MAC.md"
 fi
 ok "no extra remotes"
 
 name="$(git config --local --get user.name || true)"
 email="$(git config --local --get user.email || true)"
 # Pin dual-Mac identity. Overwrite school / mrmax115 / Cursor Agent / any non-match.
-# Cursor/Grok may stay on m.aguilar-aasted@students.mccc.edu — that is OK (docs/DUAL-MAC.md).
+# Cursor/Grok may stay on m.aguilar-aasted@students.mccc.edu — that is OK (docs/release/DUAL-MAC.md).
 if [[ -z "$name" || "$name" == "Cursor Agent" || "$name" != "$WANT_NAME" ]]; then
   git config --local user.name "$WANT_NAME"
   name="$WANT_NAME"

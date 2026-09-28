@@ -13,7 +13,7 @@ still requires Save (Face ID on first fill).
 provision the **HealthKit** capability, so Xcode's automatic signing fails the
 whole build ("Cannot create a iOS App Development provisioning profile") while
 the entitlement is present — the same class of problem as CoreNFC
-(`docs/NFC-RESTORE.md`) and Associated Domains. Keep the flag and the
+(`docs/hardware/NFC-RESTORE.md`) and Associated Domains. Keep the flag and the
 entitlements file in lockstep.
 
 While parked, `HealthKitProfileImport.isAvailable` is always `false`, so the

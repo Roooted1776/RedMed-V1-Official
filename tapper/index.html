@@ -4618,7 +4618,7 @@ function redmedAssetURL(file) {
   // (AASA /tapper/*) claim the tap before Safari loads. No custom-scheme
   // handoff: redmed:// is not exclusive, so #d= would reach any app that
   // registers it, and Safari errors on phones without RedMed. No BLE / ranging.
-  // See docs/associated-domains-restore.md.
+  // See docs/hardware/associated-domains-restore.md.
   function hasBandPayload() {
     // Require non-empty fragment after #d= — bare "#d=" is not a real band tap.
     var h = location.hash || '';

@@ -49,7 +49,7 @@ off): same button, Write The Band disabled.
   **NXP NTAG216**, ISO 14443A Type 2, NDEF blank unlocked. No battery, no BLE.
   Not NTAG213/215, MIFARE, LF, or UHF. Factory does not pre-encode or lock.
 - Chip must be **rewritable** (NDEF not permanently locked). Factory-blank or
-  overwriteable stub only — see `docs/band-engraving-and-nfc-sourcing.md`.
+  overwriteable stub only — see `docs/hardware/band-engraving-and-nfc-sourcing.md`.
 - **Owner data independence:** `NFCWriter` / `ProfileNFCCodec` write only
   `AppConfig.medicalCardBaseURL#d=…` (`OwnerBandURI.isValidWriteURL`). Current
   base is `https://redmed.live/tapper/` (Hostinger static — `docs/domain.md`).

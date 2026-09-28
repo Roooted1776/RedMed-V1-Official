@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Flip NFC band hardware on or off in lockstep, then prove it with the contract.
 #
-#   scripts/nfc-hardware.sh on    # needs a paid Apple Developer team (see docs/NFC-RESTORE.md)
+#   scripts/nfc-hardware.sh on    # needs a paid Apple Developer team (see docs/hardware/NFC-RESTORE.md)
 #   scripts/nfc-hardware.sh off   # park again
 #   scripts/nfc-hardware.sh status
 #
