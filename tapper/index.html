@@ -634,7 +634,9 @@ function redmedAssetURL(file) {
     border-radius: 50%;
     overflow: hidden;
     border: none;
-    box-shadow: 0 3px 10px rgba(225,29,72,0.18);
+    /* Accent ring — thin white keyline + accent hairline under the existing
+       drop shadow, borrowed from the marketing shell's plate imagery. */
+    box-shadow: 0 0 0 2px rgba(255,247,247,0.9), 0 0 0 3px rgba(225,29,72,0.28), 0 3px 10px rgba(225,29,72,0.18);
     flex-shrink: 0;
     display: block;
     object-fit: cover;
@@ -739,6 +741,10 @@ function redmedAssetURL(file) {
     position: relative;
     z-index: 1;
     pointer-events: auto;
+    /* Vital-glow lift — accent-tinted shadow layered under the neutral .card
+       shadow, borrowed from the marketing shell's card treatment. Visual
+       only; no layout change. */
+    box-shadow: var(--shadow), 0 10px 28px rgba(225,29,72,0.10);
   }
   /* Owner YOU card — dual redmedSurface cards (identity rows + list drops). */
   .you-stack {
@@ -1059,7 +1065,26 @@ function redmedAssetURL(file) {
 
   /* —— 911 / Find Help —— lockstep EmergencyView (top 16, stack gap 10) —— */
   .page-pad { padding: 4px var(--page-pad-x) 0; }
-  #panel-911 { padding-top: 0; padding-bottom: 24px; }
+  #panel-911 { padding-top: 0; padding-bottom: 24px; position: relative; overflow: hidden; }
+  /* Decorative ghost numeral — visual accent only, borrowed from the
+     marketing shell's giant "911" treatment. aria-hidden, absolutely
+     positioned behind real content; no layout impact. */
+  .panel-911-ghost {
+    position: absolute;
+    top: -0.06em;
+    right: -0.03em;
+    z-index: 0;
+    font-size: 46cqi;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    opacity: 0.06;
+    pointer-events: none;
+    user-select: none;
+  }
+  #panel-911 > .page-help-chrome,
+  #panel-911 > .page-pad { position: relative; z-index: 1; }
   #panel-911 .page-pad {
     display: flex;
     flex-direction: column;
@@ -1109,7 +1134,8 @@ function redmedAssetURL(file) {
     font-weight: 700;
     font-size: var(--fs-btn);
     padding: 16px;
-    box-shadow: var(--shadow-accent);
+    /* Gloss highlight layered onto the existing accent shadow — visual only. */
+    box-shadow: var(--shadow-accent), inset 0 1px 0 rgba(255,255,255,0.35);
   }
   .btn-secondary {
     background: var(--surface);
@@ -1136,7 +1162,8 @@ function redmedAssetURL(file) {
     font-size: 16px; /* PrimaryButton */
     padding: 15px 12px;
     border-radius: var(--box);
-    box-shadow: var(--shadow-accent);
+    /* Gloss highlight layered onto the existing accent shadow — visual only. */
+    box-shadow: var(--shadow-accent), inset 0 1px 0 rgba(255,255,255,0.35);
   }
   .btn-call-ico {
     display: inline-flex;
@@ -1781,6 +1808,7 @@ function redmedAssetURL(file) {
   .tab.active { color: var(--accent); font-weight: 600; /* TabBarItem semibold */ }
   .tab.active .icon-wrap {
     background: rgba(225,29,72,0.12);
+    box-shadow: 0 3px 8px rgba(225,29,72,0.16);
   }
   .home-pill {
     width: 118px;
@@ -2156,6 +2184,7 @@ function redmedAssetURL(file) {
 
     <!-- 911 — mirrors owner EmergencyView (PageHelpChrome + content-first). -->
     <div class="panel" id="panel-911" data-panel="911" role="tabpanel" aria-labelledby="tab-911" aria-hidden="true">
+      <span class="panel-911-ghost" aria-hidden="true">911</span>
       <div class="page-help-chrome"><a href="../Document/" aria-label="Help · Policies">Help</a></div>
       <div class="page-pad">
         <div class="gps-actions">
