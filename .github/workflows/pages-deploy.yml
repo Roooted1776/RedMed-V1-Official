@@ -108,11 +108,13 @@ jobs:
         id: hostinger
         env:
           TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          TOKEN_ALT: ${{ secrets.HOSTSTINGER }}
         run: |
-          if [ -z "$TOKEN" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          else
+          # HOSTSTINGER is the name the token was saved under. Prefer the real name.
+          if [ -n "$TOKEN" ] || [ -n "$TOKEN_ALT" ]; then
             echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Hostinger secrets optional
@@ -126,8 +128,13 @@ jobs:
         if: github.event_name != 'pull_request' && steps.hostinger.outputs.skip != 'true'
         env:
           HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          HOSTSTINGER: ${{ secrets.HOSTSTINGER }}
         run: |
           set -euo pipefail
+          if [ -z "${HOSTINGER_API_TOKEN:-}" ]; then
+            HOSTINGER_API_TOKEN="$HOSTSTINGER"
+            export HOSTINGER_API_TOKEN
+          fi
           bash scripts/stage-site.sh
           # Lockfile-pinned, no lifecycle scripts — this step holds the deploy token.
           npm ci --ignore-scripts --prefix scripts
