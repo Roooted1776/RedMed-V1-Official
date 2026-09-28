@@ -5,6 +5,8 @@
  * Prereqs:
  *   bash scripts/stage-site.sh
  *   HOSTINGER_API_TOKEN in env (hPanel → Profile & settings → API Tokens)
+ *   Optional: HOSTINGER_USERNAME (hPanel plan user, e.g. u666300215) when the
+ *   websites?domain= filter returns empty — common for parked hostnames.
  *
  * Usage:
  *   npm install --no-save axios tus-js-client   # once per machine
@@ -57,11 +59,46 @@ async function api(method, urlPath, data) {
   return res.data;
 }
 
+function websitesFrom(body) {
+  if (Array.isArray(body?.data)) return body.data;
+  if (Array.isArray(body)) return body;
+  return [];
+}
+
+function siteDomain(site) {
+  return String(site?.domain || site?.domain_name || site?.vhost || '').toLowerCase();
+}
+
 async function resolveUsername(domain) {
-  const body = await api('get', `api/hosting/v1/websites?domain=${encodeURIComponent(domain)}`);
-  const username = body?.data?.[0]?.username;
-  if (!username) throw new Error(`No Hostinger website for ${domain}`);
-  return username;
+  const forced = (process.env.HOSTINGER_USERNAME || '').trim();
+  if (forced) {
+    console.log(`Using HOSTINGER_USERNAME=${forced}`);
+    return forced;
+  }
+
+  const needle = String(domain || '').toLowerCase();
+  const filtered = websitesFrom(
+    await api('get', `api/hosting/v1/websites?domain=${encodeURIComponent(domain)}`),
+  );
+  let hit = filtered.find((s) => siteDomain(s) === needle && s?.username) || filtered.find((s) => s?.username);
+  if (hit?.username) return hit.username;
+
+  // Domain filter is empty for some parked / alias hostnames — scan the account.
+  const all = websitesFrom(await api('get', 'api/hosting/v1/websites?per_page=100'));
+  hit = all.find((s) => siteDomain(s) === needle && s?.username);
+  if (hit?.username) return hit.username;
+
+  // Documented product plan for redmed.live (docs/domain.md).
+  if (needle === 'redmed.live') {
+    console.warn('No websites?domain=redmed.live hit — falling back to u666300215');
+    return 'u666300215';
+  }
+
+  const names = all.map((s) => siteDomain(s) || '(no-domain)').filter(Boolean).slice(0, 20);
+  throw new Error(
+    `No Hostinger website for ${domain}` +
+      (names.length ? ` (saw: ${names.join(', ')})` : ' (websites list empty)'),
+  );
 }
 
 async function uploadArchive(username, domain, filePath) {
