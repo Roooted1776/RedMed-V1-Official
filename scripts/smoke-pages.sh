@@ -59,7 +59,7 @@ AUTH_COPY_NEEDLES = (
 )
 # Passerby shell is not an ad surface. Trackers on tapper.html would load on a
 # band tap (PHI in the fragment). Store / listing pixels stay off this file.
-# docs/ADVERTISING.md + docs/DO-NOT.md.
+# docs/growth/ADVERTISING.md + docs/legal/DO-NOT.md.
 AD_NETWORK_NEEDLES = (
     "googletagmanager",
     "google-analytics",

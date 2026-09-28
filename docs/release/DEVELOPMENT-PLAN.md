@@ -44,7 +44,7 @@ Retain the current physical layout; do not relocate the iOS project or stable we
 | `supabase/tests/` | Privilege and data-contract tests | Backend/security |
 | `scripts/`, `.github/workflows/` | Repeatable checks and release gates | Backend/operations |
 | `docs/adr/` | Architecture decisions | Max |
-| `docs/RELEASE-RUNBOOK.md` | Deploy, rollback, incident response | Max plus an assigned backup |
+| `docs/release/RELEASE-RUNBOOK.md` | Deploy, rollback, incident response | Max plus an assigned backup |
 
 Max can initially hold several engineering roles. Independent clinical review should not be replaced by an engineering self-review.
 

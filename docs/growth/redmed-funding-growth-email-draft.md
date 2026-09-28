@@ -96,7 +96,7 @@ Exact name of the bot: **RedMed Funding/Growth** (slash included). Not “Fundin
 **Preferred — Automations schedule UI**
 
 1. On **RedMed Funding/Growth**, set schedule to every **2 weeks**, Monday **14:00 America/New_York**.
-2. Trigger prompt: “Run the bi-weekly View B station recognition email from `docs/redmed-funding-growth-email-draft.md` (or `docs/biweekly-funding-bot-email.md`). Substitute placeholders. Pass claim checklist. Send via Gmail MCP only if recipients are configured.”
+2. Trigger prompt: “Run the bi-weekly View B station recognition email from `docs/growth/redmed-funding-growth-email-draft.md` (or `docs/growth/biweekly-funding-bot-email.md`). Substitute placeholders. Pass claim checklist. Send via Gmail MCP only if recipients are configured.”
 
 **Fallback — long-lived Cloud Agent + `subscribe_timer`**
 
@@ -113,7 +113,7 @@ Exact name of the bot: **RedMed Funding/Growth** (slash included). Not “Fundin
 2. Paste:
 
 ```
-Send the draft in docs/redmed-funding-growth-email-draft.md
+Send the draft in docs/growth/redmed-funding-growth-email-draft.md
 to these recipients: <paste list>.
 Use Subject + Body (plain text). Substitute {{FIRST_NAME}} / {{SENDER_NAME}} / {{REPLY_TO}}.
 Pass the claim checklist. Gmail MCP only. Do not invent claims.

@@ -6,4 +6,4 @@
 4. Before **every Archive**: Xcode → `PrivacyInfo.xcprivacy` → File inspector → Target Membership → **RedMed**.
 5. The iPhone app is `owner/RedMed.xcodeproj` in this repo. Open that project on the Mac.
 
-See `docs/DO-NOT.md`.
+See `docs/legal/DO-NOT.md`.

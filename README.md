@@ -11,10 +11,10 @@ Canonical git remote: **`Roooted1776/RedMed-V1-Official`** (migrated from `frisk
 
 ## Development control center
 
-Start with [`docs/DEVELOPMENT-PLAN.md`](docs/DEVELOPMENT-PLAN.md) for priorities,
+Start with [`docs/release/DEVELOPMENT-PLAN.md`](docs/release/DEVELOPMENT-PLAN.md) for priorities,
 owners, launch blockers and acceptance criteria. Architecture boundaries are
 recorded in [`docs/adr/001-emergency-path-and-ops.md`](docs/adr/001-emergency-path-and-ops.md);
-the release procedure is [`docs/RELEASE-RUNBOOK.md`](docs/RELEASE-RUNBOOK.md).
+the release procedure is [`docs/release/RELEASE-RUNBOOK.md`](docs/release/RELEASE-RUNBOOK.md).
 
 ```bash
 make setup          # pinned deploy-script dependencies, no lifecycle scripts
@@ -59,22 +59,22 @@ BASE=https://redmed.live bash scripts/smoke-pages.sh
 BASE=http://195.35.60.70 HOST_HEADER=redmed.live bash scripts/smoke-pages.sh
 ```
 
-DNS cutover: [`docs/domain.md`](docs/domain.md). Production matrix: [`docs/PRODUCTION.md`](docs/PRODUCTION.md). Agent rules: [`AGENTS.md`](AGENTS.md).
+DNS cutover: [`docs/domain.md`](docs/domain.md). Production matrix: [`docs/release/PRODUCTION.md`](docs/release/PRODUCTION.md). Agent rules: [`AGENTS.md`](AGENTS.md).
 
 ## Parked (Owner) until paid Apple Developer
 
 | Flag | Default | Restore |
 |------|---------|---------|
-| `nfcHardwareEnabled` | `false` | [`docs/NFC-RESTORE.md`](docs/NFC-RESTORE.md) |
-| `associatedDomainsEnabled` | `false` | [`docs/associated-domains-restore.md`](docs/associated-domains-restore.md) |
-| `healthKitImportEnabled` | `false` | [`docs/healthkit-restore.md`](docs/healthkit-restore.md) |
-| App Store listing | parked | [`docs/APP-STORE.md`](docs/APP-STORE.md) |
+| `nfcHardwareEnabled` | `false` | [`docs/hardware/NFC-RESTORE.md`](docs/hardware/NFC-RESTORE.md) |
+| `associatedDomainsEnabled` | `false` | [`docs/hardware/associated-domains-restore.md`](docs/hardware/associated-domains-restore.md) |
+| `healthKitImportEnabled` | `false` | [`docs/hardware/healthkit-restore.md`](docs/hardware/healthkit-restore.md) |
+| App Store listing | parked | [`docs/release/APP-STORE.md`](docs/release/APP-STORE.md) |
 
 Do not market “write from the app” until Tag Reading + Write The Band on blank NTAG216 is proven.
 
 ## Ops (not the band host)
 
-- VPS / Traefik / Docker: **ops only** — never Assist `#d=` origin ([`docs/OPS.md`](docs/OPS.md)).
+- VPS / Traefik / Docker: **ops only** — never Assist `#d=` origin ([`docs/release/OPS.md`](docs/release/OPS.md)).
 - No MCP in this repository. Assist, the website, and the band tap do not call one. Product wall: no `#d=` fragment through an MCP or the VPS. The public tap page does not query Supabase.
 - Supabase project `RedMed Secure Data` (`mohxobgyjkcmkqxijgeg`): `redmed_ops` is the release ledger. `redmed_owner` is the signed-in wearer copy. Not a HIPAA certification.
 - Side repos: `Roooted1776.github.io` (Assist backup), `redmed-privacy` (do **not** use as Connect Privacy URL — use live `/Document/`).

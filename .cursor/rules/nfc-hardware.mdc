@@ -96,5 +96,5 @@ against `owner/RedMed/`. Do not weaken the NTAG216 contract from the Assist shel
 - Keep `AppConfig.nfcHardwareEnabled`, `RedMed.entitlements`
   (`com.apple.developer.nfc.readersession`), and `Info.plist`'s
   `NFCReaderUsageDescription` in lockstep — restoring hardware means
-  flipping all three together (see `docs/NFC-RESTORE.md`), never just the
+  flipping all three together (see `docs/hardware/NFC-RESTORE.md`), never just the
   Swift flag.

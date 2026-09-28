@@ -57,7 +57,7 @@ are green (same bar as Tag Reading + Write The Band on a blank NTAG216):
 honesty** — Share Band URL / Preview pack the same `#d=` Write will use; they
 do not write the chip and do not mark Linked. Do **not** sell “program it with
 Shortcuts / NFC Tools” as the product path. In-repo CoreNFC lockstep may
-already be restored (`docs/NFC-RESTORE.md`); portal Tag Reading + proven Write
+already be restored (`docs/hardware/NFC-RESTORE.md`); portal Tag Reading + proven Write
 are what flip the storefront claim.
 
 ### Shared banned copy (both views)
@@ -220,7 +220,7 @@ You cannot honestly sell “hospital ICE infrastructure” on that posture.
 Zero outbound to materials management / GPO / hospital admin, and **$0 paid
 media aimed at facilities**, until:
 
-- LLC (or equivalent), confirmatory IP assignment (`docs/IP-ASSIGNMENT.md`), product liability insurance
+- LLC (or equivalent), confirmatory IP assignment (`docs/legal/IP-ASSIGNMENT.md`), product liability insurance
 - Counsel on FDA “medical device” for *facility-issued* ID bands
 - A written decision on BAAs (today’s Help text says you will not sign)
 - A SKU story that matches the chip: **blank NDEF, wearer/staff writes from

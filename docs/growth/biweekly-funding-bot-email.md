@@ -128,7 +128,7 @@ Forbidden (abort send if model invents these):
    - `{{RECIPIENTS}}` list (start with the 10 local NJ/IL stations from View B)
    - `{{FROM_EMAIL}}` / `{{REPLY_TO}}` / `{{SENDER_NAME}}`
 5. On each fire, the agent:
-   - Reads `docs/redmed-funding-growth-email-draft.md` (or this file) for subject + body
+   - Reads `docs/growth/redmed-funding-growth-email-draft.md` (or this file) for subject + body
    - Substitutes placeholders
    - Runs claim checklist
    - Sends via Gmail MCP (one message per recipient or BCC batch — prefer one-by-one with `{{FIRST_NAME}}` if known)
@@ -142,13 +142,13 @@ Step-by-step UI checklist: [`redmed-funding-growth-email-draft.md`](redmed-fundi
 ```
 You are RedMed Funding/Growth. Bi-weekly View B recognition email only.
 
-1. Open docs/redmed-funding-growth-email-draft.md
-   (fallback: docs/biweekly-funding-bot-email.md).
+1. Open docs/growth/redmed-funding-growth-email-draft.md
+   (fallback: docs/growth/biweekly-funding-bot-email.md).
 2. Use Subject + Body (plain text). Substitute placeholders from your configured
    recipient list / from / reply-to. Do not invent new product claims.
 3. Pass the claim checklist in that doc. If anything fails, do not send; note why.
 4. Send via Cursor Gmail MCP. Do not use a separate Grok Gmail OAuth.
-5. Recognition training only until company gate is green (see docs/ems-station-outreach.md).
+5. Recognition training only until company gate is green (see docs/growth/ems-station-outreach.md).
 6. After send, record date, recipient count, and subject used. No PHI. No full medical profiles. Do not commit the log to git.
 ```
 

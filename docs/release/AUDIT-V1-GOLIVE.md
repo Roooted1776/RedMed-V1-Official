@@ -34,7 +34,7 @@
 4. AASA JSON (not parking) at `/apple-app-site-association` + `.well-known/`
 5. ~~Mirror-push history~~ Done 2026-09-26: frisky full history merged into V1 `main` (non-force, `--allow-unrelated-histories`). Macs: `git remote set-url origin https://github.com/Roooted1776/RedMed-V1-Official.git && git fetch && git reset --keep origin/main`
 6. CI secrets on V1 remote: `HOSTINGER_API_TOKEN`, `CLOUDFLARE_API_TOKEN`
-7. Paid Apple Program → NFC + Associated Domains restore → App Store (`docs/APP-STORE.md`)
+7. Paid Apple Program → NFC + Associated Domains restore → App Store (`docs/release/APP-STORE.md`)
 
 ## Side repos
 

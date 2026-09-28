@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fix Xcode "missing project.pbxproj" when Recents still open the pre-rename path
 # RedMed-Xcode/RedMed.xcodeproj. Canonical project is owner/RedMed.xcodeproj;
-# RedMed-Xcode is a compatibility symlink → owner (see docs/WORKFLOW.md).
+# RedMed-Xcode is a compatibility symlink → owner (see docs/release/WORKFLOW.md).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

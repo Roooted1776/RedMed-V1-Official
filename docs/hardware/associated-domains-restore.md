@@ -41,7 +41,7 @@ no `applinks:` key (NFC Tag Reading may already be present — add
 teams cannot provision Associated Domains, so Automatic Signing fails
 ("Cannot create a iOS App Development provisioning profile") while the
 entitlement is present — the same class of problem as CoreNFC
-(`docs/NFC-RESTORE.md`).
+(`docs/hardware/NFC-RESTORE.md`).
 
 Leave `onContinueUserActivity` in place — no-op without the entitlement.
 Without the entitlement, a band tap opens Safari Assist even on a phone

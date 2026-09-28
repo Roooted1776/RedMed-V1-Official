@@ -70,7 +70,7 @@ enum USCrashDetectionCall {
 /// Scene policy: keep listening through `.inactive`; hard-stop on
 /// `.background`. That inactive keep-listening path is the only
 /// “still around for a moment” window — no post-Home grace (parked;
-/// see `docs/DO-NOT.md`). Lock / force-quit / never-launched is Apple
+/// see `docs/legal/DO-NOT.md`). Lock / force-quit / never-launched is Apple
 /// Crash Detection on supported hardware — RedMed does not sense those.
 
 @MainActor
