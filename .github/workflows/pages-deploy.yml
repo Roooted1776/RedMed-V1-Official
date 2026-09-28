@@ -166,14 +166,13 @@ jobs:
           ok=0
           for i in 1 2 3 4 5; do
             # Cert is for redmed.live, not the bare IP — curl -k for this probe only.
-            if curl -skS -m 20 -H "Host: redmed.live" "https://${VPS_IP}/tapper/" | grep -qiE 'RedMed|tapper|emergency'; then
-              # Full smoke against public DNS is the hard gate below; this proves the VPS answers.
-              CODE="$(curl -skS -o /dev/null -w '%{http_code}' -m 20 -H "Host: redmed.live" "https://${VPS_IP}/tapper/" || echo 000)"
-              echo "VPS /tapper/ → HTTP ${CODE}"
-              if [ "$CODE" = "200" ]; then
-                ok=1
-                break
-              fi
+            # Write the body to a file. Piping into grep -q closes early and curl
+            # exits 23, which pipefail treats as a failed probe.
+            CODE="$(curl -skS -m 20 -o /tmp/vps-tapper.html -w '%{http_code}' -H "Host: redmed.live" "https://${VPS_IP}/tapper/" || echo 000)"
+            echo "VPS /tapper/ → HTTP ${CODE}"
+            if [ "$CODE" = "200" ] && grep -qiE 'RedMed|tapper|emergency' /tmp/vps-tapper.html; then
+              ok=1
+              break
             fi
             sleep 2
           done
