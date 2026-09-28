@@ -15,7 +15,7 @@ test -f dist/passerby/.htaccess
 echo
 echo "== Max / secrets (agent cannot finish without these) =="
 cat <<'EOF'
-1. HOSTINGER_API_TOKEN → node scripts/deploy-hostinger-static.mjs redmed.live
+1. Do not upload dist/passerby onto redmed.live /. That replaces the live marketing homepage. The deploy script refuses unless REDMED_ALLOW_HOMEPAGE_REPLACE=1 (docs/domain.md). Assist is already at /tapper/ on the VPS.
 2. CLOUDFLARE_API_TOKEN → node scripts/setup-cloudflare-dns.mjs redmed.live
 3. Namecheap → Custom DNS → Cloudflare NS (DNSSEC off first)
 4. bash scripts/verify-cf-dns-cutover.sh

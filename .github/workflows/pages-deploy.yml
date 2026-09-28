@@ -141,8 +141,8 @@ jobs:
             echo "uploaded=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if echo "$out" | grep -qiE 'websites list is empty|No Hostinger website|visible to token \(0\)'; then
-            echo "::warning::Shared Hostinger static upload skipped — token has no websites (live origin is VPS Traefik, docs/domain.md)."
+          if echo "$out" | grep -qiE 'websites list is empty|No Hostinger website|visible to token \(0\)|REFUSING upload'; then
+            echo "::warning::Shared Hostinger static upload skipped — would replace the live marketing homepage, or the token has no websites (docs/domain.md)."
             echo "uploaded=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
