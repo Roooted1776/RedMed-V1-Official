@@ -108,10 +108,8 @@ jobs:
         id: hostinger
         env:
           TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
-          TOKEN_ALT: ${{ secrets.HOSTSTINGER }}
         run: |
-          # HOSTSTINGER is the name the token was saved under. Prefer the real name.
-          if [ -n "$TOKEN" ] || [ -n "$TOKEN_ALT" ]; then
+          if [ -n "$TOKEN" ]; then
             echo "skip=false" >> "$GITHUB_OUTPUT"
           else
             echo "skip=true" >> "$GITHUB_OUTPUT"
@@ -128,14 +126,8 @@ jobs:
         if: github.event_name != 'pull_request' && steps.hostinger.outputs.skip != 'true'
         env:
           HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
-          HOSTSTINGER: ${{ secrets.HOSTSTINGER }}
-          HOSTINGER_USERNAME: u666300215
         run: |
           set -euo pipefail
-          if [ -z "${HOSTINGER_API_TOKEN:-}" ]; then
-            HOSTINGER_API_TOKEN="$HOSTSTINGER"
-            export HOSTINGER_API_TOKEN
-          fi
           bash scripts/stage-site.sh
           npm ci --ignore-scripts --prefix scripts
           # Account token currently sees zero shared-hosting websites (docs/domain.md).
