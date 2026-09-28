@@ -124,12 +124,45 @@ jobs:
           echo "Live band write base is https://redmed.live/tapper/ (docs/domain.md)."
           echo "Deploy from a machine with the token: bash scripts/stage-site.sh && node scripts/deploy-hostinger-static.mjs redmed.live"
 
+      - name: List Hostinger websites (token scope check)
+        if: steps.hostinger.outputs.skip != 'true'
+        env:
+          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          HOSTSTINGER: ${{ secrets.HOSTSTINGER }}
+        run: |
+          set -euo pipefail
+          if [ -z "${HOSTINGER_API_TOKEN:-}" ]; then
+            HOSTINGER_API_TOKEN="$HOSTSTINGER"
+            export HOSTINGER_API_TOKEN
+          fi
+          npm ci --ignore-scripts --prefix scripts
+          node -e "
+          const axios = require('./scripts/node_modules/axios');
+          const token = process.env.HOSTINGER_API_TOKEN;
+          axios.get('https://developers.hostinger.com/api/hosting/v1/websites?per_page=100', {
+            headers: { Accept: 'application/json', Authorization: 'Bearer ' + token },
+            validateStatus: () => true,
+            timeout: 60000,
+          }).then((res) => {
+            console.log('status', res.status);
+            const rows = Array.isArray(res.data?.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
+            console.log('count', rows.length);
+            for (const s of rows.slice(0, 40)) {
+              const d = s.domain || s.domain_name || s.vhost || '(no-domain)';
+              const u = s.username || '(no-user)';
+              const t = s.website_type || s.vhost_type || '?';
+              console.log('-', u, d, 'type=' + t, s.is_enabled === false ? 'disabled' : 'enabled');
+            }
+            if (res.status >= 400) process.exit(1);
+          });
+          "
+
       - name: Stage + deploy passerby assets to Hostinger
         if: github.event_name != 'pull_request' && steps.hostinger.outputs.skip != 'true'
         env:
           HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
           HOSTSTINGER: ${{ secrets.HOSTSTINGER }}
-          # Plan user from docs/domain.md — websites?domain=redmed.live is empty while parked.
+          # Hint only — deploy script ignores this if the user is not on the token's website list.
           HOSTINGER_USERNAME: u666300215
         run: |
           set -euo pipefail
@@ -139,6 +172,7 @@ jobs:
           fi
           bash scripts/stage-site.sh
           # Lockfile-pinned, no lifecycle scripts — this step holds the deploy token.
+          # npm ci already ran in the list step when token present; re-run is cheap/idempotent.
           npm ci --ignore-scripts --prefix scripts
           node scripts/deploy-hostinger-static.mjs redmed.live
 
