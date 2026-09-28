@@ -17,7 +17,7 @@ fragment, query string, or `redmed_owner` row.
 | **DNS** | Namecheap BasicDNS. `@`/`www` A records → `2.25.249.204` directly. No Cloudflare. |
 | **Registrar** | Namecheap |
 | **Backup Assist** | `Roooted1776.github.io` via `scripts/publish-github-io.sh` / its `Publish tapper` Action (now correctly synced from `RedMed-V1-Official`) |
-| **VPS** | Hostinger KVM `2010795` / `srv2010795.hstgr.cloud` / `2.25.249.204` — Docker/Traefik. Runs ops tooling (`redmed-mcp`) **and** the `redmed-portal` static Assist container. See product-wall note above — "runs on the VPS" is not the same as "touches Assist data." |
+| **VPS** | Hostinger KVM `2010795` / `srv2010795.hstgr.cloud` / `2.25.249.204` — Docker/Traefik. Runs ops tooling (the ops MCP server) **and** the `redmed-portal` static Assist container. See product-wall note above — "runs on the VPS" is not the same as "touches Assist data." |
 | **Supabase** | Project `mohxobgyjkcmkqxijgeg` (`RedMed Secure Data`) — `redmed_ops` release ledger; `redmed_owner` signed-in wearer rows. MCP does not read wearer rows. Not involved in serving Assist content. |
 | **MCP** | Not part of this repository. Assist, the website, Owner, and `supabase/` do not call one. |
 
@@ -27,7 +27,7 @@ fragment, query string, or `redmed_owner` row.
 - Companion: `hostinger-vps-ssh` MCP for SFTP/rich SSH.
 - Hostinger product MCP (`Hostinger-vps`): power, firewall, snapshots — not shell.
 - Confirm before destructive changes (reboot, recreate, firewall wipe, `rm -rf`).
-- Containers as of 2026-09-28: `traefik-traefik-1` (reverse proxy, ports 80/443), `redmed-portal-live` (static Assist shell, image `redmed-portal:*`, internal port 8090), `redmed-mcp` (ops MCP server). Adding app logic to `redmed-portal` that reads `#d=`, query strings, or writes to a DB breaks the product wall — don't.
+- Containers as of 2026-09-28: `traefik-traefik-1` (reverse proxy, ports 80/443), `redmed-portal-live` (static Assist shell, image `redmed-portal:*`, internal port 8090), the ops MCP server. Adding app logic to `redmed-portal` that reads `#d=`, query strings, or writes to a DB breaks the product wall — don't.
 
 ## Secrets matrix
 
