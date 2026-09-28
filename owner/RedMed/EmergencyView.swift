@@ -36,10 +36,6 @@ struct EmergencyView: View {
                     // Owner's own contacts. A scanner session is someone
                     // else's band, so these stay off it.
                     if !isScannerSession {
-                        ShareLocationCard(
-                            location: locationManager.location,
-                            address: currentAddress
-                        )
                         EmergencyContactsCallCard()
                     }
                     SeizureTimerStrip(isVisible: isVisible)
