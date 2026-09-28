@@ -129,6 +129,8 @@ jobs:
         env:
           HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
           HOSTSTINGER: ${{ secrets.HOSTSTINGER }}
+          # Plan user from docs/domain.md — websites?domain=redmed.live is empty while parked.
+          HOSTINGER_USERNAME: u666300215
         run: |
           set -euo pipefail
           if [ -z "${HOSTINGER_API_TOKEN:-}" ]; then
