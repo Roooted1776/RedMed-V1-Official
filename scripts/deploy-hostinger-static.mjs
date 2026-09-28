@@ -112,6 +112,19 @@ async function listAllWebsites() {
   return all;
 }
 
+// Exit code for "this token has no usable website for this domain" — a known,
+// expected condition (e.g. an account that only holds a VPS product), distinct
+// from exit 1 (an unexpected/real error) and exit 2 (homepage-replace refusal).
+// Callers (CI) should branch on this code, not on error message text, which
+// can be reworded without anyone remembering to update a grep elsewhere.
+const NO_WEBSITE_EXIT_CODE = 3;
+
+function noWebsiteError(message) {
+  const err = new Error(message);
+  err.deployExitCode = NO_WEBSITE_EXIT_CODE;
+  return err;
+}
+
 /**
  * Resolve { username, domain } for the deploy API.
  * Requires an exact website row for the requested hostname — never guesses
@@ -127,7 +140,7 @@ async function resolveTarget(domain) {
     console.log(`  - ${inventoryLine(site)}`);
   }
   if (!all.length) {
-    throw new Error(
+    throw noWebsiteError(
       `No Hostinger shared-hosting website is visible to this token for ${needle}. ` +
         'This account may only hold a VPS/other product — redmed.live is actually served ' +
         'from the Hostinger VPS + Traefik, not this deploy path (see docs/OPS.md).',
@@ -139,7 +152,7 @@ async function resolveTarget(domain) {
     return { username: exact.username, domain: siteDomain(exact) };
   }
 
-  throw new Error(
+  throw noWebsiteError(
     `No exact Hostinger website match for ${needle}. Token sees: ${all.map(inventoryLine).join(' | ')}`,
   );
 }
@@ -152,7 +165,7 @@ async function uploadArchive(username, domain, filePath) {
     if (err.status === 404) {
       throw new Error(
         `upload-urls 404 for username=${username} domain=${domain}. ` +
-          'That site is not on this token — fix HOSTINGER_USERNAME / domain or recreate the Hostinger website.',
+          'That site is not on this token — recreate the Hostinger website or check the domain.',
       );
     }
     throw err;
@@ -209,5 +222,5 @@ async function main() {
 
 main().catch((err) => {
   console.error(err.message || err);
-  process.exit(1);
+  process.exit(err.deployExitCode || 1);
 });

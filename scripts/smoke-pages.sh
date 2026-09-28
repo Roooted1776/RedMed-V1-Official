@@ -8,12 +8,13 @@ exec python3 - "$@" <<'PY'
 Usage:
   ./scripts/smoke-pages.sh
   BASE=https://redmed.live ./scripts/smoke-pages.sh
-  BASE=http://195.35.60.70 HOST_HEADER=redmed.live ./scripts/smoke-pages.sh
+  BASE=https://2.25.249.204 HOST_HEADER=redmed.live INSECURE_TLS=1 ./scripts/smoke-pages.sh
   BASE=https://roooted1776.github.io ./scripts/smoke-pages.sh
 """
 from __future__ import annotations
 
 import os
+import ssl
 import sys
 import urllib.error
 import urllib.request
@@ -21,6 +22,14 @@ from pathlib import Path
 
 BASE = os.environ.get("BASE", "http://127.0.0.1:8787").rstrip("/")
 HOST_HEADER = os.environ.get("HOST_HEADER", "").strip()
+# For hitting an origin IP directly over HTTPS (cert is issued for the real
+# hostname, not the bare IP) — e.g. BASE=https://2.25.249.204 HOST_HEADER=redmed.live.
+INSECURE_TLS = os.environ.get("INSECURE_TLS", "").strip() == "1"
+_SSL_CONTEXT = None
+if INSECURE_TLS:
+    _SSL_CONTEXT = ssl.create_default_context()
+    _SSL_CONTEXT.check_hostname = False
+    _SSL_CONTEXT.verify_mode = ssl.CERT_NONE
 UA = "RedMed-smoke-pages/1.0 (+https://github.com/Roooted1776/RedMed-V1-Official)"
 REPO = Path(os.environ["REPO_ROOT"])
 
@@ -145,7 +154,7 @@ def fetch(path: str) -> tuple[int, bytes]:
         headers["Host"] = HOST_HEADER
     req = urllib.request.Request(url, headers=headers)
     try:
-        with urllib.request.urlopen(req, timeout=_FETCH_TIMEOUT) as resp:
+        with urllib.request.urlopen(req, timeout=_FETCH_TIMEOUT, context=_SSL_CONTEXT) as resp:
             return resp.status, resp.read()
     except urllib.error.HTTPError as e:
         return e.code, e.read() if e.fp else b""

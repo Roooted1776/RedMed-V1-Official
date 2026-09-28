@@ -1,9 +1,10 @@
 # Assist shell smoke + optional Hostinger shared-static upload.
 # Product write base: https://redmed.live/tapper/ (docs/domain.md).
 # Live origin (2026-09-28): Hostinger VPS Traefik → redmed-portal (2.25.249.204).
-# Shared Hostinger static upload (deploy-hostinger-static.mjs) is dead on this
-# account's API token (zero websites) — soft-skip when inventory is empty.
-# github.io remains a backup for already-written bands.
+# Shared Hostinger static upload (deploy-hostinger-static.mjs) always refuses
+# redmed.live here (it would replace the live marketing homepage — see
+# REDMED_ALLOW_HOMEPAGE_REPLACE in that script) and is soft-skipped without
+# staging/uploading. github.io remains a backup for already-written bands.
 # Static HTML only. A band tap decodes #d= in the browser. This workflow does not call Supabase.
 
 name: Pages tapper deploy
@@ -126,12 +127,25 @@ jobs:
         if: github.event_name != 'pull_request' && steps.hostinger.outputs.skip != 'true'
         env:
           HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          REDMED_ALLOW_HOMEPAGE_REPLACE: ${{ vars.REDMED_ALLOW_HOMEPAGE_REPLACE }}
         run: |
           set -euo pipefail
+          # This workflow always targets redmed.live, which deploy-hostinger-static.mjs
+          # refuses unless REDMED_ALLOW_HOMEPAGE_REPLACE=1 — a full archive upload
+          # would replace the live marketing homepage, not this repo's stub content
+          # (docs/domain.md). Skip straight to a notice instead of staging/zipping/
+          # npm-installing for a call that's guaranteed to be refused.
+          if [ "${REDMED_ALLOW_HOMEPAGE_REPLACE:-}" != "1" ]; then
+            echo "::notice::Skipping Hostinger shared-static upload — would replace the live marketing homepage at redmed.live (docs/domain.md). Set the REDMED_ALLOW_HOMEPAGE_REPLACE repo variable to 1 only for a deliberate, reviewed homepage replace."
+            echo "uploaded=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           bash scripts/stage-site.sh
           npm ci --ignore-scripts --prefix scripts
-          # Account token currently sees zero shared-hosting websites (docs/domain.md).
-          # Soft-skip so VPS-origin smokes still run; do not hard-fail main.
+          # Exit 3 = deploy-hostinger-static.mjs's "no matching website for this
+          # token" case (e.g. account only holds a VPS product) — a known, expected
+          # condition to soft-skip. Branch on that exit code, not on message text,
+          # so a future wording change can't silently flip soft-skip vs hard-fail.
           set +e
           out="$(node scripts/deploy-hostinger-static.mjs redmed.live 2>&1)"
           code=$?
@@ -141,28 +155,26 @@ jobs:
             echo "uploaded=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if echo "$out" | grep -qiE 'websites list is empty|No Hostinger website|visible to token \(0\)|REFUSING upload'; then
-            echo "::warning::Shared Hostinger static upload skipped — would replace the live marketing homepage, or the token has no websites (docs/domain.md)."
+          if [ "$code" = 3 ]; then
+            echo "::warning::Shared Hostinger static upload skipped — token has no matching website for redmed.live (docs/domain.md)."
             echo "uploaded=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          echo "::error::Hostinger shared-static upload failed unexpectedly."
+          echo "::error::Hostinger shared-static upload failed unexpectedly (exit ${code})."
           exit 1
 
       - name: Smoke VPS origin (Traefik / redmed-portal)
         run: |
           set -euo pipefail
           # Live Assist origin (docs/domain.md): Namecheap A → VPS Traefik.
+          # Reuse the same structured checks (no-auth, no-ads, CSP, redirect
+          # stubs, sw.js version, …) used for the backup/public-base hosts below,
+          # instead of a weaker ad-hoc curl+grep — this is the real production origin.
           VPS_IP=2.25.249.204
-          echo "Smoking VPS origin https://${VPS_IP}/tapper/ Host: redmed.live (insecure TLS name mismatch OK)"
+          echo "Smoking VPS origin https://${VPS_IP}/ Host: redmed.live (insecure TLS name mismatch OK)"
           ok=0
           for i in 1 2 3 4 5; do
-            # Cert is for redmed.live, not the bare IP — curl -k for this probe only.
-            # Write the body to a file. Piping into grep -q closes early and curl
-            # exits 23, which pipefail treats as a failed probe.
-            CODE="$(curl -skS -m 20 -o /tmp/vps-tapper.html -w '%{http_code}' -H "Host: redmed.live" "https://${VPS_IP}/tapper/" || echo 000)"
-            echo "VPS /tapper/ → HTTP ${CODE}"
-            if [ "$CODE" = "200" ] && grep -qiE 'RedMed|tapper|emergency' /tmp/vps-tapper.html; then
+            if BASE="https://${VPS_IP}" HOST_HEADER=redmed.live INSECURE_TLS=1 bash scripts/smoke-pages.sh; then
               ok=1
               break
             fi
@@ -176,7 +188,7 @@ jobs:
             echo "::warning::VPS origin probe failed and DNS A is '${A_REC:-none}' (not ${VPS_IP}) — soft-fail (docs/domain.md)."
             exit 0
           fi
-          echo "::error::VPS origin https://${VPS_IP}/tapper/ (Host: redmed.live) failed after DNS pointed at VPS."
+          echo "::error::VPS origin https://${VPS_IP}/ (Host: redmed.live) failed after DNS pointed at VPS."
           exit 1
 
       - name: Smoke github.io backup host
