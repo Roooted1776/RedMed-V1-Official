@@ -557,7 +557,7 @@ struct HelpMenuView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 OwnerModalChrome(
-                    title: "Help",
+                    title: "Policy",
                     leadingTitle: "Done",
                     leadingAction: { dismiss() }
                 )

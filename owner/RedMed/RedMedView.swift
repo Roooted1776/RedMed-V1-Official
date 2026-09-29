@@ -71,6 +71,7 @@ struct RedMedView: View {
                 // Owner always — funnel and YOU card (no view-unlock pane).
                 VStack(spacing: 0) {
                     HStack(alignment: .center, spacing: 12) {
+                        OwnerSignInButton()
                         Spacer(minLength: 0)
                         ChromeTextAction(title: "Edit", action: { requestEdit() })
                     }
