@@ -173,13 +173,33 @@ assert('portal_admin_finish stays service_role only',
   finishMig.includes('revoke all on function public.portal_admin_finish(uuid, text, uuid) from public, anon, authenticated')
   && finishMig.includes('grant execute on function redmed_private.portal_admin_finish(uuid, text, uuid) to service_role'));
 const portalHtml = read('portal/index.html');
-const portalJs = read('portal/app.js');
-assert('account portal CSP allows only this Supabase project',
-  portalHtml.includes('Content-Security-Policy')
-  && portalHtml.includes("script-src 'self'")
-  && portalHtml.includes('https://mohxobgyjkcmkqxijgeg.supabase.co')
-  && portalHtml.includes('wss://mohxobgyjkcmkqxijgeg.supabase.co'));
-assert('account contacts are built without innerHTML', !portalJs.includes('innerHTML'));
+const portalNginx = read('portal/nginx.conf');
+const portalSignInFiles = [
+  'portal/app.js',
+  'portal/auth.js',
+  'portal/profile.js',
+  'portal/band.js',
+  'portal/supabase-client.js',
+  'portal/supabase-config.js',
+  'portal/vendor/supabase-js.js',
+  'owner/RedMed/RedMedLiveAccountView.swift',
+];
+assert('website account page has no sign-in client',
+  portalSignInFiles.every((p) => !existsSync(join(ROOT, p)))
+  && !portalHtml.includes('<form')
+  && !portalHtml.includes('<script')
+  && !/supabase/i.test(portalHtml)
+  && !portalHtml.includes('type="email"')
+  && !portalHtml.includes('type="password"')
+  && portalHtml.includes("script-src 'none'")
+  && portalHtml.includes("connect-src 'none'")
+  && !portalNginx.includes('supabase'));
+assert('app does not open a website account dialog',
+  !account.includes('RedMedLiveAccountView')
+  && !account.includes('?account=1')
+  && !client.includes('?account=1')
+  && !pbx.includes('RedMedLiveAccountView')
+  && account.includes('Email Me a Code'));
 
 console.log(`\n${total} check(s), ${failed} failed.`);
 if (failed) {

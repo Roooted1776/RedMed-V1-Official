@@ -2,8 +2,8 @@
 <html lang="en-US">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' data:; font-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self' https://mohxobgyjkcmkqxijgeg.supabase.co wss://mohxobgyjkcmkqxijgeg.supabase.co; upgrade-insecure-requests">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; form-action 'none'; frame-ancestors 'none'; img-src 'self'; style-src 'self'; script-src 'none'; connect-src 'none'; upgrade-insecure-requests">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#fff7f7">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex">
@@ -11,136 +11,11 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">RedMed</div>
-  <div class="tagline">Account sync</div>
-</header>
-
-<main class="sheet">
-
-  <!-- Email step -->
-  <section id="view-email" class="view">
-    <h1>Sign in</h1>
-    <p class="hint">Same email one-time-code sign-in as the iPhone app. No password.</p>
-    <form id="email-form">
-      <label for="email-input">Email</label>
-      <input id="email-input" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com">
-      <button type="submit" class="primary">Email Me a Code</button>
-    </form>
-    <p id="email-note" class="note" role="status"></p>
-  </section>
-
-  <!-- Code step -->
-  <section id="view-code" class="view" hidden>
-    <h1>Enter code</h1>
-    <p class="hint">We sent a code to <strong id="code-target"></strong>.</p>
-    <form id="code-form">
-      <label for="code-input">6-digit code</label>
-      <input id="code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required placeholder="123456">
-      <button type="submit" class="primary">Verify Code</button>
-    </form>
-    <div class="row-between">
-      <button type="button" id="use-different-email" class="linklike">Use a different email</button>
-      <button type="button" id="resend-code" class="linklike" disabled>Resend</button>
-    </div>
-    <p id="code-note" class="note" role="status"></p>
-  </section>
-
-  <!-- Signed-in profile step -->
-  <section id="view-profile" class="view" hidden>
-
-    <div class="card">
-      <div class="row-between">
-        <div>
-          <h2 class="card-title">Wearer copy</h2>
-          <p class="hint">Signed in as <span id="signed-in-email"></span></p>
-        </div>
-        <span id="status-pill" class="pill">Signed in</span>
-      </div>
-      <p class="hint" id="last-synced">Not synced yet</p>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title">Band</h2>
-      <p class="hint" id="band-status">Checking last verified write…</p>
-    </div>
-
-    <h1>Your medical ID</h1>
-    <form id="profile-form">
-      <fieldset>
-        <legend>You</legend>
-        <label for="f-name">Name</label>
-        <input id="f-name" type="text">
-
-        <label for="f-birth-date">Birth date</label>
-        <input id="f-birth-date" type="text" placeholder="e.g. Jan 4, 1990">
-
-        <label for="f-blood-type">Blood type</label>
-        <input id="f-blood-type" type="text" placeholder="e.g. O+">
-
-        <label class="checkbox"><input id="f-organ-donor" type="checkbox"> Organ donor</label>
-        <label class="checkbox"><input id="f-pregnant" type="checkbox"> Pregnant</label>
-        <label class="checkbox"><input id="f-deaf-vision" type="checkbox"> Deaf / vision impaired</label>
-      </fieldset>
-
-      <fieldset>
-        <legend>Allergies</legend>
-        <textarea id="f-allergies" rows="3" placeholder="One per line"></textarea>
-      </fieldset>
-
-      <fieldset>
-        <legend>Medicines</legend>
-        <textarea id="f-medications" rows="3" placeholder="One per line"></textarea>
-      </fieldset>
-
-      <fieldset>
-        <legend>Conditions</legend>
-        <textarea id="f-conditions" rows="3" placeholder="One per line"></textarea>
-      </fieldset>
-
-      <fieldset>
-        <legend>Emergency contacts</legend>
-        <div id="contacts-list"></div>
-        <button type="button" id="add-contact" class="linklike">+ Add contact</button>
-      </fieldset>
-
-      <fieldset>
-        <legend>Notes</legend>
-        <textarea id="f-notes" rows="3"></textarea>
-      </fieldset>
-
-      <button type="submit" class="primary">Save</button>
-      <p id="profile-note" class="note" role="status"></p>
-      <p id="last-updated" class="hint"></p>
-    </form>
-
-    <p class="disclosure">
-      This syncs the same signed-in wearer copy the iPhone app uses. Editing here does not rewrite your NFC band —
-      rewrite it from the app's NFC tab after changing anything here.
-    </p>
-
-    <div class="card">
-      <h2 class="card-title">Manage</h2>
-      <button type="button" id="sign-out" class="row-action">Sign Out</button>
-      <button type="button" id="sign-out-all" class="row-action">Sign Out All Devices</button>
-      <p class="hint sub">Lost or sold a phone? End every session on this account.</p>
-      <button type="button" id="delete-account" class="row-action danger">Delete Account</button>
-      <p class="hint sub">Removes the sign-in and the account copy for good.</p>
-    </div>
-
-    <details class="card">
-      <summary class="card-title">What syncs</summary>
-      <ul class="disclosure-list">
-        <li>Stored: the fields on your RedMed card, tied to your sign-in only. Row-level security blocks every other account.</li>
-        <li>Not stored: the band's #d= link. A verified write logs only a SHA-256 of it and its size.</li>
-        <li>The public tap page and helpers' phones never call this account.</li>
-        <li>Delete Account removes the sign-in and everything stored under it. It needs a connection and tells you if it didn't happen.</li>
-      </ul>
-    </details>
-  </section>
-
+<main>
+  <p class="brand">RedMed</p>
+  <h1>Account sync is in the iPhone app</h1>
+  <p>This page does not ask for an email, a password, or a code. Open RedMed on your iPhone and use Account Sync there.</p>
+  <p><a href="/tapper/">Emergency card</a></p>
 </main>
-
-<script type="module" src="app.js"></script>
 </body>
 </html>

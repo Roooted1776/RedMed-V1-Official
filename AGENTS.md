@@ -69,6 +69,7 @@ Gmail for automations: Cursor Gmail MCP, not a separate Grok Gmail plugin.
 - No HIPAA-certified / fake App Store ID claims.
 - Face ID is UI-only. Keychain stays `WhenPasscodeSetThisDeviceOnly` with no biometry ACL.
 - Assist at `https://redmed.live/tapper/` is no-auth, no-ads. `#d=` codec lockstep tests must stay green.
+- Account sign-in is the Owner app only (`OwnerAccountView`). The public site, including `portal/`, does not collect an email, a password, or a code.
 - VPS serves Assist as static files only — no server code, DB, or log config may read/store `#d=` or `redmed_owner` data (product wall above).
 - SOS = full sound + full light; arms only on SOS toggle or US Crash Detection collision timing — never on band tap alone. Owner phone with RedMed + written band: applinks (Universal Links) claim the tap — no `redmed://band#d=` handoff. No fake band-distance ranging.
 - Band is factory blank NDEF-unlocked NXP NTAG216 — no permanent lock bytes, ever. `scripts/test-nfc-hardware.mjs` (51 checks) must stay green.
