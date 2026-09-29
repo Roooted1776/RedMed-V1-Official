@@ -12,6 +12,10 @@ private struct OwnerHelpOpenKey: EnvironmentKey {
     static let defaultValue: Binding<Bool>? = nil
 }
 
+private struct OwnerSignInOpenKey: EnvironmentKey {
+    static let defaultValue: Binding<Bool>? = nil
+}
+
 extension EnvironmentValues {
     /// True when this tree is the first-responder / scan shell (no owner edit).
     var isScannerSession: Bool {
@@ -30,6 +34,12 @@ extension EnvironmentValues {
     var ownerHelpOpen: Binding<Bool>? {
         get { self[OwnerHelpOpenKey.self] }
         set { self[OwnerHelpOpenKey.self] = newValue }
+    }
+
+    /// Presents Account Sync (Sign In) from the nearest `presentsOwnerHelp()` root.
+    var ownerSignInOpen: Binding<Bool>? {
+        get { self[OwnerSignInOpenKey.self] }
+        set { self[OwnerSignInOpenKey.self] = newValue }
     }
 }
 
@@ -53,10 +63,26 @@ struct OwnerHelpButton: View {
 
     var body: some View {
         if let ownerHelpOpen {
-            ChromeTextAction(title: "Help") {
+            ChromeTextAction(title: "Policy") {
                 ownerHelpOpen.wrappedValue = true
             }
             .accessibilityIdentifier("owner-help")
+        }
+    }
+}
+
+/// Shows "Sign In" next to Help on every owner page; hides itself once
+/// `CloudSyncStatus` reports a signed-in email — no dead link once signed in.
+struct OwnerSignInButton: View {
+    @Environment(\.ownerSignInOpen) private var ownerSignInOpen
+    @ObservedObject private var status = CloudSyncStatus.shared
+
+    var body: some View {
+        if let ownerSignInOpen, status.email == nil {
+            ChromeTextAction(title: "Sign In") {
+                ownerSignInOpen.wrappedValue = true
+            }
+            .accessibilityIdentifier("owner-sign-in")
         }
     }
 }
@@ -75,6 +101,7 @@ struct PageHelpChrome<Trailing: View>: View {
                 OwnerHelpButton()
             } else {
                 OwnerHelpButton()
+                OwnerSignInButton()
                 Spacer(minLength: 0)
                 trailing()
             }
@@ -97,12 +124,14 @@ extension PageHelpChrome where Trailing == EmptyView {
 /// Local Help cover so the button works on tab roots and on sheets / full-screen covers.
 private struct PresentsOwnerHelp: ViewModifier {
     @State private var showHelp = false
+    @State private var showSignIn = false
     @Environment(\.isScannerSession) private var isScannerSession
     @EnvironmentObject private var profile: ProfileData
 
     func body(content: Content) -> some View {
         content
             .environment(\.ownerHelpOpen, $showHelp)
+            .environment(\.ownerSignInOpen, $showSignIn)
             .fullScreenCover(isPresented: $showHelp) {
                 HelpMenuView(
                     onOpenNFC: isScannerSession ? nil : {
@@ -112,6 +141,13 @@ private struct PresentsOwnerHelp: ViewModifier {
                 )
                 .environmentObject(profile)
                 .environment(\.isScannerSession, isScannerSession)
+                .presentationBackground(Color.redmedBg)
+            }
+            .sheet(isPresented: $showSignIn) {
+                NavigationStack {
+                    OwnerAccountView()
+                }
+                .environmentObject(profile)
                 .presentationBackground(Color.redmedBg)
             }
     }

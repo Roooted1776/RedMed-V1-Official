@@ -12,6 +12,8 @@ struct OwnerAccountView: View {
     @State private var step: Step = .email
     @State private var email = ""
     @State private var code = ""
+    @State private var password = ""
+    @State private var usePassword = false
     @State private var busy = false
     @State private var note: String?
     @State private var noteIsError = false
@@ -19,9 +21,10 @@ struct OwnerAccountView: View {
     @State private var confirmSignOut = false
     @State private var confirmSignOutAll = false
     @State private var confirmDelete = false
+    @State private var showCreateAccount = false
     @FocusState private var focus: Field?
 
-    private enum Field { case email, code }
+    private enum Field { case email, code, password }
 
     private var signedIn: Bool {
         status.email != nil || ProfileCloudSync.isSignedIn
@@ -60,7 +63,15 @@ struct OwnerAccountView: View {
         .toolbarBackground(Color.redmedBg, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.light, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                ChromeTextAction(title: "Create Account") { showCreateAccount = true }
+            }
+        }
         .onAppear { status.refresh() }
+        .sheet(isPresented: $showCreateAccount) {
+            RedMedLiveAccountView()
+        }
         .confirmationDialog(
             "Sign out of account sync?",
             isPresented: $confirmSignOut,
@@ -164,15 +175,46 @@ struct OwnerAccountView: View {
                     content: .emailAddress,
                     keyboard: .emailAddress
                 )
-                .submitLabel(.send)
-                .onSubmit { Task { await send() } }
-                PrimaryButton(
-                    title: "Email Me a Code",
-                    systemImage: "envelope.fill",
-                    busy: busy,
-                    disabled: !emailLooksValid
-                ) {
-                    Task { await send() }
+                .submitLabel(usePassword ? .go : .send)
+                .onSubmit { Task { await (usePassword ? signInPassword() : send()) } }
+                if usePassword {
+                    SecureField("Password", text: $password)
+                        .textContentType(.password)
+                        .focused($focus, equals: .password)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.redmedDark)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 12)
+                        .background(Color.redmedBg)
+                        .clipShape(RoundedRectangle(cornerRadius: RedMedChrome.boxRadius, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: RedMedChrome.boxRadius, style: .continuous)
+                                .strokeBorder(focus == .password ? Color.redmedAccent.opacity(0.55) : Color.redmedDivider, lineWidth: 1.2)
+                        )
+                        .submitLabel(.go)
+                        .onSubmit { Task { await signInPassword() } }
+                    PrimaryButton(
+                        title: "Sign In",
+                        systemImage: "lock.open.fill",
+                        busy: busy,
+                        disabled: !emailLooksValid || password.isEmpty
+                    ) {
+                        Task { await signInPassword() }
+                    }
+                } else {
+                    PrimaryButton(
+                        title: "Email Me a Code",
+                        systemImage: "envelope.fill",
+                        busy: busy,
+                        disabled: !emailLooksValid
+                    ) {
+                        Task { await send() }
+                    }
+                }
+                ChromeTextAction(title: usePassword ? "Use a one-time code instead" : "Have a redmed.live account with a password?") {
+                    usePassword.toggle()
+                    password = ""
+                    note = nil
                 }
             case .code:
                 Text("We sent a code to \(trimmedEmail).")
@@ -498,6 +540,26 @@ struct OwnerAccountView: View {
             setNote(error.ownerMessage, error: true)
         } catch {
             setNote("That code didn't verify.", error: true)
+        }
+    }
+
+    private func signInPassword() async {
+        guard emailLooksValid, !password.isEmpty, !busy else { return }
+        busy = true
+        defer { busy = false }
+        do {
+            try await OwnerSupabaseClient.shared.signInWithPassword(email: trimmedEmail, password: password)
+            password = ""
+            focus = nil
+            RedMedHaptics.success()
+            setNote(nil)
+            await ProfileCloudSync.didSignIn(into: profile)
+        } catch OwnerSyncError.http(let httpStatus) where (400..<500).contains(httpStatus) {
+            setNote("That email or password didn't work.", error: true)
+        } catch let error as OwnerSyncError {
+            setNote(error.ownerMessage, error: true)
+        } catch {
+            setNote("Couldn't sign in.", error: true)
         }
     }
 
