@@ -70,7 +70,7 @@ enum USCrashDetectionCall {
 /// Scene policy: keep listening through `.inactive`; hard-stop on
 /// `.background`. That inactive keep-listening path is the only
 /// “still around for a moment” window — no post-Home grace (parked;
-/// see `docs/DO-NOT.md`). Lock / force-quit / never-launched is Apple
+/// see `docs/legal/DO-NOT.md`). Lock / force-quit / never-launched is Apple
 /// Crash Detection on supported hardware — RedMed does not sense those.
 
 @MainActor
@@ -81,7 +81,10 @@ final class CrashMotionGuard: ObservableObject {
     /// Seconds until crash autodial. Nil when idle, after SOS (already dialed),
     /// or after the crash delay has fired.
     @Published private(set) var crashDialRemaining: TimeInterval? = nil
-    /// Set once per real motion-detected crash arm (never for manual SOS).
+    /// Set once per real motion-detected crash (never for manual SOS), only
+    /// after the US Crash Detection countdown runs out without Stop — the
+    /// Messages sheet must never cover Stop The Alarm while a false positive
+    /// can still be cancelled.
     /// Lives here, not on `ShareLocationCard`'s own @State, because the tab
     /// mount that follows `redMedSurvivalArmed` happens on a later SwiftUI
     /// render pass — a per-view flag could miss the change or double-read
@@ -177,7 +180,6 @@ final class CrashMotionGuard: ObservableObject {
         }
         if source == .crash {
             startCrashDialCountdown(generation: generation)
-            pendingCrashAutoShare = true
         } else {
             crashDialRemaining = nil
         }
@@ -194,6 +196,8 @@ final class CrashMotionGuard: ObservableObject {
                 guard self.engine.isArmGenerationCurrent(generation), self.isArmed else { return }
                 if left <= 0 {
                     self.crashDialRemaining = nil
+                    // Not stopped in time — now open Text My Location.
+                    self.pendingCrashAutoShare = true
                     // Dial only on time and on screen. A countdown that ran out
                     // while RedMed was backgrounded / suspended must not place a
                     // late 911 call on resume; the alarm stays armed and Call 911

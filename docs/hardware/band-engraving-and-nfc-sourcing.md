@@ -34,7 +34,7 @@ are live on a blank NTAG216. Do **not** ship “buy blank + Shortcuts / NFC
 Tools” as the product path. Public claims: store/transfer/display + Share
 honesty only ([`FDA-CLAIMS-WALL.md`](FDA-CLAIMS-WALL.md)). Paid ads stay at
 **$0** until this sequence plus a live `/tapper/` and a real App Store
-listing are green ([`docs/ADVERTISING.md`](ADVERTISING.md)).
+listing are green ([`docs/growth/ADVERTISING.md`](ADVERTISING.md)).
 
 ---
 

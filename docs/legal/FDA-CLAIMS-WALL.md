@@ -107,7 +107,7 @@ quietly add clinical-threshold ads.
 
 ### Any App Store copy still saying write-from-app?
 
-**No.** Connect listing is parked (`docs/APP-STORE.md`: no paid listing /
+**No.** Connect listing is parked (`docs/release/APP-STORE.md`: no paid listing /
 fake `apps.apple.com` ID). In-repo fields:
 
 - Sign-off: “Listing must not promise live bracelet write until NFC

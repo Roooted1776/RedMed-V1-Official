@@ -1089,7 +1089,7 @@ private struct DraftLinesEditor: View {
         }
         .buttonStyle(.plain)
 
-        Text("One item per row. A comma becomes two items on the card.")
+        Text("One item per row.")
             .font(.system(size: 12, weight: .medium))
             .foregroundColor(.redmedMuted)
             .frame(maxWidth: .infinity, alignment: .leading)

@@ -1,6 +1,6 @@
 .derivedData/
 
-# Local Cursor user sync tarballs (may include MCP tokens). See docs/DUAL-MAC.md.
+# Local Cursor user sync tarballs (may include MCP tokens). See docs/release/DUAL-MAC.md.
 .local/
 
 # macOS

@@ -499,7 +499,10 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
             m = created
         }
         m.desiredAccuracy = kCLLocationAccuracyBest
-        m.distanceFilter = 5
+        // No OS distance filter: a still phone must keep getting fixes so the
+        // 60 s refresh in didUpdateLocations keeps LIVE GPS live. That delegate
+        // already drops fixes that aren't better, moved, or newer.
+        m.distanceFilter = kCLDistanceFilterNone
         switch m.authorizationStatus {
         case .notDetermined:
             m.requestWhenInUseAuthorization()

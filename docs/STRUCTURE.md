@@ -12,8 +12,8 @@ Only what must live at the deploy / GitHub surface:
 | `README.md` | GitHub landing (product + run/deploy + dead-host note) |
 | `AGENTS.md` | Cursor / agent rules (must be easy to find) |
 | `tapper.html` · `index.html` · `card.html` · `get.html` · `get/` · `redmed-emergency.html` | Identical `#d=` redirect stubs → `/tapper/` (`scripts/write-tapper-redirects.sh`) |
-| `sw.js` · `_headers` · `_redirects` · `scripts/stage-site.sh` · `scripts/deploy-hostinger-static.mjs` · `scripts/setup-cloudflare-dns.mjs` · `scripts/verify-cf-dns-cutover.sh` | Hostinger static deploy + Cloudflare DNS/SSL cutover for `redmed.live` / SW |
-| `.htaccess` | Hostinger Apache AASA Content-Type (staged into `dist/passerby`) |
+| `sw.js` · `_headers` · `_redirects` · `scripts/stage-site.sh` · `scripts/deploy-hostinger-static.mjs` · `scripts/setup-cloudflare-dns.mjs` · `scripts/verify-cf-dns-cutover.sh` | SW + legacy, non-functional Hostinger static deploy / Cloudflare DNS-SSL cutover scripts for `redmed.live` (abandoned — live path is the VPS `redmed-portal` container behind Traefik, see `docs/domain.md`) |
+| `.htaccess` | Legacy Hostinger Apache AASA Content-Type, staged into `dist/passerby` by the now-dead static-deploy path |
 | `apple-app-site-association` · `.well-known/apple-app-site-association` | Universal Links — identical, both locations required (Apple checks root, then `.well-known/`) |
 | `.gitignore` · `.github/` · `.cursor/` | tooling |
 
@@ -32,7 +32,12 @@ RedMed-V1-Official/
 ├── privacy/               # /privacy bounce → /Document/#privacy (_redirects + privacy/index.html)
 ├── support/               # App Store Connect Support URL (scripts/publish-github-io.sh)
 ├── assets/                # canonical brand PNGs / SVG
-├── docs/                  # all long-form docs (this file, OPS, domain, PRODUCTION)
+├── docs/                  # this file, SECURITY pointer, domain.md (CI-referenced, kept at root)
+│   ├── legal/              # IP assignment, factory PO/QC rider, FDA claims wall, DO-NOT
+│   ├── growth/             # advertising, station outreach, funding-bot emails, founder-why
+│   ├── release/            # OPS, DUAL-MAC, APP-STORE, RELEASE-RUNBOOK, audits, go-live
+│   ├── hardware/           # NFC/HealthKit/associated-domains restore, band sourcing
+│   └── adr/                # architecture decision records
 ├── scripts/               # run, deploy, smoke, sync-document, write-tapper-redirects, #d= codec
 ├── Pages surface files    # redirect stubs, sw, .htaccess (see table)
 └── .github/workflows/
@@ -45,22 +50,22 @@ RedMed-V1-Official/
 | `../MAX.md` | Max profile + shipped history (agent memory; linked from `AGENTS.md`) |
 | `docs/SECURITY.md` | Pointer into Help → Security / `/Document/#security` (not a second threat model) |
 | `docs/STRUCTURE.md` | This map |
-| `docs/DUAL-MAC.md` | MacBook + Mini: Cursor ShipIt repair, prefs/colors sync, `gh` HTTPS push/pull |
-| `docs/domain.md` | `redmed.live` Namecheap → Cloudflare DNS/SSL → Hostinger static |
-| `docs/OPS.md` | VPS / Supabase / secrets — ops only, product wall |
-| `docs/AUDIT-V1-GOLIVE.md` | V1 go-live deployability audit |
-| `docs/NFC-RESTORE.md` | CoreNFC entitlement restore |
-| `docs/band-engraving-and-nfc-sourcing.md` | Hardware |
-| `docs/ADVERTISING.md` | Two ad views: wearer/family (DTC) and facility/EMS; shared gate + banned claims |
-| `docs/ems-station-outreach.md` | View B station playbook (60s brief + one-pager). Recognition training only until company gate |
-| `docs/redmed-funding-growth-email-draft.md` | Paste-ready bi-weekly View B email for the **RedMed Funding/Growth** bot |
-| `docs/biweekly-funding-bot-email.md` | Same email + Cursor Automation / Gmail MCP wiring. No live lists or tokens in git |
-| `docs/FDA-CLAIMS-WALL.md` | §520(o) / General Wellness claims wall — Arrival Day Pack + station sell |
-| `docs/IP-ASSIGNMENT.md` | How-to: confirmatory IP assignment (code, tapper, brand, band → LLC) |
-| `docs/ip-assignment.html` | Printable one-page instrument (sign; do not commit the signed copy) |
-| `docs/SPEC-EXHIBIT-A-PO-QC.md` | Pre-50 factory PO / QC rider how-to (freight line, 5-day QC, no Deposit 2 without written accept/reject) |
-| `docs/spec-exhibit-a-po-qc-rider.html` | Printable bilingual EN/中文 rider (sign; do not commit the filled copy) |
-| `docs/FOUNDER-WHY.md` | Careful founder-why paste (categories only) — About / station insert / Arrival Day Pack |
+| `docs/release/DUAL-MAC.md` | MacBook + Mini: Cursor ShipIt repair, prefs/colors sync, `gh` HTTPS push/pull |
+| `docs/domain.md` | `redmed.live` Namecheap DNS → Hostinger VPS + Traefik (`redmed-portal`) direct — no Cloudflare, no Hostinger static plan |
+| `docs/release/OPS.md` | VPS / Supabase / secrets — ops only, product wall |
+| `docs/release/AUDIT-V1-GOLIVE.md` | V1 go-live deployability audit |
+| `docs/hardware/NFC-RESTORE.md` | CoreNFC entitlement restore |
+| `docs/hardware/band-engraving-and-nfc-sourcing.md` | Hardware |
+| `docs/growth/ADVERTISING.md` | Two ad views: wearer/family (DTC) and facility/EMS; shared gate + banned claims |
+| `docs/growth/ems-station-outreach.md` | View B station playbook (60s brief + one-pager). Recognition training only until company gate |
+| `docs/growth/redmed-funding-growth-email-draft.md` | Paste-ready bi-weekly View B email for the **RedMed Funding/Growth** bot |
+| `docs/growth/biweekly-funding-bot-email.md` | Same email + Cursor Automation / Gmail MCP wiring. No live lists or tokens in git |
+| `docs/legal/FDA-CLAIMS-WALL.md` | §520(o) / General Wellness claims wall — Arrival Day Pack + station sell |
+| `docs/legal/IP-ASSIGNMENT.md` | How-to: confirmatory IP assignment (code, tapper, brand, band → LLC) |
+| `docs/legal/ip-assignment.html` | Printable one-page instrument (sign; do not commit the signed copy) |
+| `docs/legal/SPEC-EXHIBIT-A-PO-QC.md` | Pre-50 factory PO / QC rider how-to (freight line, 5-day QC, no Deposit 2 without written accept/reject) |
+| `docs/legal/spec-exhibit-a-po-qc-rider.html` | Printable bilingual EN/中文 rider (sign; do not commit the filled copy) |
+| `docs/growth/FOUNDER-WHY.md` | Careful founder-why paste (categories only) — About / station insert / Arrival Day Pack |
 
 Hosted `/Document/` is `Document/index.html`. `Document/Document.html` is a thin hash-preserving redirect to `/Document/`. Band tap Help opens `/Document/` straight. The in-app copy is `owner/RedMed/Document/`. `/privacy` redirects to `/Document/`.
 

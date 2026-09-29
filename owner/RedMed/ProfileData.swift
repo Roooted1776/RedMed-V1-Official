@@ -418,7 +418,8 @@ class ProfileData: ObservableObject {
         guard persists else { return false }
         guard hasSensitiveProfileData else { return false }
 
-        if restampToday {
+        // A pulled row with no stamp still gets today's, never a blank one.
+        if restampToday || lastUpdated.isEmpty {
             let stamp = DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .none)
             if lastUpdated != stamp {
                 lastUpdated = stamp

@@ -1,0 +1,170 @@
+/* RedMed account portal — brand colors match owner/RedMed/Theme.swift.
+   Not shared with tapper/'s CSS on purpose (separate surface). */
+:root {
+  --redmed-accent: #e11d48;
+  --redmed-bg: #fff7f7;
+  --redmed-dark: #1c1917;
+  --redmed-muted: #78716c;
+  --redmed-divider: #e7dedb;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--redmed-bg);
+  color: var(--redmed-dark);
+  font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.topbar {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 20px max(16px, env(safe-area-inset-left));
+  border-bottom: 1px solid var(--redmed-divider);
+}
+.brand { font-weight: 800; font-size: 20px; color: var(--redmed-accent); }
+.tagline { color: var(--redmed-muted); font-size: 14px; }
+
+.sheet {
+  max-width: 30rem;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+h1 { font-size: 22px; margin: 0 0 6px; }
+.hint { color: var(--redmed-muted); font-size: 14px; margin: 0 0 16px; }
+
+label { display: block; font-weight: 600; font-size: 13px; margin: 14px 0 6px; }
+label.checkbox { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+label.checkbox input { width: auto; }
+
+input[type="email"], input[type="text"], input[type="tel"], textarea {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1.2px solid var(--redmed-divider);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--redmed-dark);
+}
+input:focus, textarea:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--redmed-accent) 55%, var(--redmed-divider));
+}
+
+button.primary {
+  width: 100%;
+  margin-top: 18px;
+  padding: 13px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--redmed-accent);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+button.primary:active { opacity: 0.85; }
+
+button.linklike {
+  background: none;
+  border: none;
+  color: var(--redmed-accent);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+  cursor: pointer;
+}
+button.linklike.danger { color: #b91c1c; }
+
+.note { font-size: 13px; color: var(--redmed-muted); min-height: 1.2em; }
+.note.error { color: var(--redmed-accent); font-weight: 600; }
+
+fieldset {
+  border: none;
+  padding: 16px 0;
+  margin: 0;
+  border-bottom: 1px solid var(--redmed-divider);
+}
+legend { font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.02em; color: var(--redmed-muted); padding: 0; }
+
+.row-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--redmed-divider);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.card-title { font-size: 15px; font-weight: 700; margin: 0 0 4px; color: var(--redmed-dark); }
+details.card summary { cursor: pointer; list-style: none; }
+details.card summary::-webkit-details-marker { display: none; }
+details.card summary::after { content: " ›"; color: var(--redmed-muted); }
+details.card[open] summary::after { content: " ⌄"; }
+
+.pill {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--redmed-bg);
+  border: 1px solid var(--redmed-divider);
+  color: var(--redmed-dark);
+  white-space: nowrap;
+}
+.pill.ok { color: #15803d; border-color: #bbf7d0; }
+.pill.warn { color: var(--redmed-accent); border-color: #fecdd3; }
+
+.row-action {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--redmed-divider);
+  padding: 12px 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--redmed-accent);
+  cursor: pointer;
+}
+.row-action:first-of-type { border-top: none; }
+.row-action.danger { color: #b91c1c; }
+.hint.sub { margin: 0 0 4px; font-size: 12px; }
+
+.disclosure-list { margin: 10px 0 0; padding-left: 18px; font-size: 13px; color: var(--redmed-dark); }
+.disclosure-list li { margin-bottom: 8px; }
+
+.contact-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.contact-row input { padding: 10px; font-size: 14px; }
+.remove-contact {
+  background: none;
+  border: none;
+  color: var(--redmed-muted);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.disclosure {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--redmed-muted);
+}
+
+@media (max-width: 420px) {
+  .contact-row { grid-template-columns: 1fr; }
+}
