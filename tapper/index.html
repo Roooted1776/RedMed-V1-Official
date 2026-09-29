@@ -2999,10 +2999,6 @@ function redmedAssetURL(file) {
   }
 
   var firstPhone = '';
-  /// True only after a successful `decodeProfile()` (or native embed) that
-  /// actually has medical fields. Used to refuse SOS arming on garbage
-  /// `#d=`, empty `{}` / `[]`, and the No Patient empty state.
-  var paintedFromBand = false;
 
   function profileHasContent(p) {
     if (!p) return false;
@@ -3047,7 +3043,6 @@ function redmedAssetURL(file) {
 
   function renderProfile(p, fromBand) {
     var hasPatient = profileHasContent(p);
-    paintedFromBand = !!fromBand && hasPatient;
     p = p || {};
     var rawName = (p.name || '').trim();
     var rawDob = (p.dob || '').trim();
@@ -4003,6 +3998,8 @@ function redmedAssetURL(file) {
   var US_CRASH_ALERT_S = 10;
   var US_CRASH_COUNTDOWN_S = 30;
   var US_CRASH_DIAL_DELAY_S = US_CRASH_ALERT_S + US_CRASH_COUNTDOWN_S;
+  // Same late-wake window as CrashMotionGuard.lateDialGraceSeconds.
+  var US_CRASH_LATE_DIAL_GRACE_S = 5;
 
   var armed = false;
   var ctx = null;
@@ -4116,7 +4113,17 @@ function redmedAssetURL(file) {
       var left = (until - Date.now()) / 1000;
       if (left <= 0) {
         clearCrashDial();
-        dialEmergencyNow();
+        // Match owner CrashMotionGuard: a countdown that ends while this tab
+        // is hidden, or that wakes more than 5s late, must not place the call.
+        // The alarm stays armed. Call stays one tap away.
+        var onTime = left > -US_CRASH_LATE_DIAL_GRACE_S;
+        var visible = document.visibilityState === 'visible';
+        if (visible && onTime) dialEmergencyNow();
+        else if (crashDialHint) {
+          crashDialHint.hidden = false;
+          crashDialHint.classList.add('show');
+          crashDialHint.textContent = 'Call not placed. Tap Call if you still need it.';
+        }
         return;
       }
       paintCrashHint(left);
@@ -4539,21 +4546,43 @@ function redmedAssetURL(file) {
     }
   }
 
-  // Unmute SOS audio on first gesture only — do NOT request DeviceMotion here.
-  // iOS motion permission looks like an auth gate and interrupts RedMed · 911
-  // taps. Motion is requested only from the SOS button (explicit).
-  function onFirstGesture() {
+  // A tel: control or the SOS button must not share its gesture with the iOS
+  // motion prompt — that dialog steals the call. Any other first tap (a tab,
+  // a section, the card) starts collision detection without dialing.
+  function gestureSkipsMotionPrompt(target) {
+    var node = target && target.nodeType === 1 ? target : (target && target.parentElement);
+    while (node && node !== document) {
+      if (node.id === 'sosBtn' || node.id === 'callEmergency911' || node.id === 'aidStopAlarm') return true;
+      if (node.tagName === 'A') {
+        var href = node.getAttribute('href') || '';
+        if (href.indexOf('tel:') === 0) return true;
+      }
+      node = node.parentNode;
+    }
+    return false;
+  }
+
+  var gestureAudioUnlocked = false;
+  function unlockArmedAudio() {
+    if (!armed || gestureAudioUnlocked) return;
+    gestureAudioUnlocked = true;
+    // NFC open often blocks autoplay until a gesture — unlock and play now.
+    if (!ctx && !htmlAudio) startAudio();
+    else {
+      if (ctx && ctx.state === 'suspended') ctx.resume();
+      fireSirenBurst();
+      ensurePlaying();
+    }
+  }
+
+  function onFirstGesture(e) {
+    // iOS only treats click (not touchstart) as the gesture for
+    // DeviceMotionEvent.requestPermission. Audio may unlock on the touch.
+    unlockArmedAudio();
+    if (e && e.type === 'touchstart') return;
     document.removeEventListener('touchstart', onFirstGesture, true);
     document.removeEventListener('click', onFirstGesture, true);
-    if (armed) {
-      // NFC open often blocks autoplay until a gesture — unlock and play now.
-      if (!ctx && !htmlAudio) startAudio();
-      else {
-        if (ctx && ctx.state === 'suspended') ctx.resume();
-        fireSirenBurst();
-        ensurePlaying();
-      }
-    }
+    if (!gestureSkipsMotionPrompt(e && e.target)) requestMotionThenStart();
   }
   document.addEventListener('touchstart', onFirstGesture, true);
   document.addEventListener('click', onFirstGesture, true);

@@ -236,6 +236,15 @@ def main() -> int:
         ok = False
     else:
         print("OK   redirect redmed-emergency.html")
+    tapper_emergency = (REPO / "tapper" / "emergency.html").read_text(encoding="utf-8")
+    if "data-tab=\"medical\"" in tapper_emergency or "None on this card" in tapper_emergency:
+        print("FAIL tapper/emergency.html must stay a redirect with no medical negatives")
+        ok = False
+    elif "/tapper/" not in tapper_emergency or "location.hash" not in tapper_emergency:
+        print("FAIL tapper/emergency.html missing hash-preserving /tapper/ redirect")
+        ok = False
+    else:
+        print("OK   redirect tapper/emergency.html")
 
     ok &= check("/tapper/", 'data-tab="medical"', 'data-tab="911"', 'id="tab-aid"')
     ok &= check("/tapper/index.html", 'data-tab="medical"')
