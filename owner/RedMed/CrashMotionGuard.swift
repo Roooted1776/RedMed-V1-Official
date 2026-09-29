@@ -81,6 +81,25 @@ final class CrashMotionGuard: ObservableObject {
     /// Seconds until crash autodial. Nil when idle, after SOS (already dialed),
     /// or after the crash delay has fired.
     @Published private(set) var crashDialRemaining: TimeInterval? = nil
+    /// Set once per real motion-detected crash (never for manual SOS), only
+    /// after the US Crash Detection countdown runs out without Stop — the
+    /// Messages sheet must never cover Stop The Alarm while a false positive
+    /// can still be cancelled.
+    /// Lives here, not on `ShareLocationCard`'s own @State, because the tab
+    /// mount that follows `redMedSurvivalArmed` happens on a later SwiftUI
+    /// render pass — a per-view flag could miss the change or double-read
+    /// the already-true value at init. `ShareLocationCard` calls
+    /// `consumePendingCrashAutoShare()` from both `onAppear` and `onChange`
+    /// so it catches the flag whichever comes first, and only ever once.
+    @Published private(set) var pendingCrashAutoShare: Bool = false
+
+    /// One-shot read: true only the first time this is called after a crash
+    /// armed. Safe to call from `onAppear` and `onChange` both.
+    func consumePendingCrashAutoShare() -> Bool {
+        guard pendingCrashAutoShare else { return false }
+        pendingCrashAutoShare = false
+        return true
+    }
 
     /// Off-main motion state + CoreMotion — never touches UIKit / @Published.
     private let engine = MotionEngine()
@@ -111,6 +130,9 @@ final class CrashMotionGuard: ObservableObject {
         crashDialTask = nil
         crashDialRemaining = nil
         engine.invalidateArm()
+        // A false-positive stopped before ShareLocationCard ever consumed
+        // this must not surface at some unrelated later 911-tab visit.
+        pendingCrashAutoShare = false
         guard isArmed else { return }
         isArmed = false
         Task { @MainActor in
@@ -174,6 +196,8 @@ final class CrashMotionGuard: ObservableObject {
                 guard self.engine.isArmGenerationCurrent(generation), self.isArmed else { return }
                 if left <= 0 {
                     self.crashDialRemaining = nil
+                    // Not stopped in time — now open Text My Location.
+                    self.pendingCrashAutoShare = true
                     // Dial only on time and on screen. A countdown that ran out
                     // while RedMed was backgrounded / suspended must not place a
                     // late 911 call on resume; the alarm stays armed and Call 911

@@ -12,8 +12,8 @@ Only what must live at the deploy / GitHub surface:
 | `README.md` | GitHub landing (product + run/deploy + dead-host note) |
 | `AGENTS.md` | Cursor / agent rules (must be easy to find) |
 | `tapper.html` · `index.html` · `card.html` · `get.html` · `get/` · `redmed-emergency.html` | Identical `#d=` redirect stubs → `/tapper/` (`scripts/write-tapper-redirects.sh`) |
-| `sw.js` · `_headers` · `_redirects` · `scripts/stage-site.sh` · `scripts/deploy-hostinger-static.mjs` · `scripts/setup-cloudflare-dns.mjs` · `scripts/verify-cf-dns-cutover.sh` | Hostinger static deploy + Cloudflare DNS/SSL cutover for `redmed.live` / SW |
-| `.htaccess` | Hostinger Apache AASA Content-Type (staged into `dist/passerby`) |
+| `sw.js` · `_headers` · `_redirects` · `scripts/stage-site.sh` · `scripts/deploy-hostinger-static.mjs` · `scripts/setup-cloudflare-dns.mjs` · `scripts/verify-cf-dns-cutover.sh` | SW + legacy, non-functional Hostinger static deploy / Cloudflare DNS-SSL cutover scripts for `redmed.live` (abandoned — live path is the VPS `redmed-portal` container behind Traefik, see `docs/domain.md`) |
+| `.htaccess` | Legacy Hostinger Apache AASA Content-Type, staged into `dist/passerby` by the now-dead static-deploy path |
 | `apple-app-site-association` · `.well-known/apple-app-site-association` | Universal Links — identical, both locations required (Apple checks root, then `.well-known/`) |
 | `.gitignore` · `.github/` · `.cursor/` | tooling |
 
@@ -51,7 +51,7 @@ RedMed-V1-Official/
 | `docs/SECURITY.md` | Pointer into Help → Security / `/Document/#security` (not a second threat model) |
 | `docs/STRUCTURE.md` | This map |
 | `docs/release/DUAL-MAC.md` | MacBook + Mini: Cursor ShipIt repair, prefs/colors sync, `gh` HTTPS push/pull |
-| `docs/domain.md` | `redmed.live` Namecheap → Cloudflare DNS/SSL → Hostinger static |
+| `docs/domain.md` | `redmed.live` Namecheap DNS → Hostinger VPS + Traefik (`redmed-portal`) direct — no Cloudflare, no Hostinger static plan |
 | `docs/release/OPS.md` | VPS / Supabase / secrets — ops only, product wall |
 | `docs/release/AUDIT-V1-GOLIVE.md` | V1 go-live deployability audit |
 | `docs/hardware/NFC-RESTORE.md` | CoreNFC entitlement restore |

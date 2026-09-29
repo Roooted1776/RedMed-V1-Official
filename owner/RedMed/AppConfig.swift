@@ -110,7 +110,7 @@ enum AppConfig {
     /// Keep flag false until restore steps in `docs/hardware/NFC-RESTORE.md`.
     /// No Share control — helpers open the card only by tapping the band
     /// (~1–2″); it loads in their browser.
-    static let nfcHardwareEnabled = true
+    static let nfcHardwareEnabled = false
 
     /// `true` = `RedMed.entitlements` includes `applinks:` so a phone with RedMed
     /// installed opens the app on `/tapper/` band taps instead of Safari (own
