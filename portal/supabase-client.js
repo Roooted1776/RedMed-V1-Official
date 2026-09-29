@@ -1,0 +1,16 @@
+// Single Supabase client for the portal. db.schema pins every PostgREST call
+// (the SDK's .from()) to redmed_owner, the same header effect as the iOS
+// client's per-request Accept-Profile/Content-Profile: redmed_owner.
+// .auth.* calls are unaffected by db.schema — they always hit /auth/v1/*,
+// exactly like OwnerSupabaseClient's sendEmailCode/verifyEmailCode.
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./supabase-config.js";
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  db: { schema: "redmed_owner" },
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
+  },
+});
