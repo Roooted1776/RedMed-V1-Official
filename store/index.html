@@ -3,108 +3,187 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'self'; script-src 'self'; connect-src 'none'; form-action 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'self' https://api.fontshare.com; font-src https://cdn.fontshare.com; script-src 'self'; connect-src 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#0b0b0d">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#171819">
+<meta name="color-scheme" content="light dark">
 <title>RedMed Band | Store</title>
-<meta name="description" content="The RedMed NFC medical ID band. Tap it, get the card. No app or account needed to read it.">
-<link rel="icon" type="image/png" href="/assets/BrandLogo.png">
+<meta name="description" content="The RedMed NFC medical ID band. A deliberate tap opens the card. No app or account needed to read it.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=cabinet-grotesk@500,700,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="store.css">
+<script src="theme.js"></script>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-theme" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+  <symbol id="i-nfc" viewBox="0 0 24 24"><path d="M6 8.3a6.5 6.5 0 0 1 0 7.4M10 6.5a10 10 0 0 1 0 11M14 4.7a13.5 13.5 0 0 1 0 14.6M18 3a17 17 0 0 1 0 18"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21v-1a6 6 0 0 1 12 0v1M16 11l2 2 4-4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+</svg>
 
-<div class="bg" aria-hidden="true">
-  <video id="bgvideo" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg">
-    <source src="assets/hero.webm" type="video/webm">
-    <source src="assets/hero.mp4" type="video/mp4">
-  </video>
-  <div class="bg-shade"></div>
-</div>
-
-<header class="top">
-  <a class="brand" href="/" aria-label="RedMed home"><img src="/assets/BrandLogo.png" width="32" height="32" alt=""><span>RedMed</span></a>
-  <nav aria-label="Site">
-    <a href="/">Home</a>
-    <a href="/tapper/">See a card</a>
-    <a href="#faq">FAQ</a>
-    <a class="pill" href="#buy">Buy</a>
+<a class="skip" href="#main">Skip to content</a>
+<header class="header">
+  <a class="brand" href="/" aria-label="RedMed home">
+    <svg viewBox="0 0 36 36" aria-hidden="true"><rect width="36" height="36" rx="9" fill="currentColor"/><path d="M5 18h7l3-8 6 16 3-8h7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>RedMed<span class="brand-dot">.</span></span>
+  </a>
+  <nav aria-label="Main navigation">
+    <a href="/#how">How it works</a>
+    <a href="#buy">Bands</a>
+    <a href="#questions">Questions</a>
+    <a href="/tapper/">Open tap page</a>
   </nav>
+  <div class="header-actions">
+    <button class="icon-button" id="theme-toggle" type="button" aria-label="Switch color theme" title="Switch color theme"><svg class="ic"><use href="#i-theme"/></svg></button>
+    <a class="button small" href="#buy">Shop bands</a>
+  </div>
 </header>
 
-<main>
+<main id="main">
   <section class="hero">
-    <p class="eyebrow">NFC medical ID band</p>
-    <h1>Your medical card,<br>on your wrist.</h1>
-    <p class="lede">Anyone with a phone can tap the band and read your emergency card. No app, no account, no ads on their side.</p>
-    <div class="cta-row">
-      <a class="btn primary" href="#buy" id="heroBuy">Shop bands</a>
-      <a class="btn ghost" href="/tapper/">Preview the card</a>
+    <div class="hero-bg" aria-hidden="true">
+      <video id="bgvideo" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg">
+        <source src="assets/hero.webm" type="video/webm">
+        <source src="assets/hero.mp4" type="video/mp4">
+      </video>
+      <div class="hero-shade"></div>
     </div>
-    <ul class="chips" aria-label="Highlights">
-      <li>NXP NTAG216</li>
-      <li>Tap range ~1 to 2 in</li>
-      <li>Data stays in the band link</li>
-    </ul>
-  </section>
-
-  <section class="buy" id="buy" aria-labelledby="buyhead">
-    <h2 id="buyhead">Choose your pack</h2>
-    <p class="sub">Select a pack, then check out securely.</p>
-
-    <div class="tiers" id="tiers" role="radiogroup" aria-label="Pack size"></div>
-
-    <div class="checkout">
-      <div class="summary">
-        <span id="sumName">Pair</span>
-        <strong id="sumPrice">$59</strong>
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="signal-dot"></span> THE BAND STORE</p>
+      <h1>A small band.<br>A vital <span>connection.</span></h1>
+      <p class="hero-description">When you can't explain, let your wristband speak. A deliberate tap opens your emergency card on any phone.</p>
+      <div class="hero-actions">
+        <a class="button" href="#buy">Get your band <svg class="ic"><use href="#i-arrow"/></svg></a>
+        <a class="text-button" href="/tapper/"><span class="play"><svg class="ic"><use href="#i-play"/></svg></span> Preview the card</a>
       </div>
-      <a class="btn primary big" id="checkoutBtn" href="#buy" rel="noopener">Checkout</a>
-      <p class="notice" id="notice" role="status" hidden></p>
-
-      <div class="pay" aria-label="Payment methods">
-        <span class="paylabel">Pay with</span>
-        <span class="mark" title="Apple Pay">
-          <svg viewBox="0 3.8 24 16.4" width="56" height="38" role="img" aria-label="Apple Pay"><path fill="currentColor" d="M2.15 4.318a42.16 42.16 0 0 0-.454.003c-.15.005-.303.013-.452.04a1.44 1.44 0 0 0-1.06.772c-.07.138-.114.278-.14.43-.028.148-.037.3-.04.45A10.2 10.2 0 0 0 0 6.222v11.557c0 .07.002.138.003.207.004.15.013.303.04.452.027.15.072.291.142.429a1.436 1.436 0 0 0 .63.63c.138.07.278.115.43.142.148.027.3.036.45.04l.208.003h20.194l.207-.003c.15-.004.303-.013.452-.04.15-.027.291-.071.428-.141a1.432 1.432 0 0 0 .631-.631c.07-.138.115-.278.141-.43.027-.148.036-.3.04-.45.002-.07.003-.138.003-.208l.001-.246V6.221c0-.07-.002-.138-.004-.207a2.995 2.995 0 0 0-.04-.452 1.446 1.446 0 0 0-1.2-1.201 3.022 3.022 0 0 0-.452-.04 10.448 10.448 0 0 0-.453-.003zm0 .512h19.942c.066 0 .131.002.197.003.115.004.25.01.375.032.109.02.2.05.287.094a.927.927 0 0 1 .407.407.997.997 0 0 1 .094.288c.022.123.028.258.031.374.002.065.003.13.003.197v11.552c0 .065 0 .13-.003.196-.003.115-.009.25-.032.375a.927.927 0 0 1-.5.693 1.002 1.002 0 0 1-.286.094 2.598 2.598 0 0 1-.373.032l-.2.003H1.906c-.066 0-.133-.002-.196-.003a2.61 2.61 0 0 1-.375-.032c-.109-.02-.2-.05-.288-.094a.918.918 0 0 1-.406-.407 1.006 1.006 0 0 1-.094-.288 2.531 2.531 0 0 1-.032-.373 9.588 9.588 0 0 1-.002-.197V6.224c0-.065 0-.131.002-.197.004-.114.01-.248.032-.375.02-.108.05-.199.094-.287a.925.925 0 0 1 .407-.406 1.03 1.03 0 0 1 .287-.094c.125-.022.26-.029.375-.032.065-.002.131-.002.196-.003zm4.71 3.7c-.3.016-.668.199-.88.456-.191.22-.36.58-.316.918.338.03.675-.169.888-.418.205-.258.345-.603.308-.955zm2.207.42v5.493h.852v-1.877h1.18c1.078 0 1.835-.739 1.835-1.812 0-1.07-.742-1.805-1.808-1.805zm.852.719h.982c.739 0 1.161.396 1.161 1.089 0 .692-.422 1.092-1.164 1.092h-.979zm-3.154.3c-.45.01-.83.28-1.05.28-.235 0-.593-.264-.981-.257a1.446 1.446 0 0 0-1.23.747c-.527.908-.139 2.255.374 2.995.249.366.549.769.944.754.373-.014.52-.242.973-.242.454 0 .586.242.98.235.41-.007.667-.366.915-.733.286-.417.403-.82.41-.841-.007-.008-.79-.308-.797-1.209-.008-.754.615-1.113.644-1.135-.352-.52-.9-.578-1.09-.593a1.123 1.123 0 0 0-.092-.002zm8.204.397c-.99 0-1.606.533-1.652 1.256h.777c.072-.358.369-.586.845-.586.502 0 .803.266.803.711v.309l-1.097.064c-.951.054-1.488.484-1.488 1.184 0 .72.548 1.207 1.332 1.207.526 0 1.032-.281 1.264-.727h.019v.659h.788v-2.76c0-.803-.62-1.317-1.591-1.317zm1.94.072l1.446 4.009c0 .003-.073.24-.073.247-.125.41-.33.571-.711.571-.069 0-.206 0-.267-.015v.666c.06.011.267.019.335.019.83 0 1.226-.312 1.568-1.283l1.5-4.214h-.868l-1.012 3.259h-.015l-1.013-3.26zm-1.167 2.189v.316c0 .521-.45.917-1.024.917-.442 0-.731-.228-.731-.579 0-.342.278-.56.769-.593z"/></svg>
-        </span>
-        <span class="mark stripe" title="Powered by Stripe">
-          <svg viewBox="0 0 24 24" width="18" height="18" role="img" aria-hidden="true"><path fill="currentColor" d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/></svg>
-          <span>Powered by Stripe</span>
-        </span>
-      </div>
-      <p class="fine">Apple Pay, cards and wallets appear on the secure Stripe checkout page when your device supports them. RedMed never sees your card.</p>
+      <p class="hero-note">NFC medical ID &middot; Ships when ready</p>
+    </div>
+    <div class="product-tag"><svg class="ic"><use href="#i-nfc"/></svg><span>PASSIVE NFC<br><strong>No battery. Deliberate tap.</strong></span></div>
+    <div class="hero-bottom">
+      <span>Designed around people.<br>Not just technology.</span>
+      <a href="#buy">Choose a pack <svg class="ic"><use href="#i-down"/></svg></a>
+      <button type="button" class="vbtn" id="motionBtn" aria-pressed="false"><svg class="ic"><use id="motionIcon" href="#i-pause"/></svg><span id="motionText">Pause video</span></button>
     </div>
   </section>
 
-  <section class="features" aria-labelledby="fh">
-    <h2 id="fh">What you get</h2>
-    <div class="grid">
-      <article><h3>Tap to read</h3><p>Any phone with NFC opens the card in the browser. Nothing to install.</p></article>
-      <article><h3>Blank and unlocked</h3><p>Factory blank NXP NTAG216. We never set permanent lock bytes.</p></article>
-      <article><h3>Private by design</h3><p>Your details ride in the link fragment, which browsers never send to a server.</p></article>
-      <article><h3>Deliberate tap</h3><p>Built for a ~1 to 2 in tap. Walking past someone does nothing.</p></article>
+  <div class="principles">
+    <span><svg class="ic"><use href="#i-nfc"/></svg> Tap or scan</span>
+    <span><svg class="ic"><use href="#i-user"/></svg> No responder account</span>
+    <span><svg class="ic"><use href="#i-shield"/></svg> Medical data stays in the link</span>
+    <span><svg class="ic"><use href="#i-lock"/></svg> Secure Stripe checkout</span>
+  </div>
+
+  <section class="section buy" id="buy" aria-labelledby="buyhead">
+    <div class="section-heading">
+      <p class="eyebrow">01 / CHOOSE YOUR PACK</p>
+      <h2 id="buyhead">One band.<br>Or one for everyone.</h2>
+      <p>Pick a pack, review it, then check out with Stripe.</p>
+    </div>
+    <div class="shop">
+      <div class="tiers" id="tiers" role="radiogroup" aria-label="Pack size"></div>
+      <aside class="checkout" aria-label="Order summary">
+        <p class="eyebrow">YOUR ORDER</p>
+        <div class="summary"><span id="sumName">Pair</span><strong id="sumPrice">$59</strong></div>
+        <p class="sumnote" id="sumNote"></p>
+        <button class="button full" id="checkoutBtn" type="button">Review and checkout <svg class="ic"><use href="#i-arrow"/></svg></button>
+        <div class="pay" aria-label="Payment methods">
+          <span class="paylabel">Pay with</span>
+          <span class="mark card" title="Debit or credit card"><svg class="ic"><use href="#i-card"/></svg><span>Debit or credit card</span></span>
+          <span class="mark" title="Apple Pay"><svg viewBox="0 3.8 24 16.4" width="56" height="38" role="img" aria-label="Apple Pay"><path fill="currentColor" d="M2.15 4.318a42.16 42.16 0 0 0-.454.003c-.15.005-.303.013-.452.04a1.44 1.44 0 0 0-1.06.772c-.07.138-.114.278-.14.43-.028.148-.037.3-.04.45A10.2 10.2 0 0 0 0 6.222v11.557c0 .07.002.138.003.207.004.15.013.303.04.452.027.15.072.291.142.429a1.436 1.436 0 0 0 .63.63c.138.07.278.115.43.142.148.027.3.036.45.04l.208.003h20.194l.207-.003c.15-.004.303-.013.452-.04.15-.027.291-.071.428-.141a1.432 1.432 0 0 0 .631-.631c.07-.138.115-.278.141-.43.027-.148.036-.3.04-.45.002-.07.003-.138.003-.208l.001-.246V6.221c0-.07-.002-.138-.004-.207a2.995 2.995 0 0 0-.04-.452 1.446 1.446 0 0 0-1.2-1.201 3.022 3.022 0 0 0-.452-.04 10.448 10.448 0 0 0-.453-.003zm0 .512h19.942c.066 0 .131.002.197.003.115.004.25.01.375.032.109.02.2.05.287.094a.927.927 0 0 1 .407.407.997.997 0 0 1 .094.288c.022.123.028.258.031.374.002.065.003.13.003.197v11.552c0 .065 0 .13-.003.196-.003.115-.009.25-.032.375a.927.927 0 0 1-.5.693 1.002 1.002 0 0 1-.286.094 2.598 2.598 0 0 1-.373.032l-.2.003H1.906c-.066 0-.133-.002-.196-.003a2.61 2.61 0 0 1-.375-.032c-.109-.02-.2-.05-.288-.094a.918.918 0 0 1-.406-.407 1.006 1.006 0 0 1-.094-.288 2.531 2.531 0 0 1-.032-.373 9.588 9.588 0 0 1-.002-.197V6.224c0-.065 0-.131.002-.197.004-.114.01-.248.032-.375.02-.108.05-.199.094-.287a.925.925 0 0 1 .407-.406 1.03 1.03 0 0 1 .287-.094c.125-.022.26-.029.375-.032.065-.002.131-.002.196-.003zm4.71 3.7c-.3.016-.668.199-.88.456-.191.22-.36.58-.316.918.338.03.675-.169.888-.418.205-.258.345-.603.308-.955zm2.207.42v5.493h.852v-1.877h1.18c1.078 0 1.835-.739 1.835-1.812 0-1.07-.742-1.805-1.808-1.805zm.852.719h.982c.739 0 1.161.396 1.161 1.089 0 .692-.422 1.092-1.164 1.092h-.979zm-3.154.3c-.45.01-.83.28-1.05.28-.235 0-.593-.264-.981-.257a1.446 1.446 0 0 0-1.23.747c-.527.908-.139 2.255.374 2.995.249.366.549.769.944.754.373-.014.52-.242.973-.242.454 0 .586.242.98.235.41-.007.667-.366.915-.733.286-.417.403-.82.41-.841-.007-.008-.79-.308-.797-1.209-.008-.754.615-1.113.644-1.135-.352-.52-.9-.578-1.09-.593a1.123 1.123 0 0 0-.092-.002zm8.204.397c-.99 0-1.606.533-1.652 1.256h.777c.072-.358.369-.586.845-.586.502 0 .803.266.803.711v.309l-1.097.064c-.951.054-1.488.484-1.488 1.184 0 .72.548 1.207 1.332 1.207.526 0 1.032-.281 1.264-.727h.019v.659h.788v-2.76c0-.803-.62-1.317-1.591-1.317zm1.94.072l1.446 4.009c0 .003-.073.24-.073.247-.125.41-.33.571-.711.571-.069 0-.206 0-.267-.015v.666c.06.011.267.019.335.019.83 0 1.226-.312 1.568-1.283l1.5-4.214h-.868l-1.012 3.259h-.015l-1.013-3.26zm-1.167 2.189v.316c0 .521-.45.917-1.024.917-.442 0-.731-.228-.731-.579 0-.342.278-.56.769-.593z"/></svg></span>
+          <span class="mark stripe" title="Powered by Stripe"><svg viewBox="0 0 24 24" width="18" height="18" role="img" aria-hidden="true"><path fill="currentColor" d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/></svg><span>Powered by Stripe</span></span>
+        </div>
+        <p class="fineprint">On the next screen you can enter a debit or credit card (Visa, Mastercard, Amex, Discover), or use Apple Pay when your device supports it. The card form is Stripe's. RedMed never sees your card.</p>
+      </aside>
     </div>
   </section>
 
-  <section class="faq" id="faq" aria-labelledby="qh">
-    <h2 id="qh">Questions</h2>
-    <details><summary>When does it ship?</summary><p>Ships when ready. There is no date promise. Your receipt from Stripe is your order record.</p></details>
-    <details><summary>What am I buying today?</summary><p>Blank NTAG216 bands. Writing a band from inside the app is not live yet, so this page does not sell it.</p></details>
-    <details><summary>Is it a medical device or HIPAA certified?</summary><p>No. It is an ID card on a band, not a medical device and not HIPAA certified.</p></details>
-    <details><summary>Is my payment safe?</summary><p>Checkout is hosted by Stripe. This page loads no payment scripts and stores no card data.</p></details>
-    <details><summary>Something is wrong with my order</summary><p>Email <a id="supportLink" href="mailto:help.RedMed@gmail.com">help.RedMed@gmail.com</a>. Do not send medical details.</p></details>
+  <section class="section story" id="how">
+    <div class="section-heading">
+      <p class="eyebrow">02 / FROM WRIST TO INFORMATION</p>
+      <h2>Less searching.<br>More understanding.</h2>
+      <p>The band is the product. Your card rides in its link, so a helper needs nothing but a phone.</p>
+    </div>
+    <div class="steps">
+      <article><span class="step-number">01</span><div><h3>Get your band</h3><p>A factory blank NXP NTAG216, unlocked so you can set it up yourself.</p></div><svg class="ic big"><use href="#i-nfc"/></svg></article>
+      <article><span class="step-number">02</span><div><h3>Carry the connection</h3><p>Wear it. It has no battery and never fires on a walk-by.</p></div><svg class="ic big"><use href="#i-user"/></svg></article>
+      <article><span class="step-number">03</span><div><h3>Help someone understand</h3><p>A deliberate 1 to 2 inch tap opens your card. No sign in for the helper.</p></div><svg class="ic big"><use href="#i-shield"/></svg></article>
+    </div>
+  </section>
+
+  <section class="section technology" id="technology">
+    <div class="tech-copy">
+      <p class="eyebrow">03 / SMALL TECH. HUMAN PURPOSE.</p>
+      <h2>A connection.<br>Not another screen.</h2>
+      <dl>
+        <div><dt>Chip specification</dt><dd>NXP NTAG216</dd></div>
+        <div><dt>Connection</dt><dd>NFC, 13.56 MHz, ISO 14443A</dd></div>
+        <div><dt>Power</dt><dd>None. Passive.</dd></div>
+        <div><dt>Tap range</dt><dd>About 1 to 2 in</dd></div>
+        <div><dt>Lock</dt><dd>Never permanently locked</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section faq" id="questions">
+    <div class="section-heading">
+      <p class="eyebrow">A FEW IMPORTANT ANSWERS</p>
+      <h2>Clear by design.</h2>
+      <p>No fine-print promises about something this important.</p>
+    </div>
+    <div class="faq-list">
+      <details><summary>When does it ship?<svg class="ic"><use href="#i-plus"/></svg></summary><p>Ships when ready. There is no date promise. Your Stripe receipt is your order record.</p></details>
+      <details><summary>What am I buying today?<svg class="ic"><use href="#i-plus"/></svg></summary><p>Blank NTAG216 bands. Writing a band from inside the app is not live yet, so this page does not sell it.</p></details>
+      <details><summary>Is it a medical device or HIPAA certified?<svg class="ic"><use href="#i-plus"/></svg></summary><p>No. It is an ID card on a band, not a medical device and not HIPAA certified.</p></details>
+      <details><summary>Is my payment safe?<svg class="ic"><use href="#i-plus"/></svg></summary><p>Checkout is hosted by Stripe. This page loads no payment scripts and stores no card data.</p></details>
+      <details><summary>Something is wrong with my order<svg class="ic"><use href="#i-plus"/></svg></summary><p>Email <a class="inline" id="supportLink" href="mailto:help.RedMed@gmail.com">help.RedMed@gmail.com</a>. Do not send medical details.</p></details>
+    </div>
+  </section>
+
+  <section class="closing">
+    <p class="eyebrow">BUILT FOR PEOPLE. READY FOR POSSIBILITY.</p>
+    <h2>Start with a connection.</h2>
+    <p>Pick your pack and check out securely with Stripe.</p>
+    <a class="button light" href="#buy">Shop bands <svg class="ic"><use href="#i-arrow"/></svg></a>
   </section>
 </main>
 
 <footer>
-  <p>&copy; RedMed. <a href="/privacy/">Privacy</a> <a href="/support/">Support</a> <a href="/">redmed.live</a></p>
-  <button type="button" class="linkbtn" id="motionBtn" aria-pressed="false">Pause background video</button>
+  <a class="brand" href="/"><span>RedMed<span class="brand-dot">.</span></span></a>
+  <p>Information when words aren't possible.</p>
+  <div><a href="/privacy/">Privacy</a> <a href="/support/">Support</a> <a href="/">redmed.live</a></div>
 </footer>
 
 <div class="sticky" id="sticky" hidden>
   <span id="stickyText">Pair &middot; $59</span>
-  <a class="btn primary" id="stickyBtn" href="#buy" rel="noopener">Checkout</a>
+  <button class="button small" id="stickyBtn" type="button">Checkout</button>
 </div>
+
+<dialog id="review" aria-labelledby="reviewTitle">
+  <button class="icon-button dialog-close" type="button" aria-label="Close" id="reviewClose"><svg class="ic"><use href="#i-x"/></svg></button>
+  <p class="eyebrow">BEFORE YOU PAY</p>
+  <h2 id="reviewTitle">Pair</h2>
+  <p class="review-price" id="reviewPrice">$59</p>
+  <ul class="review-list">
+    <li>Blank NXP NTAG216 bands, unlocked.</li>
+    <li>Enter a debit or credit card on Stripe's secure page, or use Apple Pay.</li>
+    <li>Ships when ready. No date promise.</li>
+    <li>Not a medical device. Not HIPAA certified.</li>
+  </ul>
+  <label class="ack"><input type="checkbox" id="ack"> <span>I understand these are blank bands and shipping has no date promise.</span></label>
+  <a class="button full" id="goBtn" href="#buy" rel="noopener" aria-disabled="true">Continue to Stripe <svg class="ic"><use href="#i-arrow"/></svg></a>
+  <p class="notice" id="notice" role="status" hidden></p>
+  <div class="pay small"><span class="mark card" title="Debit or credit card"><svg class="ic"><use href="#i-card"/></svg><span>Debit or credit card</span></span><span class="mark"><svg viewBox="0 3.8 24 16.4" width="56" height="38" role="img" aria-label="Apple Pay"><path fill="currentColor" d="M2.15 4.318a42.16 42.16 0 0 0-.454.003c-.15.005-.303.013-.452.04a1.44 1.44 0 0 0-1.06.772c-.07.138-.114.278-.14.43-.028.148-.037.3-.04.45A10.2 10.2 0 0 0 0 6.222v11.557c0 .07.002.138.003.207.004.15.013.303.04.452.027.15.072.291.142.429a1.436 1.436 0 0 0 .63.63c.138.07.278.115.43.142.148.027.3.036.45.04l.208.003h20.194l.207-.003c.15-.004.303-.013.452-.04.15-.027.291-.071.428-.141a1.432 1.432 0 0 0 .631-.631c.07-.138.115-.278.141-.43.027-.148.036-.3.04-.45.002-.07.003-.138.003-.208l.001-.246V6.221c0-.07-.002-.138-.004-.207a2.995 2.995 0 0 0-.04-.452 1.446 1.446 0 0 0-1.2-1.201 3.022 3.022 0 0 0-.452-.04 10.448 10.448 0 0 0-.453-.003zm0 .512h19.942c.066 0 .131.002.197.003.115.004.25.01.375.032.109.02.2.05.287.094a.927.927 0 0 1 .407.407.997.997 0 0 1 .094.288c.022.123.028.258.031.374.002.065.003.13.003.197v11.552c0 .065 0 .13-.003.196-.003.115-.009.25-.032.375a.927.927 0 0 1-.5.693 1.002 1.002 0 0 1-.286.094 2.598 2.598 0 0 1-.373.032l-.2.003H1.906c-.066 0-.133-.002-.196-.003a2.61 2.61 0 0 1-.375-.032c-.109-.02-.2-.05-.288-.094a.918.918 0 0 1-.406-.407 1.006 1.006 0 0 1-.094-.288 2.531 2.531 0 0 1-.032-.373 9.588 9.588 0 0 1-.002-.197V6.224c0-.065 0-.131.002-.197.004-.114.01-.248.032-.375.02-.108.05-.199.094-.287a.925.925 0 0 1 .407-.406 1.03 1.03 0 0 1 .287-.094c.125-.022.26-.029.375-.032.065-.002.131-.002.196-.003zm4.71 3.7c-.3.016-.668.199-.88.456-.191.22-.36.58-.316.918.338.03.675-.169.888-.418.205-.258.345-.603.308-.955zm2.207.42v5.493h.852v-1.877h1.18c1.078 0 1.835-.739 1.835-1.812 0-1.07-.742-1.805-1.808-1.805zm.852.719h.982c.739 0 1.161.396 1.161 1.089 0 .692-.422 1.092-1.164 1.092h-.979zm-3.154.3c-.45.01-.83.28-1.05.28-.235 0-.593-.264-.981-.257a1.446 1.446 0 0 0-1.23.747c-.527.908-.139 2.255.374 2.995.249.366.549.769.944.754.373-.014.52-.242.973-.242.454 0 .586.242.98.235.41-.007.667-.366.915-.733.286-.417.403-.82.41-.841-.007-.008-.79-.308-.797-1.209-.008-.754.615-1.113.644-1.135-.352-.52-.9-.578-1.09-.593a1.123 1.123 0 0 0-.092-.002zm8.204.397c-.99 0-1.606.533-1.652 1.256h.777c.072-.358.369-.586.845-.586.502 0 .803.266.803.711v.309l-1.097.064c-.951.054-1.488.484-1.488 1.184 0 .72.548 1.207 1.332 1.207.526 0 1.032-.281 1.264-.727h.019v.659h.788v-2.76c0-.803-.62-1.317-1.591-1.317zm1.94.072l1.446 4.009c0 .003-.073.24-.073.247-.125.41-.33.571-.711.571-.069 0-.206 0-.267-.015v.666c.06.011.267.019.335.019.83 0 1.226-.312 1.568-1.283l1.5-4.214h-.868l-1.012 3.259h-.015l-1.013-3.26zm-1.167 2.189v.316c0 .521-.45.917-1.024.917-.442 0-.731-.228-.731-.579 0-.342.278-.56.769-.593z"/></svg></span><span class="mark stripe"><svg viewBox="0 0 24 24" width="18" height="18" role="img" aria-hidden="true"><path fill="currentColor" d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.594-7.305h.003z"/></svg><span>Powered by Stripe</span></span></div>
+</dialog>
 
 <noscript><p class="ns">JavaScript is needed to pick a pack. Email <a href="mailto:help.RedMed@gmail.com">help.RedMed@gmail.com</a> to order.</p></noscript>
 <script src="config.js"></script>
