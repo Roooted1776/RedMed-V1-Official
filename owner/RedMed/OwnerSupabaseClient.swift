@@ -205,6 +205,27 @@ actor OwnerSupabaseClient {
         try store(auth.session(fallbackEmail: email))
     }
 
+    // MARK: - Email + password (same account, e.g. one created on redmed.live)
+
+    /// Same `auth.users` row as the OTP flow above — Supabase Auth is shared
+    /// across every client on this project, so an account created with a
+    /// password (e.g. the redmed.live band-management sign-up) authenticates
+    /// here with that password, no separate account or migration needed.
+    func signInWithPassword(email: String, password: String) async throws {
+        let payload: [String: String] = ["email": email, "password": password]
+        let body = try Self.makeEncoder().encode(payload)
+        let (data, response) = try await request(
+            path: "/auth/v1/token?grant_type=password",
+            method: "POST",
+            body: body,
+            session: nil,
+            profile: nil
+        )
+        try Self.requireOK(response)
+        let auth = try Self.makeDecoder().decode(AuthTokenResponse.self, from: data)
+        try store(auth.session(fallbackEmail: email))
+    }
+
     // MARK: - profiles
 
     /// Upsert and return the row the server stored (with its `updated_at`).
