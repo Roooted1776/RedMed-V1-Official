@@ -34,6 +34,7 @@ copy get
 copy Document
 copy privacy
 copy support
+copy store
 copy .well-known
 # Hostinger Apache AASA Content-Type (CF _headers is ignored on origin)
 if [[ -f .htaccess ]]; then
