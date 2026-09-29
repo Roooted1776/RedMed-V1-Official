@@ -88,9 +88,12 @@ local network. HF NFC physics + Universal Links are the controls.
 4. Confirm `applinks:` in the entitlements and both AASA files agree on
    `redmed.live` (custom domain cutover already landed, `docs/domain.md`).
 5. Tap an `https://redmed.live/tapper/#d=…` band with RedMed installed and
-   confirm `webpageURL` still carries `#d=` (unverified: an earlier audit
-   says Universal Links can drop the fragment). If it is dropped, a helper
-   who has RedMed gets no card — fix before shipping NFC write.
+   confirm the in-app card appears for someone else's band. `onOpenURL` and
+   `NSUserActivity.userInfo` are checked as well as `webpageURL`, because
+   Universal Links sometimes omit the fragment on one of those paths.
+   `redmed://` is still never ingested. If every path arrives without `#d=`,
+   the app stays quiet (no guessed card, no SOS) — do not ship NFC write
+   until a device tap shows the fragment on at least one of those paths.
 
 ## Park again (personal team only)
 

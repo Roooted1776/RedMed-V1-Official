@@ -48,9 +48,12 @@ struct RedMedApp: App {
                     NotificationCenter.default.post(name: .redMedOpenNFCTab, object: nil)
                     return
                 }
-                // No `redmed://band#d=` ingest: custom schemes are not exclusive
-                // and any page could push a forged card. Band taps arrive only
-                // via Universal Links below.
+                // redmed:// is never ingested — any app can register that scheme.
+                // https://redmed.live/tapper/#d= often arrives here with the
+                // fragment still attached when webpageURL has already dropped it.
+                if TapperWebLink.isCardURL(url) {
+                    bandTap.ingest(url.absoluteString, profile: profile)
+                }
             }
             // Associated Domains (applinks:) — the only band-tap path into the app.
             // Wrist-band proximity must not Safari-hijack an iPhone that already
@@ -61,16 +64,79 @@ struct RedMedApp: App {
             // funnel and restore-in-flight still show the card once settle says
             // it is not own-match — helpers who installed RedMed must not lose
             // the patient card to a start screen.
-            // UL often drops the URL fragment — no `#d=` still means quiet
-            // (owner phone must not scream). Phones without RedMed keep Safari
-            // Assist; band tap never arms SOS.
+            // One UL callback often drops `#d=`. Prefer whichever candidate
+            // still decodes. No fragment on every path stays quiet (owner phone
+            // must not scream). Phones without RedMed keep Safari Assist; band
+            // tap never arms SOS.
             .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
-                guard let url = activity.webpageURL else { return }
-                let path = url.path.lowercased()
-                guard path == "/tapper" || path.hasPrefix("/tapper/") else { return }
-                bandTap.ingest(url.absoluteString, profile: profile)
+                guard let urlString = TapperWebLink.cardURLString(from: activity) else { return }
+                bandTap.ingest(urlString, profile: profile)
             }
         }
+    }
+}
+
+/// https card URLs for the write-base host only. `redmed://` never qualifies.
+enum TapperWebLink {
+    static func isCardURL(_ url: URL) -> Bool {
+        guard (url.scheme ?? "").lowercased() == "https" else { return false }
+        let path = url.path.lowercased()
+        guard path == "/tapper" || path.hasPrefix("/tapper/") else { return false }
+        guard let host = url.host?.lowercased(), !host.isEmpty else { return false }
+        return allowedHosts.contains(host)
+    }
+
+    /// Prefer a string that still decodes `#d=`. `webpageURL` sometimes omits
+    /// the fragment; `onOpenURL` and `userInfo` can still carry it.
+    static func cardURLString(from activity: NSUserActivity) -> String? {
+        let page = activity.webpageURL
+        var candidates: [String] = []
+        if let page, isCardURL(page) {
+            candidates.append(page.absoluteString)
+        }
+        if let info = activity.userInfo {
+            for value in info.values {
+                let string: String?
+                if let text = value as? String {
+                    string = text
+                } else if let url = value as? URL {
+                    string = url.absoluteString
+                } else {
+                    string = nil
+                }
+                guard let string, let url = URL(string: string), isCardURL(url) else { continue }
+                // A userInfo URL has to be the same card as webpageURL. That
+                // keeps a stray string in the activity from replacing the tap.
+                if let page {
+                    guard url.host?.lowercased() == page.host?.lowercased(),
+                          url.path.lowercased() == page.path.lowercased() else { continue }
+                }
+                candidates.append(string)
+            }
+        }
+        let decoded = candidates.filter { candidate in
+            guard let url = URL(string: candidate), isCardURL(url) else { return false }
+            return ProfileNFCCodec.decodeProfile(fromURLString: candidate) != nil
+        }
+        if let hit = decoded.first { return hit }
+        return candidates.first { candidate in
+            guard let url = URL(string: candidate) else { return false }
+            return isCardURL(url)
+        }
+    }
+
+    private static var allowedHosts: Set<String> {
+        guard let base = URL(string: AppConfig.medicalCardBaseURL),
+              let host = base.host?.lowercased(), !host.isEmpty else {
+            return ["redmed.live", "www.redmed.live"]
+        }
+        var hosts: Set<String> = [host]
+        if host.hasPrefix("www.") {
+            hosts.insert(String(host.dropFirst(4)))
+        } else {
+            hosts.insert("www." + host)
+        }
+        return hosts
     }
 }
 

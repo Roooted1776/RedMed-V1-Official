@@ -53,9 +53,11 @@ enum USCrashDetectionCall {
 /// Cancel on Aid or Stop SOS on Find Help.
 /// SOS tap opens `tel:` immediately (no in-app prompt, no countdown).
 /// Crash follows `USCrashDetectionCall` (10s alert + 30s countdown) then the
-/// same `tel:` unless Stop. Not Apple's sensor fusion / API. NFC band-tap
-/// auto-arm is siren only on the Safari / no-app path (Associated Domains
-/// keeps installed RedMed out of that path).
+/// same `tel:` unless Stop. A countdown that ends in the background, or more
+/// than `lateDialGraceSeconds` late, does not dial. Not Apple's sensor fusion
+/// / API. A band tap never auto-arms SOS on Safari or in this app. Associated
+/// Domains claim the tap on a phone that has RedMed; Assist stays in Safari
+/// when the app is not installed.
 /// Motion path ignores running, walking, eating, sex / masturbation / intimate
 /// motion, rhythmic daily activity, and hand/wrist handling.
 ///
