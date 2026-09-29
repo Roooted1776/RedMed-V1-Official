@@ -1,10 +1,12 @@
 import SwiftUI
 import CoreLocation
 import MapKit
+import MessageUI
 
-// 911 tab, owner only: street address for the live fix, one-tap contact
-// calls, and nearest ERs. Nothing here reaches a RedMed server. Address
-// lookup and ER search ask Apple on this phone.
+// 911 tab, owner only: street address for the live fix, Text My Location to
+// emergency contacts, one-tap contact calls, and nearest ERs.
+// Nothing here reaches a RedMed server. Address lookup and ER search ask Apple
+// on this phone. Texts go out only when the owner taps Send in Messages.
 
 // MARK: - Street address
 
@@ -69,6 +71,203 @@ final class LiveAddressResolver: ObservableObject {
             .compactMap { $0 }
             .filter { !$0.isEmpty }
         return parts.isEmpty ? nil : parts.joined(separator: ", ")
+    }
+}
+
+// MARK: - Message text
+
+/// SMS body for Text My Location. Name + where only. Never medical fields.
+enum EmergencyLocationMessage {
+    static func body(
+        name: String,
+        location: CLLocation?,
+        address: String?,
+        now: Date = Date()
+    ) -> String {
+        let who = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        var lines = [who.isEmpty ? "EMERGENCY: I need help." : "EMERGENCY: \(who) needs help."]
+        if let location, location.horizontalAccuracy >= 0 {
+            if let address, !address.isEmpty {
+                lines.append("Near: \(address)")
+            }
+            var gps = "GPS: \(GPSCard.coordinateText(location)) (±\(Int(location.horizontalAccuracy.rounded())) m)"
+            if GPSCard.isStale(location, now: now) {
+                let minutes = max(1, Int(now.timeIntervalSince(location.timestamp) / 60))
+                gps += " — last known, \(minutes) min ago"
+            }
+            lines.append(gps)
+            lines.append("Map: \(mapsURL(location.coordinate))")
+        } else {
+            lines.append("My location isn't available yet. Call me.")
+        }
+        let time = DateFormatter.localizedString(from: now, dateStyle: .none, timeStyle: .short)
+        lines.append("Sent from RedMed at \(time). If I don't answer, call \(EmergencyNumber.current).")
+        return lines.joined(separator: "\n")
+    }
+
+    /// Apple Maps link any phone can open (non-iPhones get a web map).
+    static func mapsURL(_ c: CLLocationCoordinate2D) -> String {
+        let ll = String(format: "%.6f,%.6f", c.latitude, c.longitude)
+        return "https://maps.apple.com/?ll=\(ll)&q=SOS"
+    }
+
+    /// `sms:`-safe recipients from saved contacts (digits and a leading +).
+    static func recipients(_ contacts: [EmergencyContact]) -> [String] {
+        var seen = Set<String>()
+        return contacts.map(\.dialDigits).filter { digits in
+            digits.filter(\.isNumber).count >= 3 && seen.insert(digits).inserted
+        }
+    }
+}
+
+// MARK: - Messages composer
+
+/// Messages sheet prefilled with recipients + body. The owner taps Send;
+/// RedMed never sends by itself.
+struct MessageComposeSheet: UIViewControllerRepresentable {
+    let recipients: [String]
+    let body: String
+    let onFinish: (MessageComposeResult) -> Void
+
+    static var canSend: Bool { MFMessageComposeViewController.canSendText() }
+
+    func makeCoordinator() -> Coordinator { Coordinator(onFinish: onFinish) }
+
+    func makeUIViewController(context: Context) -> MFMessageComposeViewController {
+        let vc = MFMessageComposeViewController()
+        vc.messageComposeDelegate = context.coordinator
+        vc.recipients = recipients
+        vc.body = body
+        return vc
+    }
+
+    func updateUIViewController(_ vc: MFMessageComposeViewController, context: Context) {}
+
+    final class Coordinator: NSObject, MFMessageComposeViewControllerDelegate {
+        let onFinish: (MessageComposeResult) -> Void
+        init(onFinish: @escaping (MessageComposeResult) -> Void) { self.onFinish = onFinish }
+
+        func messageComposeViewController(
+            _ controller: MFMessageComposeViewController,
+            didFinishWith result: MessageComposeResult
+        ) {
+            onFinish(result)
+        }
+    }
+}
+
+/// Fallback when this device can't send texts (iPad without Messages, Simulator).
+struct ActivityShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ vc: UIActivityViewController, context: Context) {}
+}
+
+// MARK: - Text My Location
+
+struct ShareLocationCard: View {
+    @EnvironmentObject private var profile: ProfileData
+    @ObservedObject private var survivalAlarm = CrashMotionGuard.shared
+    let location: CLLocation?
+    let address: String?
+
+    private enum Sheet: Identifiable {
+        case messages(recipients: [String], body: String)
+        case share(String)
+        var id: String {
+            switch self {
+            case .messages: return "messages"
+            case .share: return "share"
+            }
+        }
+    }
+
+    @State private var sheet: Sheet?
+    @State private var note: String?
+
+    private var recipients: [String] { EmergencyLocationMessage.recipients(profile.contacts) }
+
+    private var recipientLine: String {
+        let names = profile.contacts
+            .filter { !$0.dialDigits.isEmpty }
+            .map { $0.name.isEmpty ? $0.phone : $0.name }
+        if names.isEmpty {
+            return "No emergency contacts saved. You pick who gets it in Messages. Add contacts in Edit."
+        }
+        return "To \(ListFormatter.localizedString(byJoining: names)). You tap Send in Messages."
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            if survivalAlarm.isArmed {
+                Text("SOS is on. Text your contacts where you are.")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.redmedAccent)
+                    .accessibilityAddTraits(.updatesFrequently)
+            }
+            CompactFillButton(
+                title: "Text My Location",
+                systemImage: "location.fill",
+                fill: survivalAlarm.isArmed ? .redmedAccent : .redmedDark
+            ) {
+                RedMedHaptics.medium()
+                compose()
+            }
+            .accessibilityHint("Opens Messages with your address, GPS, and a map link for your emergency contacts. Nothing sends until you tap Send.")
+            Text(note ?? recipientLine)
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(.redmedMuted)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .sheet(item: $sheet) { sheet in
+            switch sheet {
+            case .messages(let recipients, let body):
+                MessageComposeSheet(recipients: recipients, body: body) { result in
+                    self.sheet = nil
+                    switch result {
+                    case .sent: note = "Sent. Keep your phone on you and stay reachable."
+                    case .failed: note = "Messages couldn't send. Try again or call."
+                    default: note = nil
+                    }
+                }
+                .ignoresSafeArea()
+            case .share(let body):
+                ActivityShareSheet(items: [body])
+                    .presentationDetents([.medium, .large])
+            }
+        }
+        // Real motion-detected crash (never manual SOS) auto-opens this same
+        // composer once the crash countdown ends without Stop — still one
+        // tap (Send) to actually go out, iOS allows nothing less. `onAppear`
+        // catches a countdown that ended before this card mounted (911 tab
+        // wasn't up yet); `onChange` catches one that ends while the card is
+        // already on screen. Either way
+        // `consumePendingCrashAutoShare()` only returns true once.
+        .onAppear { checkPendingCrashAutoShare() }
+        .onChange(of: survivalAlarm.pendingCrashAutoShare) { _, pending in
+            guard pending else { return }
+            checkPendingCrashAutoShare()
+        }
+    }
+
+    private func checkPendingCrashAutoShare() {
+        guard survivalAlarm.consumePendingCrashAutoShare() else { return }
+        compose()
+    }
+
+    private func compose() {
+        let body = EmergencyLocationMessage.body(name: profile.name, location: location, address: address)
+        note = nil
+        if MessageComposeSheet.canSend {
+            sheet = .messages(recipients: recipients, body: body)
+        } else {
+            sheet = .share(body)
+        }
     }
 }
 

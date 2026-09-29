@@ -719,7 +719,8 @@ enum ProfileNFCCodec {
                 )
             }
         }
-        guard decoded > 0, decoded <= maxInflatedBytes else { return nil }
+        // A full buffer means output was truncated at the cap — refuse it.
+        guard decoded > 0, decoded < maxInflatedBytes else { return nil }
         destination.count = decoded
         return destination
     }
