@@ -26,6 +26,7 @@ function assert(name, cond, detail) {
 }
 
 const appConfig = readFileSync(join(ROOT, 'owner/RedMed/AppConfig.swift'), 'utf8');
+const redMedApp = readFileSync(join(ROOT, 'owner/RedMed/RedMedApp.swift'), 'utf8');
 const writer = readFileSync(join(ROOT, 'owner/RedMed/NFCWriter.swift'), 'utf8');
 const reader = readFileSync(join(ROOT, 'owner/RedMed/NFCReader.swift'), 'utf8');
 const manager = readFileSync(join(ROOT, 'owner/RedMed/NFCBandManager.swift'), 'utf8');
@@ -176,6 +177,10 @@ assert('NFCReader also requires hardware NFC availability', reader.includes('gua
     `nfcHardwareEnabled=${hardwareEnabled} associatedDomainsEnabled=${udlEnabled} applinks=${udlEntitled}`,
   );
 }
+
+assert('https tapper URLs ingest from onOpenURL', redMedApp.includes('TapperWebLink.isCardURL(url)') && redMedApp.includes('bandTap.ingest(url.absoluteString, profile: profile)'));
+assert('UL prefers a candidate that still decodes #d=', redMedApp.includes('ProfileNFCCodec.decodeProfile(fromURLString: candidate)'));
+assert('custom scheme is not a band ingest path', !redMedApp.includes('redmed://band') && redMedApp.includes('redmed:// is never ingested'));
 
 console.log(`\n${total} check(s), ${failed} failed.`);
 if (failed) {

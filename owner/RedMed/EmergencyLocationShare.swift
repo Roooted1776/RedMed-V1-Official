@@ -7,6 +7,8 @@ import MessageUI
 // emergency contacts, one-tap contact calls, and nearest ERs.
 // Nothing here reaches a RedMed server. Address lookup and ER search ask Apple
 // on this phone. Texts go out only when the owner taps Send in Messages.
+// A phone that cannot open Messages gets a note. The location text is not
+// handed to the system share sheet.
 
 // MARK: - Street address
 
@@ -156,17 +158,6 @@ struct MessageComposeSheet: UIViewControllerRepresentable {
     }
 }
 
-/// Fallback when this device can't send texts (iPad without Messages, Simulator).
-struct ActivityShareSheet: UIViewControllerRepresentable {
-    let items: [Any]
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
-    }
-
-    func updateUIViewController(_ vc: UIActivityViewController, context: Context) {}
-}
-
 // MARK: - Text My Location
 
 struct ShareLocationCard: View {
@@ -177,11 +168,9 @@ struct ShareLocationCard: View {
 
     private enum Sheet: Identifiable {
         case messages(recipients: [String], body: String)
-        case share(String)
         var id: String {
             switch self {
             case .messages: return "messages"
-            case .share: return "share"
             }
         }
     }
@@ -236,14 +225,12 @@ struct ShareLocationCard: View {
                     }
                 }
                 .ignoresSafeArea()
-            case .share(let body):
-                ActivityShareSheet(items: [body])
-                    .presentationDetents([.medium, .large])
             }
         }
-        // Real motion-detected crash (never manual SOS) auto-opens this same
-        // composer once the crash countdown ends without Stop — still one
-        // tap (Send) to actually go out, iOS allows nothing less. `onAppear`
+        // Real motion-detected crash (never manual SOS) auto-opens Messages
+        // once the crash countdown ends without Stop — still one tap (Send)
+        // to actually go out. If this phone can't text, compose() leaves a
+        // note and does not open a share sheet. `onAppear`
         // catches a countdown that ended before this card mounted (911 tab
         // wasn't up yet); `onChange` catches one that ends while the card is
         // already on screen. Either way
@@ -261,13 +248,15 @@ struct ShareLocationCard: View {
     }
 
     private func compose() {
-        let body = EmergencyLocationMessage.body(name: profile.name, location: location, address: address)
         note = nil
-        if MessageComposeSheet.canSend {
-            sheet = .messages(recipients: recipients, body: body)
-        } else {
-            sheet = .share(body)
+        guard MessageComposeSheet.canSend else {
+            // No share sheet: name, address, and GPS must not go to Mail or
+            // another app. Messages is the only composer.
+            note = "This phone can't open Messages. Nothing was shared. Call your contacts."
+            return
         }
+        let body = EmergencyLocationMessage.body(name: profile.name, location: location, address: address)
+        sheet = .messages(recipients: recipients, body: body)
     }
 }
 

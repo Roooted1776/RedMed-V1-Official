@@ -164,6 +164,43 @@ for (const col of ['birth_date', 'blood_type', 'bracelet_linked', 'is_organ_dono
   assert(`column ${col} in SQL + Swift`, sql.includes(`  ${col} `) && client.includes(`"${col}"`));
 }
 
+const finishMigName = '20260929120000_portal_admin_finish_auth.sql';
+assert('portal_admin_finish auth migration present', migFiles.includes(finishMigName));
+const finishMig = migFiles.includes(finishMigName) ? readMig(finishMigName) : '';
+assert('portal_admin_finish requires the event actor to be an admin',
+  /function redmed_private\.portal_admin_finish[\s\S]*admin_members[\s\S]*update redmed_private\.admin_events/.test(finishMig));
+assert('portal_admin_finish stays service_role only',
+  finishMig.includes('revoke all on function public.portal_admin_finish(uuid, text, uuid) from public, anon, authenticated')
+  && finishMig.includes('grant execute on function redmed_private.portal_admin_finish(uuid, text, uuid) to service_role'));
+const portalHtml = read('portal/index.html');
+const portalNginx = read('portal/nginx.conf');
+const portalSignInFiles = [
+  'portal/app.js',
+  'portal/auth.js',
+  'portal/profile.js',
+  'portal/band.js',
+  'portal/supabase-client.js',
+  'portal/supabase-config.js',
+  'portal/vendor/supabase-js.js',
+  'owner/RedMed/RedMedLiveAccountView.swift',
+];
+assert('website account page has no sign-in client',
+  portalSignInFiles.every((p) => !existsSync(join(ROOT, p)))
+  && !portalHtml.includes('<form')
+  && !portalHtml.includes('<script')
+  && !/supabase/i.test(portalHtml)
+  && !portalHtml.includes('type="email"')
+  && !portalHtml.includes('type="password"')
+  && portalHtml.includes("script-src 'none'")
+  && portalHtml.includes("connect-src 'none'")
+  && !portalNginx.includes('supabase'));
+assert('app does not open a website account dialog',
+  !account.includes('RedMedLiveAccountView')
+  && !account.includes('?account=1')
+  && !client.includes('?account=1')
+  && !pbx.includes('RedMedLiveAccountView')
+  && account.includes('Email Me a Code'));
+
 console.log(`\n${total} check(s), ${failed} failed.`);
 if (failed) {
   console.error(`test-cloud-sync failed: ${failed} check(s)`);

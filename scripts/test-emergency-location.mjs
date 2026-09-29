@@ -39,7 +39,8 @@ assert('no URLSession in location share', !/URLSession/.test(code));
 assert('no Supabase in location share', !/Supabase|OwnerSupabaseClient|ProfileCloudSync/.test(code));
 assert('texts go through the Messages composer', code.includes('MFMessageComposeViewController()'));
 assert('no sms: URL auto-open', !/URL\(string:\s*"sms:/.test(code));
-assert('fallback is the share sheet, not a silent send', code.includes('UIActivityViewController(activityItems:'));
+assert('no system share sheet for location text', !code.includes('UIActivityViewController'));
+assert('phones that cannot text do not share the body', code.includes("This phone can't open Messages"));
 
 // --- SMS body carries name + where only ---
 assert('body takes name, location, address only', /static func body\(\s*name: String,\s*location: CLLocation\?,\s*address: String\?,/.test(code));

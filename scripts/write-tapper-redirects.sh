@@ -54,16 +54,18 @@ STUB=$(cat <<'EOF'
 EOF
 )
 
-mkdir -p get
-for f in tapper.html card.html get.html get/index.html redmed-emergency.html; do
+mkdir -p get tapper
+for f in tapper.html card.html get.html get/index.html redmed-emergency.html tapper/emergency.html; do
   printf '%s\n' "$STUB" > "$f"
 done
 
-# Guard: stubs must never become a second shell.
-for f in tapper.html card.html get.html get/index.html redmed-emergency.html; do
+# Guard: stubs must never become a second shell or a medical card.
+for f in tapper.html card.html get.html get/index.html redmed-emergency.html tapper/emergency.html; do
   ! grep -q 'data-tab="medical"' "$f"
+  ! grep -q 'None on this card' "$f"
   grep -q '/tapper/' "$f"
   grep -q "new URL('/tapper/', location.origin)" "$f"
+  grep -q 'location.hash' "$f"
 done
 
 echo "OK unified tapper redirect stubs"

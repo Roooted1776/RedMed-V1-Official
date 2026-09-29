@@ -506,7 +506,7 @@ assert('first-paint empty via is-unlinked CSS', /html\.is-unlinked\s+\.rm-empty\
 assert('decode-fail empty copy', tapperSrc.includes("Couldn't Read This Band") && tapperSrc.includes('function paintEmptyStateCopy'));
 assert('zlib missing DecompressionStream hint', tapperSrc.includes('cannot decode older band formats'));
 assert('passerby loaded not Linked Bracelet', tapperSrc.includes('Medical ID Loaded'));
-assert('paintedFromBand requires content', tapperSrc.includes('paintedFromBand = !!fromBand && hasPatient'));
+assert('SOS is not gated on a painted band', !tapperSrc.includes('paintedFromBand'));
 assert('treat-first early vitals script', tapperSrc.includes('__redmedEarlyVitals') && tapperSrc.includes('Treat-first:'));
 assert('hashchange re-decodes #d=', tapperSrc.includes('decodeProfile().then(function (p)') && tapperSrc.includes('hashchange'));
 assert('no redmed:// #d= handoff (non-exclusive scheme leaks PHI)', !tapperSrc.includes("'redmed://band'") && !tapperSrc.includes('handoffToInstalledApp') && !/location\.href\s*=\s*['"]redmed:\/\/band/.test(tapperSrc));
@@ -523,6 +523,13 @@ assert(
 assert('band tap never auto-arms SOS', !tapperSrc.includes('handoffToInstalledAppThenMaybeArm') && !tapperSrc.includes('function shouldAutoArm'));
 assert('SOS full sound and light', tapperSrc.includes('sos-light-flash') && tapperSrc.includes('gain.gain.value = 1') && tapperSrc.includes('Band tap does not arm SOS') && tapperSrc.includes('dark rainy night'));
 assert('SOS only toggle or US crash', tapperSrc.includes('US Crash Detection') && tapperSrc.includes('US_CRASH_ALERT_S = 10') && tapperSrc.includes('US_CRASH_COUNTDOWN_S = 30'));
+assert('crash dial refuses a hidden or late wake', tapperSrc.includes('US_CRASH_LATE_DIAL_GRACE_S = 5') && tapperSrc.includes("document.visibilityState === 'visible'") && tapperSrc.includes('Call not placed'));
+assert('iOS motion starts on a non-call click', tapperSrc.includes('function gestureSkipsMotionPrompt') && tapperSrc.includes("e.type === 'touchstart'") && tapperSrc.includes('requestMotionThenStart()'));
+{
+  const emergencyHtml = readFileSync(join(ROOT, 'tapper/emergency.html'), 'utf8');
+  assert('tapper/emergency.html redirects and keeps #d=', emergencyHtml.includes("new URL('/tapper/', location.origin)") && emergencyHtml.includes('location.hash'));
+  assert('tapper/emergency.html states no medical negative', !/None on this card/.test(emergencyHtml) && !/data-tab="medical"/.test(emergencyHtml));
+}
 const tapperAid = tapperSrc.indexOf('id="aidStopAlarm"');
 const tapper911 = tapperSrc.indexOf('id="panel-911"');
 const tapperAidPanel = tapperSrc.indexOf('id="panel-aid"');
