@@ -21,6 +21,7 @@ struct OwnerAccountView: View {
     @State private var confirmSignOut = false
     @State private var confirmSignOutAll = false
     @State private var confirmDelete = false
+    @State private var showCreateAccount = false
     @FocusState private var focus: Field?
 
     private enum Field { case email, code, password }
@@ -62,7 +63,15 @@ struct OwnerAccountView: View {
         .toolbarBackground(Color.redmedBg, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(.light, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                ChromeTextAction(title: "Create Account") { showCreateAccount = true }
+            }
+        }
         .onAppear { status.refresh() }
+        .sheet(isPresented: $showCreateAccount) {
+            RedMedLiveAccountView()
+        }
         .confirmationDialog(
             "Sign out of account sync?",
             isPresented: $confirmSignOut,
