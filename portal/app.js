@@ -116,18 +116,27 @@ function readContactsFromForm() {
 function addContactRow(contact = { name: "", relationship: "", phone: "" }) {
   const row = document.createElement("div");
   row.className = "contact-row";
-  row.innerHTML = `
-    <input class="contact-name" placeholder="Name" value="${escapeAttr(contact.name)}">
-    <input class="contact-relationship" placeholder="Relationship" value="${escapeAttr(contact.relationship)}">
-    <input class="contact-phone" placeholder="Phone" type="tel" value="${escapeAttr(contact.phone)}">
-    <button type="button" class="remove-contact" aria-label="Remove contact">✕</button>
-  `;
-  row.querySelector(".remove-contact").addEventListener("click", () => row.remove());
+  const name = document.createElement("input");
+  name.className = "contact-name";
+  name.placeholder = "Name";
+  name.value = contact.name ?? "";
+  const relationship = document.createElement("input");
+  relationship.className = "contact-relationship";
+  relationship.placeholder = "Relationship";
+  relationship.value = contact.relationship ?? "";
+  const phone = document.createElement("input");
+  phone.className = "contact-phone";
+  phone.placeholder = "Phone";
+  phone.type = "tel";
+  phone.value = contact.phone ?? "";
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "remove-contact";
+  remove.setAttribute("aria-label", "Remove contact");
+  remove.textContent = "✕";
+  remove.addEventListener("click", () => row.remove());
+  row.append(name, relationship, phone, remove);
   $("contacts-list").appendChild(row);
-}
-
-function escapeAttr(s) {
-  return String(s ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 }
 
 $("add-contact").addEventListener("click", () => addContactRow());
@@ -143,7 +152,7 @@ function fillForm(profile) {
   $("f-organ-donor").checked = !!profile.is_organ_donor;
   $("f-pregnant").checked = !!profile.is_pregnant;
   $("f-deaf-vision").checked = !!profile.is_deaf_or_vision_impaired;
-  $("contacts-list").innerHTML = "";
+  $("contacts-list").replaceChildren();
   (profile.contacts ?? []).forEach(addContactRow);
   $("last-updated").textContent = profile.last_updated
     ? `Last updated ${profile.last_updated}`

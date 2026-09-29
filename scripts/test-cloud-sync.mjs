@@ -164,6 +164,23 @@ for (const col of ['birth_date', 'blood_type', 'bracelet_linked', 'is_organ_dono
   assert(`column ${col} in SQL + Swift`, sql.includes(`  ${col} `) && client.includes(`"${col}"`));
 }
 
+const finishMigName = '20260929120000_portal_admin_finish_auth.sql';
+assert('portal_admin_finish auth migration present', migFiles.includes(finishMigName));
+const finishMig = migFiles.includes(finishMigName) ? readMig(finishMigName) : '';
+assert('portal_admin_finish requires the event actor to be an admin',
+  /function redmed_private\.portal_admin_finish[\s\S]*admin_members[\s\S]*update redmed_private\.admin_events/.test(finishMig));
+assert('portal_admin_finish stays service_role only',
+  finishMig.includes('revoke all on function public.portal_admin_finish(uuid, text, uuid) from public, anon, authenticated')
+  && finishMig.includes('grant execute on function redmed_private.portal_admin_finish(uuid, text, uuid) to service_role'));
+const portalHtml = read('portal/index.html');
+const portalJs = read('portal/app.js');
+assert('account portal CSP allows only this Supabase project',
+  portalHtml.includes('Content-Security-Policy')
+  && portalHtml.includes("script-src 'self'")
+  && portalHtml.includes('https://mohxobgyjkcmkqxijgeg.supabase.co')
+  && portalHtml.includes('wss://mohxobgyjkcmkqxijgeg.supabase.co'));
+assert('account contacts are built without innerHTML', !portalJs.includes('innerHTML'));
+
 console.log(`\n${total} check(s), ${failed} failed.`);
 if (failed) {
   console.error(`test-cloud-sync failed: ${failed} check(s)`);

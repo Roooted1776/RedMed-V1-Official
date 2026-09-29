@@ -4,8 +4,8 @@
 // .auth.* calls are unaffected by db.schema — they always hit /auth/v1/*,
 // exactly like OwnerSupabaseClient's sendEmailCode/verifyEmailCode.
 //
-// Imported from a locally vendored bundle, not a CDN: the live server's CSP
-// for this path is script-src 'self' (see server.mjs's "accountPolicy"), so
+// Imported from a locally vendored bundle, not a CDN: the account CSP is
+// script-src 'self' (meta tag in index.html, and portal/nginx.conf), so
 // a cross-origin ESM import would be blocked outright. vendor/supabase-js.js
 // is @supabase/supabase-js@2.45.4 bundled with esbuild (--bundle --format=esm,
 // zero remaining external imports) — regenerate it the same way to update.
