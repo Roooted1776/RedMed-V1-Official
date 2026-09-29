@@ -3,7 +3,13 @@
 // client's per-request Accept-Profile/Content-Profile: redmed_owner.
 // .auth.* calls are unaffected by db.schema — they always hit /auth/v1/*,
 // exactly like OwnerSupabaseClient's sendEmailCode/verifyEmailCode.
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+//
+// Imported from a locally vendored bundle, not a CDN: the live server's CSP
+// for this path is script-src 'self' (see server.mjs's "accountPolicy"), so
+// a cross-origin ESM import would be blocked outright. vendor/supabase-js.js
+// is @supabase/supabase-js@2.45.4 bundled with esbuild (--bundle --format=esm,
+// zero remaining external imports) — regenerate it the same way to update.
+import { createClient } from "./vendor/supabase-js.js";
 import { SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY } from "./supabase-config.js";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
