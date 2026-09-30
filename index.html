@@ -37,6 +37,25 @@
     text-align: center;
     padding: 48px 24px;
   }
+  header { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; }
+  header a { font-size: 0.9rem; }
+  header a.tap { color: #1c1917; border: 1px solid #d6d0cf; padding: 8px 16px; border-radius: 999px; }
+  header a.store { background: #e11d48; color: #fff; padding: 8px 18px; border-radius: 999px; }
+  header a.store:hover, header a.store:focus-visible { background: #be123c; }
+  section { text-align: left; margin-top: 44px; }
+  section h2 { font-size: 1.2rem; margin: 0 0 12px; }
+  section h3 { font-size: 1rem; margin: 18px 0 4px; }
+  section p { margin: 0 0 10px; }
+  .eyebrow { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: #6b6462; margin: 0 0 6px; }
+  .specs { margin: 14px 0 10px; padding: 0; }
+  .specs div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid #ead9d9; }
+  .specs dt { color: #6b6462; font-size: 0.9rem; }
+  .specs dd { margin: 0; font-weight: 600; text-align: right; }
+  details { border-bottom: 1px solid #ead9d9; padding: 12px 0; }
+  summary { cursor: pointer; font-weight: 600; min-height: 24px; }
+  summary:focus-visible { outline: 2px solid #e11d48; outline-offset: 3px; }
+  details p { margin: 10px 0 0; color: #3f3a38; }
+  .fineprint { font-size: 0.82rem; color: #6b6462; }
   main { max-width: 480px; }
   img.wordmark { height: 32px; margin-bottom: 28px; }
   h1 { font-size: 1.5rem; margin: 0 0 12px; }
@@ -53,12 +72,50 @@
 </style>
 </head>
 <body>
+  <header>
+    <a class="tap" href="/tapper/">Open Tap Page</a>
+    <a class="store" href="/store/">Store</a>
+  </header>
   <main>
     <img class="wordmark" src="/assets/BrandWordmark.png" alt="RedMed" width="160" height="32">
     <h1>Emergency info, one tap away.</h1>
     <p class="lede">RedMed puts a person's medical information on a small NFC band. Tapping it with any modern
       phone opens their emergency card instantly &mdash; no app, no account, no sign-in.</p>
     <p><a class="cta" href="/store/">Shop the RedMed band</a></p>
+    <section id="how" aria-labelledby="how-h">
+      <p class="eyebrow">How it works</p>
+      <h2 id="how-h">Less searching. More understanding.</h2>
+      <h3>1. Prepare your information</h3>
+      <p>Choose the emergency details and contacts you want to carry. The Owner app is designed to keep your profile on your iPhone.</p>
+      <h3>2. Carry the connection</h3>
+      <p>A compatible NFC band carries the emergency-card link. Hardware activation is still under validation.</p>
+      <h3>3. Help someone understand</h3>
+      <p>A responder opens the card without signing in. Wearer-selected information supports communication, not diagnosis or treatment decisions.</p>
+    </section>
+    <section id="technology" aria-labelledby="tech-h">
+      <p class="eyebrow">Small tech. Human purpose.</p>
+      <h2 id="tech-h">A connection. Not another screen.</h2>
+      <dl class="specs">
+        <div><dt>Chip specification</dt><dd>NXP NTAG216</dd></div>
+        <div><dt>Connection</dt><dd>NFC &middot; 13.56 MHz</dd></div>
+        <div><dt>Power</dt><dd>None. Passive.</dd></div>
+        <div><dt>Responder experience</dt><dd>No account required</dd></div>
+      </dl>
+      <p class="fineprint">Target hardware specification. Physical read/write validation is a release requirement, not a completed certification.</p>
+    </section>
+    <section id="privacy" aria-labelledby="privacy-h">
+      <p class="eyebrow">Your information. Your choice.</p>
+      <h2 id="privacy-h">Connected doesn&rsquo;t have to mean collected.</h2>
+      <p>This page does not ask for an email, a password, or a code. The card&rsquo;s contents travel in the band&rsquo;s link and are read in the browser of the phone that taps it; this site never receives them.</p>
+      <p>Anyone with your band&rsquo;s link can read the information you deliberately put on it. <a href="/Document/">Read the full privacy details.</a></p>
+    </section>
+    <section id="questions" aria-labelledby="faq-h">
+      <p class="eyebrow">A few important answers</p>
+      <h2 id="faq-h">Clear by design.</h2>
+      <details><summary>Does the person helping me need an app?</summary><p>The tap page is designed to open from a compatible phone&rsquo;s NFC reader or camera without a RedMed account. Device compatibility and a usable web connection or previously cached page are required.</p></details>
+      <details><summary>What happens without internet?</summary><p>A previously loaded tap page may work from its cache. A phone that has never opened it cannot rely on offline access. Keep essential engraved information or another non-digital backup.</p></details>
+      <details><summary>Is RedMed ready for medical use?</summary><p>RedMed is in development. Clinical-content review and physical-band validation are still release gates. It is not a replacement for emergency services or professional medical care.</p></details>
+    </section>
     <p class="fine">Main page: <a href="https://redmed.live/">https://redmed.live</a></p>
   </main>
   <footer>
