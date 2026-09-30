@@ -97,6 +97,9 @@ main>.technology{background:var(--veil2)}
 .tech-copy dl{margin-top:var(--s10);max-width:640px}
 .tech-copy dl div{display:flex;justify-content:space-between;gap:var(--s4);padding:var(--s4) 0;border-bottom:1px solid var(--border)}
 .tech-copy dt{color:var(--muted);font-size:var(--text-sm)}.tech-copy dd{font-weight:700}
+.tech-layout{max-width:1560px;margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:var(--s12);align-items:center}.tech-layout .tech-copy{max-width:none;margin:0}
+.tech-media{margin:0}.tech-media img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--border)}
+@media(max-width:1000px){.tech-layout{grid-template-columns:1fr;gap:var(--s10)}}
 .story{display:grid;grid-template-columns:1fr 1fr;gap:var(--s16)}
 .steps article{display:flex;gap:var(--s6);align-items:start;padding:var(--s6) 0;border-bottom:1px solid var(--border)}
 .steps article:first-child{padding-top:0}.steps article:last-child{border-bottom:0}
