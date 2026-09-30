@@ -119,7 +119,8 @@
     if (first && first.catch) first.catch(function () { pause(true); });
   }
   mb.addEventListener('click', function () { pause(!v.paused); });
-  v.addEventListener('error', function () { v.style.display = 'none'; }, true);
+  // Hide only when the video itself or its last fallback source fails, not when the first source is skipped.
+  v.addEventListener('error', function (e) { if (e.target === v || e.target === v.lastElementChild) v.style.display = 'none'; }, true);
 
   // gentle parallax on the hero video (desktop pointer only)
   var hero = document.querySelector('.hero');
