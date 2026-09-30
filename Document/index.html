@@ -105,7 +105,7 @@
 
     <h2><span class="sec-num">9</span> How long it lasts</h2>
     <p>While account sync is off, the profile stays on your phone and band until you remove it. When account sync is on, the signed-in wearer copy stays in Supabase until you erase it or delete the account row. Erase on this iPhone deletes the Keychain copy and, if you are signed in, the account copy. It does not wipe a band. <strong>Delete Account</strong> (Help → Account sync) deletes the sign-in itself, the account copy, and the band-write log on the server; RedMed on this iPhone and the band stay until you erase or overwrite them. <strong>Sign Out All Devices</strong> ends every signed-in session on the account.</p>
-    <p>On the phone: Help → <strong>Erase All User Data</strong> (Face ID), or delete the app. Edit has field-level Clear only (blood type / birth date) — there is no Clear-all. Clearing some fields and Save updates the stored ID; an empty Save does <strong>not</strong> write or wipe Keychain — use Erase. On the band: overwrite the chip or dispose of the band securely. We cannot wipe a band remotely — there is no link from us to the chip.</p>
+    <p>On the phone: Help → <strong>Erase All User Data</strong> (Face ID), or delete the app. Edit has field-level Clear only (blood type / birth date) — there is no Clear-all. Clearing some fields and Save updates the stored ID; an empty Save does <strong>not</strong> write or wipe Keychain — use Erase. On the band: overwrite the chip or dispose of the band securely. We cannot wipe a band remotely — there is no link from us to the chip. A lost band keeps working: anyone who taps it can read the card until the chip is overwritten or destroyed.</p>
     <p>Support emails are kept only as long as needed to answer you, then deleted. Do not send your full medical profile to support.</p>
 
     <h2><span class="sec-num">10</span> Your rights (United States)</h2>
@@ -276,6 +276,7 @@
       <li>The payload uses AES-GCM packing with a public client key (not confidentiality). Treat the band like a printed medical ID.</li>
       <li>Rewrite the band after you change your profile.</li>
       <li>RedMed cannot wipe a band remotely. Overwrite or discard the chip to remove the card from it.</li>
+      <li>If you lose a band, it still works. There is no way to turn a band off from the app or your account. Treat a lost band like a lost printed medical ID, and write a new one if you need it.</li>
     </ul>
 
     <h2><span class="sec-num">18</span> Force majeure</h2>
