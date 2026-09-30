@@ -1,6 +1,7 @@
 (function () {
   'use strict';
   var cfg = window.REDMED_STORE;
+  if (!cfg || !cfg.tiers || !cfg.tiers.length) return; // config.js missing: leave the static page alone
   var tiers = cfg.tiers;
   var selected = 'pair';
   var ok = /^https:\/\/(square\.link\/u\/|checkout\.square\.site\/)/;
