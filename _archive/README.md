@@ -10,3 +10,4 @@ main folders only hold live files. Safe to delete, or move back with `git mv`.
   `scripts/test-owner-tap-quiet.mjs`: old helper scripts nothing calls. Note
   `test-owner-tap-quiet.mjs` still works but CI never ran it; move it back to `scripts/`
   if you want that check again.
+- `docs/release/VERIFICATION-2026-09-26.md`, `docs/hardware/cold-start-audit.md`: old notes nothing links to.
