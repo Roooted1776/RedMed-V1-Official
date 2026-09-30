@@ -200,6 +200,16 @@ assert('app does not open a website account dialog',
   && !client.includes('?account=1')
   && !pbx.includes('RedMedLiveAccountView')
   && account.includes('Email Me a Code'));
+const home = read('_archive/index-new.html');
+assert('marketing homepage has no sign-in form',
+  !home.includes('<form')
+  && !home.includes('type="email"')
+  && !home.includes('type="password"')
+  && !home.includes('account-dialog')
+  && !home.includes('index-persist-admin.js')
+  && !/supabase/i.test(home)
+  && home.includes('site-home.js')
+  && home.includes('legacy.js'));
 
 console.log(`\n${total} check(s), ${failed} failed.`);
 if (failed) {
