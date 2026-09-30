@@ -8,6 +8,7 @@
  * url(...) in the store stylesheet. Skipped: external URLs, mailto/tel/custom
  * schemes (redmed://), #fragments, and data: URIs.
  *
+ * Also fails if a public page links to /tapper/ (it opens a wearer's profile).
  * Not checked on purpose: owner/ (native app, not the website).
  */
 import { readFileSync, existsSync, statSync } from 'node:fs';
@@ -67,6 +68,11 @@ function check(fromFile, url) {
   problems.push(`${fromFile}: ${url}`);
 }
 
+// The tap page (/tapper/) opens a wearer's real profile from the band link, so
+// public site pages must never link to it. (The band-address redirect stubs at the
+// repo root, like tapper.html and card.html, are not in `pages` and keep working.)
+const noTapperLinks = pages.filter((p) => p !== 'tapper/index.html');
+
 for (const page of pages) {
   const file = path.join(root, page);
   if (!existsSync(file)) {
@@ -75,6 +81,11 @@ for (const page of pages) {
   }
   const html = readFileSync(file, 'utf8');
   for (const m of html.matchAll(/\b(?:href|src|poster)\s*=\s*"([^"]*)"/g)) check(page, m[1]);
+  if (noTapperLinks.includes(page)) {
+    for (const m of html.matchAll(/<a\b[^>]*\bhref\s*=\s*"([^"]*tapper[^"]*)"/gi)) {
+      problems.push(`${page}: links to the tap page (${m[1]}); public pages must not`);
+    }
+  }
 }
 
 for (const css of stylesheets) {
