@@ -24,6 +24,7 @@ p{color:var(--muted)}
 .button:hover{background:var(--accent-hover);transform:translateY(-1px)}
 .button:active{transform:scale(.98)}
 .button.small{min-height:44px;padding:var(--s3) var(--s5)}
+.button.ghost{background:transparent;color:var(--ink);border-color:var(--border);gap:var(--s2)}.button.ghost:hover{background:var(--soft)}
 .button.light{background:#fff;color:#a31b2c}.button.light:hover{background:#f1e8e5}
 .button.full{width:100%}
 .button[aria-disabled=true]{opacity:.45;cursor:not-allowed;pointer-events:none}
@@ -132,7 +133,7 @@ dialog h2{font-size:2rem;margin-top:var(--s2)}
 @layer responsive{
 @media(max-width:1000px){.shop{grid-template-columns:1fr}.checkout{position:static}.story,.faq{grid-template-columns:1fr;gap:var(--s10)}}
 @media(max-width:820px){
-  .header{height:72px}nav{display:none}.header-actions .button{display:none}
+  .header{height:72px}nav{display:none}.tap-link span{display:none}.tap-link{width:44px;padding:0;min-height:44px;border-radius:50%}.shop-link{display:none}
   .tiers{grid-template-columns:1fr}
   .hero{min-height:620px;padding-top:var(--s12)}.hero-shade{background:linear-gradient(0deg,#171819f0 10%,#17181980 70%,#17181940)}
   .product-tag{display:none}.hero-bottom{margin-top:var(--s12)}.hero-bottom>span{display:none}
