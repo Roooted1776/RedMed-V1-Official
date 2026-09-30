@@ -5,9 +5,9 @@
 // Publishable links only. Never put a Square access token in this repo.
 window.REDMED_STORE = {
   tiers: [
-    { id: 'solo',   name: 'Single Band',  bands: 1, price: 34, blurb: 'One blank NTAG216 band.',              link: '' },
-    { id: 'pair',   name: 'Pair',         bands: 2, price: 59, blurb: 'Two bands. Wear one, keep a spare.',   link: '', badge: 'Most popular' },
-    { id: 'family', name: 'Family Pack',  bands: 4, price: 109, blurb: 'Four bands for the whole household.', link: '' }
+    { id: 'solo',   name: 'Single Band',  bands: 1, price: 40, blurb: 'One blank NTAG216 band.',              link: '' },
+    { id: 'pair',   name: 'Pair',         bands: 2, price: 65, blurb: 'Two bands. Wear one, keep a spare.',   link: '', badge: 'Most popular' },
+    { id: 'family', name: 'Family Pack',  bands: 3, price: 70, blurb: 'Three bands for the household.',      link: '' }
   ],
   currency: 'USD',
   supportEmail: 'help@redmed.live'
