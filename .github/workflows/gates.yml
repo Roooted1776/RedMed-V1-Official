@@ -36,6 +36,7 @@ jobs:
       - run: node scripts/test-cloud-sync.mjs
       - run: node scripts/test-emergency-location.mjs
       - run: node scripts/test-links.mjs
+      - run: node scripts/test-structure.mjs
 
   secrets-and-phi:
     name: No secrets or band payloads in tree
