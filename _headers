@@ -7,6 +7,13 @@
 # still the source of truth after install. github.io ignores _headers.
 # AASA Content-Type is for Cloudflare Pages only — github.io ignores _headers
 # but still serves the files (Apple accepts octet-stream there).
+#
+# RM-06 additions (2026-09-30):
+#   - CSP + frame/permissions headers on /, /portal/, /portal/*, /store/, /store/*
+#   - connect-src includes Supabase project origin on portal routes
+#   - Existing tapper headers are preserved byte-for-byte
+#   - TODO (store owner): replace connect-src 'self' with exact Stripe/payment
+#     origins when checkout JS is wired up.
 
 /apple-app-site-association
   Content-Type: application/json
@@ -47,6 +54,16 @@
 /BrandWordmark.png
   Cache-Control: public, max-age=604800, stale-while-revalidate=2592000
 
+# ── Home page (/)
+/
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+
+# ── Tapper pages (unchanged)
 /tapper
   Cache-Control: public, max-age=60, stale-while-revalidate=86400
   X-Content-Type-Options: nosniff
@@ -79,6 +96,15 @@
   Permissions-Policy: camera=(), microphone=(), payment=(), usb=(), interest-cohort=()
   Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob: data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
 
+/tapper/*
+  Cache-Control: public, max-age=60, stale-while-revalidate=86400
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), payment=(), usb=(), interest-cohort=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob: data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+
+# ── Other HTML shells (unchanged)
 /card.html
   Cache-Control: public, max-age=0, must-revalidate
   X-Content-Type-Options: nosniff
@@ -119,10 +145,58 @@
   Permissions-Policy: camera=(), microphone=(), payment=(), usb=(), interest-cohort=()
   Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob: data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
 
-/tapper/*
-  Cache-Control: public, max-age=60, stale-while-revalidate=86400
+# ── Portal (authenticated app shell)
+# connect-src includes Supabase project for auth + profile sync.
+# TODO: replace mohxobgyjkcmkqxijgeg.supabase.co with env var when
+# Cloudflare Pages secrets support _headers substitution.
+/portal
+  Cache-Control: public, max-age=0, must-revalidate
   X-Content-Type-Options: nosniff
-  Referrer-Policy: no-referrer
+  Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
-  Permissions-Policy: camera=(), microphone=(), payment=(), usb=(), interest-cohort=()
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data:; media-src 'self' blob: data:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self' https://mohxobgyjkcmkqxijgeg.supabase.co; manifest-src 'self'; upgrade-insecure-requests
+
+/portal/
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self' https://mohxobgyjkcmkqxijgeg.supabase.co; manifest-src 'self'; upgrade-insecure-requests
+
+/portal/*
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self' https://mohxobgyjkcmkqxijgeg.supabase.co; manifest-src 'self'; upgrade-insecure-requests
+
+# ── Store
+# payment=() intentionally kept until Stripe origins are confirmed.
+# TODO: when wiring checkout, add connect-src https://js.stripe.com
+#   and script-src https://js.stripe.com
+/store
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+
+/store/
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
+
+/store/*
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; manifest-src 'self'; upgrade-insecure-requests
