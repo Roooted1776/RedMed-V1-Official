@@ -137,7 +137,7 @@ dialog h2{font-size:2rem;margin-top:var(--s2)}
 @layer responsive{
 @media(max-width:1000px){.shop{grid-template-columns:1fr}.checkout{position:static}.story,.faq{grid-template-columns:1fr;gap:var(--s10)}}
 @media(max-width:820px){
-  .header{height:72px}nav{display:none}.tap-link span{display:none}.tap-link{width:44px;padding:0;min-height:44px;border-radius:50%}.shop-link{display:none}
+  .header{height:72px}nav{display:none}.tap-link span{display:none}.tap-link{width:44px;padding:0;min-height:44px;border-radius:50%}.header-actions{gap:var(--s2)}.shop-link{padding:var(--s3);white-space:nowrap}.brand{font-size:1.25rem}.brand>svg{width:28px;height:28px}.header{gap:var(--s3);padding:0 var(--s4)}
   .tiers{grid-template-columns:1fr}
   .hero{min-height:620px;padding-top:var(--s12)}.page-bg video{left:0;width:100%;-webkit-mask-image:none;mask-image:none;object-position:60% center}.hero-shade{background:linear-gradient(0deg,#050506f0 10%,#050506a0 70%,#05050660)}
   .product-tag{display:none}.hero-bottom{margin-top:var(--s12)}.hero-bottom>span{display:none}
@@ -146,3 +146,5 @@ dialog h2{font-size:2rem;margin-top:var(--s2)}
   .section{padding:var(--s16) var(--s6)}footer div{margin-left:0}
 }
 }
+
+@media(max-width:400px){.tap-link{display:none}.brand{font-size:1.1rem}.brand>svg{width:24px;height:24px}.header{padding:0 var(--s3)}}
