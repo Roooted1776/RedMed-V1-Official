@@ -87,7 +87,7 @@ nav a{font-size:var(--text-sm);color:var(--muted);font-weight:500}nav a:hover{co
 .pay.small{margin:var(--s4) 0 0}
 .paylabel{font-size:var(--text-sm)}
 .mark{display:inline-flex;align-items:center;gap:6px;color:var(--ink);height:42px;padding:0 var(--s3);border:1px solid var(--border);border-radius:6px;background:var(--bg);font-size:var(--text-xs);font-weight:700}
-.mark.stripe{color:#635bff}.mark.stripe span{color:var(--ink)}
+.mark.square{color:var(--ink)}.mark.square span{color:var(--ink)}
 .mark.card .ic{width:22px;height:22px}
 .mark svg:not(.ic){display:block}
 .technology{background:var(--soft);max-width:none}

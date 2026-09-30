@@ -3,18 +3,14 @@
   var cfg = window.REDMED_STORE;
   var tiers = cfg.tiers;
   var selected = 'pair';
-  var ok = /^https:\/\/(buy|checkout)\.stripe\.com\//;
+  var ok = /^https:\/\/(square\.link\/u\/|checkout\.square\.site\/)/;
   var $ = function (id) { return document.getElementById(id); };
   var fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: cfg.currency, maximumFractionDigits: 0 });
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function tier(id) { return tiers.filter(function (t) { return t.id === id; })[0]; }
   function live(t) { return ok.test(t.link || ''); }
-  function stripeUrl(t) {
-    var u = new URL(t.link);
-    u.searchParams.set('client_reference_id', 'store-' + t.id);
-    return u.toString();
-  }
+  function checkoutUrl(t) { return new URL(t.link).toString(); }
 
   // ---- theme toggle (initial value set in theme.js) ----
   $('theme-toggle').addEventListener('click', function () {
@@ -66,13 +62,13 @@
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { move(-1); e.preventDefault(); }
   });
 
-  // ---- review dialog, then hand off to Stripe ----
+  // ---- review dialog, then hand off to Square ----
   var dlg = $('review'), ack = $('ack'), go = $('goBtn'), notice = $('notice');
   function setGo() {
     var t = tier(selected);
     var ready = ack.checked;
     go.setAttribute('aria-disabled', ready ? 'false' : 'true');
-    go.href = ready && live(t) ? stripeUrl(t) : '#buy';
+    go.href = ready && live(t) ? checkoutUrl(t) : '#buy';
     notice.hidden = !(ready && !live(t));
     if (!live(t)) notice.textContent = 'Checkout is not switched on yet. Email ' + cfg.supportEmail + ' to order.';
   }
