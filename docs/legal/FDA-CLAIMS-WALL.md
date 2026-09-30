@@ -133,7 +133,7 @@ vendor short-link SaaS), that is covered-entity / BA creep. Refuse. Do not
 sign a BAA to paper over a host you do not run. Recognition training +
 blank/owner-write SKU only ([`ADVERTISING.md`](ADVERTISING.md) view B).
 
-Support mail (`help.RedMed@gmail.com`) stays troubleshooting only — never
+Support mail (`help@redmed.live`) stays troubleshooting only — never
 request full medical profiles; delete threads when resolved.
 
 ---

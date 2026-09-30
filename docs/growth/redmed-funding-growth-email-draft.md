@@ -58,7 +58,7 @@ RedMed
 | `{{FIRST_NAME}}` | Training officer / contact first name, or drop the greeting name |
 | `{{RECIPIENTS}}` | Station emails (NJ + IL View B list) — **not in git** |
 | `{{SENDER_NAME}}` | Founder display name |
-| `{{REPLY_TO}}` | Outreach reply address (prefer non-`help.RedMed@gmail.com`) |
+| `{{REPLY_TO}}` | Outreach reply address (prefer non-`help@redmed.live`) |
 | `{{FROM_EMAIL}}` | Same or dedicated outreach From once company gate has a domain |
 
 ---

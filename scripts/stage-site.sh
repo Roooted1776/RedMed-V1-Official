@@ -22,6 +22,7 @@ copy() {
 copy _headers
 copy _redirects
 copy index.html
+copy favicon.svg
 copy card.html
 copy get.html
 copy tapper.html

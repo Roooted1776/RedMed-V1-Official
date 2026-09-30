@@ -48,7 +48,7 @@ enum AppConfig {
     /// stay in this repo — not jsDelivr `@main` of a second tree.
     static let supportURL = "https://github.com/Roooted1776/frisky/blob/main/support/index.html"
     /// Owner Help → Contact Support. Same address as Document.html Contact sections.
-    static let supportEmail = "help.RedMed@gmail.com"
+    static let supportEmail = "help@redmed.live"
 
     /// Owner band NDEF contract (permanent): write only
     /// `medicalCardBaseURL + "#d=" + base64url`. Profile stays in the fragment —
