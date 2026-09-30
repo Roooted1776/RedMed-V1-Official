@@ -20,7 +20,7 @@
   </header>
 
   <aside class="legal-notice legal-notice-owner">
-    <strong>Owner app</strong>
+    <strong>RedMed app</strong>
     Edit your profile, Aid, Find Help, and the NFC tab live in the RedMed iPhone app. In-app Write The Band needs NFC Tag Reading on the App ID; until it is proven on a blank NTAG216, Write The Band stays disabled.
     <a href="redmed://main">Open RedMed</a>
     · <a href="/tapper/">Emergency card (any phone)</a>
@@ -142,7 +142,7 @@
     <p class="legal-parties">How RedMed protects the iPhone app, the passerby card, and the NFC band in the United States</p>
     <div class="legal-notice">
       <strong>In short</strong>
-      Profile stays on your phone (Keychain) and on the band if you write one (in-app Write needs NFC Tag Reading and stays disabled until proven). The band copy is the public fragment. A signed-in wearer copy in Supabase exists only when account sync is on. The tap page does not look the profile up. This is not a HIPAA certification. Owner Face ID gates post-Agree (first launch / after Erase), returning cold re-entry (once per process), Edit, Save, and Erase — not viewing the YOU card. NFC write, 911, Aid, same-session resume, and tapper do not prompt. Band tap needs <strong>no</strong> Face ID — EMS must read it cold. Packing on the chip is obfuscation, not a private vault.
+      Profile stays on your phone (Keychain) and on the band if you write one (in-app Write needs NFC Tag Reading and stays disabled until proven). The band copy is the public fragment. A signed-in wearer copy in Supabase exists only when account sync is on. The tap page does not look the profile up. This is not a HIPAA certification. Face ID gates post-Agree (first launch / after Erase), returning cold re-entry (once per process), Edit, Save, and Erase — not viewing the YOU card. NFC write, 911, Aid, same-session resume, and tapper do not prompt. Band tap needs <strong>no</strong> Face ID — EMS must read it cold. Packing on the chip is obfuscation, not a private vault.
     </div>
     <article class="legal-body">
       <p>This page describes how RedMed approaches security. It is informational, <strong>not a warranty</strong>, and does not change the medical-device, no-outcome, or liability terms in <a href="#terms">Terms</a>.</p>
@@ -154,7 +154,7 @@
     <ul>
       <li>Profile fields in iOS <strong>Keychain</strong> with <code>WhenPasscodeSetThisDeviceOnly</code> and <strong>no biometry ACL</strong>. Older biometry-bound blobs migrate on the next owner open (one Face ID, then never again to view).</li>
       <li>Readable while the device is unlocked; excluded from iCloud and encrypted backups.</li>
-      <li>Owner Face ID gates post-Agree (first launch / after Erase), returning cold re-entry (once per process), Edit, Save, and Erase — not viewing the YOU card. 911, Aid, NFC write, same-session resume, and tapper do not prompt.</li>
+      <li>Face ID gates post-Agree (first launch / after Erase), returning cold re-entry (once per process), Edit, Save, and Erase — not viewing the YOU card. 911, Aid, NFC write, same-session resume, and tapper do not prompt.</li>
       <li>Passerby <code>tapper.html</code> never asks for Face ID, passcode, or login — tap opens the card from <code>#d=</code>.</li>
       <li>App-switcher snapshots are covered while profile data is in memory so live fields are not cached in the system snapshot.</li>
       <li>Help → <strong>Erase All User Data</strong> deletes the Keychain profile on this iPhone (Face ID). Edit has no Clear-all — blank-all + Save cannot replace a stored blob. The physical band is not wiped remotely.</li>
