@@ -21,6 +21,9 @@
 # Fix #11: no-trailing-slash tapper URL before SW is installed.
 /tapper /tapper/ 301
 
+# Store: no-trailing-slash URL (redmed.live/store) -> static store page.
+/store /store/ 301
+
 # App Store 5.1.1 — Connect privacy-policy URL (do not send this to /tapper/).
 # privacy/index.html bounces to /Document/#privacy (same Document.html as Help).
 # Do not put #fragments in _redirects destinations — CF strips them.
