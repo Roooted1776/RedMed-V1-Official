@@ -8,7 +8,7 @@ This repo is **public**. Do not list a jsDelivr `@main` URL of `Roooted1776/redm
 
 Hosted Privacy URL is `/Document/` (same `Document.html` as in-app Help). `/privacy` redirects there — do not keep a rewritten stub.
 
-**Support mail:** `help.RedMed@gmail.com` is troubleshooting only. Do not ask users for full medical profiles. Delete threads when resolved.
+**Support mail:** `help@redmed.live` is troubleshooting only. Do not ask users for full medical profiles. Delete threads when resolved.
 
 Connect App Privacy nutrition label: **Data Not Collected**. Tracking: No.
 
@@ -34,9 +34,9 @@ parked; review notes + Promotional Text below are pack/Share only).
 | Tracking | No |
 | App Privacy | Data Not Collected |
 | Privacy Policy URL | **`https://redmed.live/Document/`** once Phase 1 DNS cutover is green (same Help → Privacy text as `Document/index.html` / in-app `owner/RedMed/Document/Document.html`); never `redmed-privacy` or jsDelivr |
-| Support | help.RedMed@gmail.com + `support/index.html` (troubleshooting only — never request full profiles; delete threads when resolved) |
+| Support | help@redmed.live + `support/index.html` (troubleshooting only — never request full profiles; delete threads when resolved) |
 | Regulated medical device | No |
-| Contact | help.RedMed@gmail.com |
+| Contact | help@redmed.live |
 
 ## Promotional Text (locked draft — paste only this)
 

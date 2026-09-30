@@ -225,7 +225,7 @@ media aimed at facilities**, until:
 - A written decision on BAAs (today’s Help text says you will not sign)
 - A SKU story that matches the chip: **blank NDEF, wearer/staff writes from
   an iPhone**, not a pre-encoded vendor cloud and not an EHR push
-- Support domain and a real invoice path (not `help.RedMed@gmail.com` only)
+- Support domain and a real invoice path (not `help@redmed.live` only)
 
 Until that gate is green, view B is **recognition training only**: staff
 learn to tap a band a *patient already wears* (view A product). You are not

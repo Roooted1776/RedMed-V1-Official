@@ -9,7 +9,7 @@ page does not read it.
 ## Report a vulnerability
 
 Use a private advisory: <https://github.com/Roooted1776/RedMed-V1-Official/security/advisories/new>.
-Or email help.RedMed@gmail.com.
+Or email help@redmed.live.
 
 Do not open public issues containing live keys or real `#d=` payloads.
 

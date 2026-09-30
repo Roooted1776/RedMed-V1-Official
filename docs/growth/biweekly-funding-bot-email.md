@@ -33,7 +33,7 @@ Do **not** add Mailchimp, SendGrid, Meta, LMS, or an xAI-only parallel stack. Ch
 | Default send | Every other **Monday 14:00 America/New_York** (adjust once) |
 | Cron (UTC, if agent timer) | `0 18 */14 * *` ≈ every 14 days at 18:00 UTC (maps to ~14:00 ET outside DST edge cases — prefer Automation “every 2 weeks” UI if available) |
 | Alt calendar anchors | 1st + 15th: `0 18 1,15 * *` (UTC) |
-| From (placeholder) | `{{FROM_EMAIL}}` — prefer a named outreach address once company gate has a real support/invoice domain; **not** `help.RedMed@gmail.com` for blast (that inbox is troubleshooting-only) |
+| From (placeholder) | `{{FROM_EMAIL}}` — prefer a named outreach address once company gate has a real support/invoice domain; **not** `help@redmed.live` for blast (that inbox is troubleshooting-only) |
 | To | `{{RECIPIENTS}}` — comma-separated station / training-officer contacts (NJ + IL list from View B playbook) |
 | BCC (optional) | Founder archive: `{{ARCHIVE_BCC}}` |
 | Reply-to | `{{REPLY_TO}}` |
@@ -159,7 +159,7 @@ You are RedMed Funding/Growth. Bi-weekly View B recognition email only.
 | `{{RECIPIENTS}}` station contact list | No addresses in repo |
 | Create Automation named exactly **RedMed Funding/Growth** and schedule it | Name is intent only; no Automation UUID yet |
 | Gmail MCP auth on that agent | Namespace needsAuth until Cursor OAuth completes |
-| `{{FROM_EMAIL}}` / `{{REPLY_TO}}` / `{{SENDER_NAME}}` | Prefer non-`help.RedMed@gmail.com` for outreach blasts |
+| `{{FROM_EMAIL}}` / `{{REPLY_TO}}` / `{{SENDER_NAME}}` | Prefer non-`help@redmed.live` for outreach blasts |
 | Optional: confirm ET timezone + first Monday | Avoid double-send on DST / overlapping timers |
 
 ---
