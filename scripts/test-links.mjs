@@ -8,8 +8,7 @@
  * url(...) in the store stylesheet. Skipped: external URLs, mailto/tel/custom
  * schemes (redmed://), #fragments, and data: URIs.
  *
- * Not checked on purpose: index-new.html (unpublished draft, not served) and
- * owner/ (native app, not the website).
+ * Not checked on purpose: owner/ (native app, not the website).
  */
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
