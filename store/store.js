@@ -4,6 +4,7 @@
   if (!cfg || !cfg.tiers || !cfg.tiers.length) return; // config.js missing: leave the static page alone
   var tiers = cfg.tiers;
   var selected = 'pair';
+  var qty = 1, MAX_QTY = 10; // how many of the chosen pack (used for the email order; Square's own page has its own selector)
   var wanted = /[?&]pack=([a-z0-9_-]+)/i.exec(location.search); // from the home page's Buy now buttons
   var ok = /^https:\/\/(square\.link\/u\/|checkout\.square\.site\/)/;
   var $ = function (id) { return document.getElementById(id); };
@@ -40,7 +41,7 @@
       var per = document.createElement('p'); per.className = 'per'; per.textContent = t.bands > 1 ? fmt.format(Math.round(t.price / t.bands)) + ' per band' : 'One band'; el.appendChild(per);
       var d = document.createElement('p'); d.className = 'blurb'; d.textContent = t.blurb; el.appendChild(d);
       var btn = document.createElement('button');
-      btn.type = 'button'; btn.className = 'button'; btn.textContent = 'Buy ' + t.name;
+      btn.type = 'button'; btn.className = 'button'; btn.textContent = 'Buy now'; btn.setAttribute('aria-label', 'Buy now: ' + t.name);
       btn.addEventListener('click', function (e) { e.stopPropagation(); selected = t.id; render(); openReview(); });
       el.appendChild(btn);
       el.addEventListener('click', function () { selected = t.id; render(); });
@@ -76,14 +77,33 @@
     if (!live(t)) notice.textContent = 'Card checkout is not switched on yet. The button opens an email to ' + cfg.supportEmail + ' so you can order.';
   }
   function orderMailto(t) {
-    var body = 'Hi RedMed,\n\nI would like to order: ' + t.name + ' (' + t.bands + (t.bands > 1 ? ' bands' : ' band') + ', ' + fmt.format(t.price) + ').\n\nName:\nShipping address:\n';
-    return 'mailto:' + cfg.supportEmail + '?subject=' + encodeURIComponent('Band order: ' + t.name) + '&body=' + encodeURIComponent(body);
+    var bandsTotal = t.bands * qty;
+    var body = 'Hi RedMed,\n\nI would like to order: ' + qty + ' x ' + t.name + ' (' + bandsTotal + (bandsTotal > 1 ? ' bands' : ' band') + ' in total, ' + fmt.format(t.price * qty) + ').\n\nName:\nShipping address:\n';
+    return 'mailto:' + cfg.supportEmail + '?subject=' + encodeURIComponent('Band order: ' + qty + ' x ' + t.name) + '&body=' + encodeURIComponent(body);
   }
+  // Quantity step. Hidden when a live Square link exists: Square's checkout page has its own quantity selector.
+  function updateReview() {
+    var t = tier(selected), bandsTotal = t.bands * qty;
+    $('reviewTitle').textContent = qty > 1 ? qty + ' \u00d7 ' + t.name + ' (' + bandsTotal + ' bands)' : t.name + ' (' + t.bands + (t.bands > 1 ? ' bands)' : ' band)');
+    $('reviewPrice').textContent = fmt.format(t.price * qty);
+    $('qtyVal').textContent = qty;
+    $('qtyMinus').disabled = qty <= 1;
+    $('qtyPlus').disabled = qty >= MAX_QTY;
+    $('qtyRow').hidden = live(t);
+    $('payLine').textContent = live(t)
+      ? "Step 3: pay on Square's secure page with a debit or credit card, or Apple Pay and Google Pay on phones that support them. You can change the quantity there."
+      : 'Step 3: card checkout is not switched on yet, so your order opens as an email to us.';
+    setGo();
+  }
+  function changeQty(step) {
+    qty = Math.min(MAX_QTY, Math.max(1, qty + step));
+    updateReview();
+  }
+  $('qtyMinus').addEventListener('click', function () { changeQty(-1); });
+  $('qtyPlus').addEventListener('click', function () { changeQty(1); });
   function openReview() {
-    var t = tier(selected);
-    $('reviewTitle').textContent = t.name + ' (' + t.bands + (t.bands > 1 ? ' bands)' : ' band)');
-    $('reviewPrice').textContent = fmt.format(t.price);
-    ack.checked = false; setGo();
+    qty = 1;
+    ack.checked = false; updateReview();
     if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
   }
   ack.addEventListener('change', setGo);
