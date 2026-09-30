@@ -56,6 +56,16 @@
   summary:focus-visible { outline: 2px solid #e11d48; outline-offset: 3px; }
   details p { margin: 10px 0 0; color: #3f3a38; }
   .fineprint { font-size: 0.82rem; color: #6b6462; }
+  html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+  .packs { display: grid; gap: 12px; margin: 14px 0 10px; padding: 0; list-style: none; }
+  .pack { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border: 1px solid #ead9d9; border-radius: 12px; background: #fff; }
+  .pack h3 { margin: 0; font-size: 1rem; }
+  .pack p { margin: 2px 0 0; font-size: 0.85rem; color: #6b6462; }
+  .pack .price { font-size: 1.25rem; font-weight: 700; white-space: nowrap; }
+  .pack .buy { display: inline-block; background: #e11d48; color: #fff; padding: 10px 18px; border-radius: 999px; min-height: 24px; white-space: nowrap; }
+  .pack .buy:hover, .pack .buy:focus-visible { background: #be123c; outline-offset: 3px; }
+  .pack .info { flex: 1; }
+  @media (max-width: 420px) { .pack { flex-wrap: wrap; } .pack .buy { width: 100%; text-align: center; box-sizing: border-box; } }
   main { max-width: 480px; }
   img.wordmark { height: 32px; margin-bottom: 28px; }
   h1 { font-size: 1.5rem; margin: 0 0 12px; }
@@ -74,14 +84,24 @@
 <body>
   <header>
     <a class="tap" href="/tapper/">Open Tap Page</a>
-    <a class="store" href="/store/">Store</a>
+    <a class="store" href="#buy">Buy a Band</a>
   </header>
   <main>
     <img class="wordmark" src="/assets/BrandWordmark.png" alt="RedMed" width="160" height="32">
     <h1>Emergency info, one tap away.</h1>
     <p class="lede">RedMed puts a person's medical information on a small NFC band. Tapping it with any modern
       phone opens their emergency card instantly &mdash; no app, no account, no sign-in.</p>
-    <p><a class="cta" href="/store/">Shop the RedMed band</a></p>
+    <p><a class="cta" href="#buy">Shop the RedMed band</a></p>
+    <section id="buy" aria-labelledby="buy-h">
+      <p class="eyebrow">The band</p>
+      <h2 id="buy-h">Pick a pack. Check out on the Store.</h2>
+      <ul class="packs">
+        <li class="pack" data-pack="solo"><div class="info"><h3>Single Band</h3><p>One blank NTAG216 band.</p></div><span class="price">$34</span><a class="buy" href="/store/?pack=solo#buy">Buy now</a></li>
+        <li class="pack" data-pack="pair"><div class="info"><h3>Pair</h3><p>Two bands. Wear one, keep a spare.</p></div><span class="price">$59</span><a class="buy" href="/store/?pack=pair#buy">Buy now</a></li>
+        <li class="pack" data-pack="family"><div class="info"><h3>Family Pack</h3><p>Four bands for the whole household.</p></div><span class="price">$109</span><a class="buy" href="/store/?pack=family#buy">Buy now</a></li>
+      </ul>
+      <p class="fineprint">Buy now opens the Store with your pack chosen. Pay by card, debit, Apple Pay or Google Pay on Square&rsquo;s secure page. Blank bands; ships when ready, no date promise.</p>
+    </section>
     <section id="how" aria-labelledby="how-h">
       <p class="eyebrow">How it works</p>
       <h2 id="how-h">Less searching. More understanding.</h2>

@@ -4,6 +4,7 @@
   if (!cfg || !cfg.tiers || !cfg.tiers.length) return; // config.js missing: leave the static page alone
   var tiers = cfg.tiers;
   var selected = 'pair';
+  var wanted = /[?&]pack=([a-z0-9_-]+)/i.exec(location.search); // from the home page's Buy now buttons
   var ok = /^https:\/\/(square\.link\/u\/|checkout\.square\.site\/)/;
   var $ = function (id) { return document.getElementById(id); };
   var fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: cfg.currency, maximumFractionDigits: 0 });
@@ -138,5 +139,6 @@
     hero.addEventListener('mouseleave', function () { v.style.transform = ''; });
   }
 
+  if (wanted && tier(wanted[1])) selected = wanted[1];
   render();
 })();

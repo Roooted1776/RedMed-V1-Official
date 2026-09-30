@@ -5,8 +5,9 @@
  *   - any pack link that is filled in is a public Square link (same rule as
  *     store/store.js), never a token, never another site
  *   - no secret-looking value (access token) is present in config.js
- *   - every pack price is displayed in the Store copy or config, and the
- *     support email in config.js is the one the page links to
+ *   - the support email in config.js is the one the Store page links to
+ *   - the home page's pack cards show the same prices as config.js and each
+ *     Buy now links to /store/?pack=<id>#buy
  * Empty links are allowed: the Store then offers "Order by email".
  */
 import { readFileSync } from 'node:fs';
@@ -55,6 +56,15 @@ if (/EAAA[A-Za-z0-9_-]{20,}|sq0[a-z]{3}-[A-Za-z0-9_-]{20,}/.test(configSrc)) {
 const html = readFileSync(path.join(root, 'store/index.html'), 'utf8');
 if (cfg && cfg.supportEmail && !html.includes(cfg.supportEmail)) {
   fail(`store/index.html does not mention the support email "${cfg.supportEmail}" from config.js`);
+}
+
+// The home page shows the same packs and prices, and each Buy now opens the Store with that pack chosen.
+const home = readFileSync(path.join(root, 'index.html'), 'utf8');
+for (const t of (cfg && cfg.tiers) || []) {
+  const card = home.match(new RegExp(`<li class="pack" data-pack="${t.id}">([\\s\\S]*?)</li>`));
+  if (!card) { fail(`index.html: no pack card for "${t.id}"`); continue; }
+  if (!card[1].includes(`$${t.price}<`)) fail(`index.html: pack "${t.id}" does not show the price $${t.price} from store/config.js`);
+  if (!card[1].includes(`href="/store/?pack=${t.id}#buy"`)) fail(`index.html: pack "${t.id}" Buy now must link to /store/?pack=${t.id}#buy`);
 }
 
 if (problems.length) {
