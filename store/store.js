@@ -63,19 +63,14 @@
   });
 
   // ---- review dialog, then hand off to Square ----
-  var dlg = $('review'), ack = $('ack'), go = $('goBtn'), notice = $('notice'), goLabel = $('goLabel');
+  var dlg = $('review'), ack = $('ack'), go = $('goBtn'), notice = $('notice');
   function setGo() {
     var t = tier(selected);
     var ready = ack.checked;
     go.setAttribute('aria-disabled', ready ? 'false' : 'true');
-    go.href = ready ? (live(t) ? checkoutUrl(t) : orderMailto(t)) : '#buy';
-    goLabel.textContent = live(t) ? 'Continue to Square' : 'Order by email';
+    go.href = ready && live(t) ? checkoutUrl(t) : '#buy';
     notice.hidden = !(ready && !live(t));
-    if (!live(t)) notice.textContent = 'Card checkout is not switched on yet. The button opens an email to ' + cfg.supportEmail + ' so you can order.';
-  }
-  function orderMailto(t) {
-    var body = 'Hi RedMed,\n\nI would like to order: ' + t.name + ' (' + t.bands + (t.bands > 1 ? ' bands' : ' band') + ', ' + fmt.format(t.price) + ').\n\nName:\nShipping address:\n';
-    return 'mailto:' + cfg.supportEmail + '?subject=' + encodeURIComponent('Band order: ' + t.name) + '&body=' + encodeURIComponent(body);
+    if (!live(t)) notice.textContent = 'Checkout is not switched on yet. Email ' + cfg.supportEmail + ' to order.';
   }
   function openReview() {
     var t = tier(selected);
@@ -86,7 +81,7 @@
   }
   ack.addEventListener('change', setGo);
   go.addEventListener('click', function (e) {
-    if (go.getAttribute('aria-disabled') === 'true') e.preventDefault();
+    if (go.getAttribute('aria-disabled') === 'true' || !live(tier(selected))) e.preventDefault();
   });
   $('reviewClose').addEventListener('click', function () { dlg.close(); });
   dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
