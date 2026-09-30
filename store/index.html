@@ -31,6 +31,12 @@
   <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
 </svg>
 
+<div class="page-bg" aria-hidden="true">
+      <video id="bgvideo" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg">
+        <source src="assets/hero.webm" type="video/webm">
+        <source src="assets/hero.mp4" type="video/mp4">
+      </video>
+</div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="header">
   <a class="brand" href="/" aria-label="RedMed home">
@@ -52,13 +58,7 @@
 
 <main id="main">
   <section class="hero">
-    <div class="hero-bg" aria-hidden="true">
-      <video id="bgvideo" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg">
-        <source src="assets/hero.webm" type="video/webm">
-        <source src="assets/hero.mp4" type="video/mp4">
-      </video>
-      <div class="hero-shade"></div>
-    </div>
+    <div class="hero-shade" aria-hidden="true"></div>
     <div class="hero-copy">
       <p class="eyebrow"><span class="signal-dot"></span> THE BAND STORE</p>
       <h1>A small band.<br>A vital <span>connection.</span></h1>
