@@ -183,7 +183,8 @@ final class BandTapIngress: ObservableObject {
         }
         // Own matching band → quiet (wrist proximity must not present the
         // passerby sheet on the wearer's phone).
-        if profile.hasSensitiveProfileData, profile.matchesBand(chip) {
+        if profile.hasSensitiveProfileData,
+           profile.matchesBand(chip) || profile.isSameWearer(as: chip) {
             return
         }
         // Foreign chip, or empty owner funnel (helper who installed RedMed) →

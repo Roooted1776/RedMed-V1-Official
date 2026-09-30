@@ -638,6 +638,17 @@ class ProfileData: ObservableObject {
             && contactsMatch
     }
 
+    /// The wearer's fixed identity on a band: name + birth date, both non-empty.
+    /// Survives later edits (allergies, meds, contacts), so the owner's own
+    /// older band stays quiet on their phone instead of opening a tap card.
+    func isSameWearer(as chip: NFCChipProfile) -> Bool {
+        let n = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let d = birthDate.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !n.isEmpty, !d.isEmpty else { return false }
+        return n == chip.name.trimmingCharacters(in: .whitespacesAndNewlines)
+            && d == chip.dob.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     /// Field writes for `ProfileNFCCodec.apply` — not a persist.
     func applyChipFields(_ chip: NFCChipProfile) {
         name = chip.name

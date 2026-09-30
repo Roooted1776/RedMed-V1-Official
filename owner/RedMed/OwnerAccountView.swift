@@ -81,7 +81,7 @@ struct OwnerAccountView: View {
             Button("Sign Out All Devices", role: .destructive) { Task { await signOutAll() } }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Use this if a phone signed in to this account is lost or sold. Every device, including this iPhone, has to sign in again. RedMed on each phone and any band stay as they are.")
+            Text("Use this if a phone signed in to this account is lost or sold. Every device, including this iPhone, has to sign in again. RedMed on each phone and any band stay as they are. A lost band keeps working; it cannot be turned off remotely.")
         }
         .confirmationDialog(
             "Delete this account?",
