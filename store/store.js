@@ -110,7 +110,13 @@
     $('motionText').textContent = p ? 'Play video' : 'Pause video';
     $('motionIcon').setAttribute('href', p ? '#i-play' : '#i-pause');
   }
-  if (reduce) pause(true);
+  var saveData = navigator.connection && navigator.connection.saveData;
+  if (reduce || saveData) { pause(true); }
+  else {
+    // iOS Low Power Mode and some browsers block autoplay: keep the poster and show a Play button.
+    var first = v.play();
+    if (first && first.catch) first.catch(function () { pause(true); });
+  }
   mb.addEventListener('click', function () { pause(!v.paused); });
   v.addEventListener('error', function () { v.style.display = 'none'; }, true);
 
