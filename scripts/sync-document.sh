@@ -52,8 +52,12 @@ cat > "$DST/Document.html" <<'EOF'
 </html>
 EOF
 
-# Hosted index must point passerby card at /tapper/ (not a local tapper.html).
-grep -q 'href="/tapper/"' "$DST/index.html"
+# The tap page opens a wearer's real profile from the band link. Public pages
+# must not link to it (no /tapper/ link on the hosted Help page).
+if grep -q 'href="/tapper/' "$DST/index.html"; then
+  echo "FAIL hosted Document/index.html links to /tapper/ (public pages must not)" >&2
+  exit 1
+fi
 grep -q 'href="legal-doc.css"' "$DST/index.html"
 grep -q 'data-tab="medical"' "$DST/index.html" && {
   echo "FAIL hosted Document/index.html looks like tapper shell" >&2
