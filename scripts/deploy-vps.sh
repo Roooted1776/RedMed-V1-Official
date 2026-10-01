@@ -78,34 +78,41 @@ else
     [ -f "$a" ] || { echo "MISSING $a (referenced by init.html)" >&2; missing=1; }
   done < <(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u)
   [ "$missing" -eq 0 ] || { echo "Fix missing files, then rerun." >&2; exit 3; }
+  # Storefront file is init.html. Never copy it over index.html.
   cp store.css store.js theme.js config.js "$STAGE/"
-  cp init.html "$STAGE/index.html"
   cp init.html "$STAGE/init.html"
   mkdir -p "$STAGE/assets"
   grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u | while read -r a; do cp "$a" "$STAGE/assets/"; done
 fi
 
+# Store deploys must not replace index.html (homepage or an older store index).
+RSYNC_EXCLUDE=()
+[ "$MODE" = "store" ] && RSYNC_EXCLUDE=(--exclude index.html)
+
 if [ "$CMD" = "dry-run" ]; then
-  rsync -avn -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
+  rsync -avn --chmod=D755,F644 "${RSYNC_EXCLUDE[@]}" -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
   exit 0
 fi
 
 STAMP="$(date +%Y%m%d%H%M%S)"
 "${SSH[@]}" "test -d '$TARGET' && tar czf /root/redmed-backup-$STAMP.tgz -C '$TARGET' . || mkdir -p '$TARGET'"
 echo "Backup: /root/redmed-backup-$STAMP.tgz (if target existed)"
-rsync -av -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
+rsync -av --chmod=D755,F644 "${RSYNC_EXCLUDE[@]}" -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
+# mktemp stages are mode 700; never leave the live docroot unreadable.
+"${SSH[@]}" "chmod 755 '$TARGET'"
 
-URL="$SITE/"; [ "$MODE" = "store" ] && URL="$SITE/store/"
-code="$(curl -s -o /dev/null -w '%{http_code}' "$URL")"
-echo "GET $URL -> $code"
+BASE="$SITE/"; PAGE="$BASE"
+[ "$MODE" = "store" ] && BASE="$SITE/store/" && PAGE="${BASE}init.html"
+code="$(curl -s -o /dev/null -w '%{http_code}' "$PAGE")"
+echo "GET $PAGE -> $code"
 [ "$code" = "200" ] || { echo "Smoke test failed. Roll back: ssh $REMOTE 'tar xzf /root/redmed-backup-$STAMP.tgz -C $TARGET'" >&2; exit 4; }
 if [ "$MODE" = "home" ]; then
-  body="$(curl -sL "$URL")"
+  body="$(curl -sL "$PAGE")"
   echo "$body" | grep -q 'Create account' || { echo "Smoke: homepage missing Create account" >&2; exit 4; }
   echo "$body" | grep -q 'Sign in' || { echo "Smoke: homepage missing Sign in" >&2; exit 4; }
   echo "OK homepage auth chrome present"
 else
   for a in $(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u); do
-    c="$(curl -s -o /dev/null -w '%{http_code}' "$URL$a")"; echo "  $a -> $c"
+    c="$(curl -s -o /dev/null -w '%{http_code}' "$BASE$a")"; echo "  $a -> $c"
   done
 fi
