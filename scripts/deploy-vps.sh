@@ -93,11 +93,12 @@ else
   fi
 fi
 
-# Never cross the two pages, and never touch Assist.
+# Quote these. An unquoted tapper/** is a shell glob and rsync then
+# copies the Assist shell onto the page being deployed.
 if [ "$MODE" = "store" ]; then
-  RSYNC_EXCLUDE=(--exclude index.html --exclude tapper --exclude tapper/**)
+  RSYNC_EXCLUDE=(--exclude 'index.html' --exclude 'tapper' --exclude 'tapper/**')
 else
-  RSYNC_EXCLUDE=(--exclude init.html --exclude tapper --exclude tapper/**)
+  RSYNC_EXCLUDE=(--exclude 'init.html' --exclude 'tapper' --exclude 'tapper/**')
 fi
 
 if [ "$CMD" = "dry-run" ]; then
