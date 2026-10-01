@@ -150,6 +150,20 @@
   // Hide only when the video itself or its last fallback source fails, not when the first source is skipped.
   v.addEventListener('error', function (e) { if (e.target === v || e.target === v.lastElementChild) v.style.display = 'none'; }, true);
 
+  // how-it-works film: muted autoplay loop, only while on screen. Poster-only with reduced motion or Save-Data.
+  var how = document.querySelector('.how-video video');
+  if (how && !reduce && !saveData && 'IntersectionObserver' in window) {
+    var seen = false, held = false;
+    how.muted = true; how.loop = true;
+    how.addEventListener('play', function () { held = false; });
+    how.addEventListener('pause', function () { if (seen) held = true; }); // viewer paused it: keep it paused
+    new IntersectionObserver(function (es) {
+      seen = es[es.length - 1].isIntersecting;
+      if (seen && !held) { var r = how.play(); if (r && r.catch) r.catch(function () {}); }
+      else if (!seen) how.pause();
+    }, { threshold: 0.35 }).observe(how);
+  }
+
   // gentle parallax on the hero video (desktop pointer only)
   var hero = document.querySelector('.hero');
   if (!reduce && matchMedia('(hover:hover)').matches) {
