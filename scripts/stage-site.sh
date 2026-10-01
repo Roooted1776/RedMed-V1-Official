@@ -51,6 +51,7 @@ test -f home/index.html || { echo "missing home/index.html (landing + auth)" >&2
 test -f home/legacy.js || { echo "missing home/legacy.js" >&2; exit 1; }
 test -d home/assets || { echo "missing home/assets/" >&2; exit 1; }
 cp -a home/index.html "$OUT/index.html"
+cp -a home/red-white.css "$OUT/red-white.css"
 cp -a home/legacy.js "$OUT/legacy.js"
 cp -a home/favicon.svg "$OUT/favicon.svg" 2>/dev/null || true
 cp -a home/band-hero.webp home/nfc-detail.webp "$OUT/" 2>/dev/null || true
