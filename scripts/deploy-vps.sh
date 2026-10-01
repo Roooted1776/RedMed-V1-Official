@@ -72,7 +72,7 @@ STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 if [ "$MODE" = "home" ]; then
   # Home page file is index.html. Never stage the store page here.
-  for f in home/index.html home/legacy.js home/hero.js home/theme.js assets/hero-hd.mp4 assets/hero-mobile.mp4; do
+  for f in home/index.html home/legacy.js home/hero.js home/theme.js home/process.js assets/hero-hd.mp4 assets/hero-mobile.mp4 assets/how-it-works.webm assets/how-it-works.mp4 assets/how-it-works-poster.jpg; do
     [ -f "$f" ] || { echo "MISSING $f" >&2; exit 3; }
   done
   [ -d home/assets ] || { echo "MISSING home/assets/" >&2; exit 3; }
@@ -81,12 +81,13 @@ if [ "$MODE" = "home" ]; then
   cp home/legacy.js "$STAGE/legacy.js"
   cp home/hero.js "$STAGE/hero.js"
   cp home/theme.js "$STAGE/theme.js"
+  cp home/process.js "$STAGE/process.js"
   [ -f home/favicon.svg ] && cp home/favicon.svg "$STAGE/"
   [ -f home/band-hero.webp ] && cp home/band-hero.webp "$STAGE/"
   [ -f home/nfc-detail.webp ] && cp home/nfc-detail.webp "$STAGE/"
   mkdir -p "$STAGE/assets"
   cp -a home/assets/. "$STAGE/assets/"
-  cp assets/hero-hd.mp4 assets/hero-mobile.mp4 "$STAGE/assets/"
+  cp assets/hero-hd.mp4 assets/hero-mobile.mp4 assets/how-it-works.webm assets/how-it-works.mp4 assets/how-it-works-poster.jpg "$STAGE/assets/"
   grep -q 'id="auth-form"' "$STAGE/index.html" || { echo "home/index.html missing auth-form" >&2; exit 3; }
   grep -q 'hero-hd.mp4' "$STAGE/index.html" || { echo "home/index.html missing hero-hd.mp4" >&2; exit 3; }
   grep -q 'autoplay' "$STAGE/index.html" || { echo "home/index.html hero video is not set to autoplay" >&2; exit 3; }

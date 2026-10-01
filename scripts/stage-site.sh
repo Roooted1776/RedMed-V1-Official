@@ -53,19 +53,22 @@ test -f home/hero.js || { echo "missing home/hero.js" >&2; exit 1; }
 test -f assets/hero-hd.mp4 || { echo "missing assets/hero-hd.mp4" >&2; exit 1; }
 test -f assets/hero-mobile.mp4 || { echo "missing assets/hero-mobile.mp4" >&2; exit 1; }
 test -f home/theme.js || { echo "missing home/theme.js" >&2; exit 1; }
+test -f home/process.js || { echo "missing home/process.js" >&2; exit 1; }
+for f in how-it-works.webm how-it-works.mp4 how-it-works-poster.jpg; do test -f "assets/$f" || { echo "missing assets/$f" >&2; exit 1; }; done
 test -d home/assets || { echo "missing home/assets/" >&2; exit 1; }
 cp -a home/index.html "$OUT/index.html"
 cp -a home/red-white.css "$OUT/red-white.css"
 cp -a home/legacy.js "$OUT/legacy.js"
 cp -a home/hero.js "$OUT/hero.js"
 cp -a home/theme.js "$OUT/theme.js"
+cp -a home/process.js "$OUT/process.js"
 cp -a home/favicon.svg "$OUT/favicon.svg" 2>/dev/null || true
 cp -a home/band-hero.webp home/nfc-detail.webp "$OUT/" 2>/dev/null || true
 mkdir -p "$OUT/assets"
 cp -a home/assets/. "$OUT/assets/"
 # Hero film lives in repo assets/ (copied above). Keep it if a later merge replaces the folder.
 test -f "$OUT/assets/herovideo.MP4" || cp -a assets/herovideo.MP4 "$OUT/assets/herovideo.MP4"
-for f in hero-hd.mp4 hero-mobile.mp4; do test -f "$OUT/assets/$f" || cp -a "assets/$f" "$OUT/assets/$f"; done
+for f in hero-hd.mp4 hero-mobile.mp4 how-it-works.webm how-it-works.mp4 how-it-works-poster.jpg; do test -f "$OUT/assets/$f" || cp -a "assets/$f" "$OUT/assets/$f"; done
 
 # Storefront source init.html (also under /store/ via store/). Parked stub stays out.
 test -f init.html || { echo "missing init.html (storefront)" >&2; exit 1; }
