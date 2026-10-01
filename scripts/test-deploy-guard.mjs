@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * The Hostinger static upload is a full docroot replace. Live homepage is
- * init.html on the VPS (deploy-vps.sh). The shared-static script must
- * refuse redmed.live before it zips, talks to the API, or needs axios.
+ * The Hostinger static upload is a full docroot replace. Live / is
+ * index.html (home/index.html) and the store is init.html (deploy-vps.sh).
+ * The shared-static script must refuse redmed.live before it zips, talks
+ * to the API, or needs axios.
  */
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';

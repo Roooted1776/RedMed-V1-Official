@@ -13,8 +13,9 @@
  *
  * redmed.live / www.redmed.live refuse this upload unless
  * REDMED_ALLOW_HOMEPAGE_REPLACE=1. The archive is a full docroot replace.
- * Live homepage is init.html via the VPS (scripts/deploy-vps.sh). This shared-
- * static path is dead on this account and must not overwrite the VPS docroot.
+ * Live / is index.html (home/index.html). The store is init.html. Both go
+ * out through scripts/deploy-vps.sh. This shared-static path is dead on
+ * this account and must not overwrite either file.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -37,7 +38,7 @@ function isLiveMarketingHost(domain) {
 // must not be the only thing standing between this archive and the homepage.
 if (isLiveMarketingHost(DOMAIN) && process.env.REDMED_ALLOW_HOMEPAGE_REPLACE !== '1') {
   console.error(
-    `REFUSING upload to ${DOMAIN} — use scripts/deploy-vps.sh for the live homepage (init.html on the VPS). Shared-static upload left unchanged. Assist stays at /tapper/. Set REDMED_ALLOW_HOMEPAGE_REPLACE=1 only for a deliberate shared-static replace.`,
+    `REFUSING upload to ${DOMAIN} — use scripts/deploy-vps.sh. Live / is index.html (home/index.html). The store is init.html. Shared-static upload left unchanged. Assist stays at /tapper/. Set REDMED_ALLOW_HOMEPAGE_REPLACE=1 only for a deliberate shared-static replace.`,
   );
   process.exit(2);
 }
