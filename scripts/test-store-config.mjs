@@ -6,6 +6,7 @@
  *     store/store.js), never a token, never another site
  *   - no secret-looking value (access token) is present in config.js
  *   - the support email in config.js is the one the Store page links to
+ *   - the starting prices in store/index.html match config.js (default pack: Pair)
  * Empty links are allowed: the Store then offers "Order by email".
  */
 import { readFileSync } from 'node:fs';
@@ -54,6 +55,21 @@ if (/EAAA[A-Za-z0-9_-]{20,}|sq0[a-z]{3}-[A-Za-z0-9_-]{20,}/.test(configSrc)) {
 const html = readFileSync(path.join(root, 'store/index.html'), 'utf8');
 if (cfg && cfg.supportEmail && !html.includes(cfg.supportEmail)) {
   fail(`store/index.html does not mention the support email "${cfg.supportEmail}" from config.js`);
+}
+
+// Before the script runs, the page shows the default pack's price (Pair is selected first).
+// Those starting prices must match config.js.
+const dflt = cfg && cfg.tiers && cfg.tiers.find((t) => t.id === 'pair');
+if (dflt) {
+  for (const [what, re] of [
+    ['order summary', /id="sumPrice">([^<]*)</],
+    ['sticky bar', /id="stickyText">[^<]*?&middot;\s*([^<]*)</],
+    ['checkout box', /id="reviewPrice">([^<]*)</],
+  ]) {
+    const m = html.match(re);
+    if (!m) fail(`store/index.html: could not find the starting price in the ${what}`);
+    else if (m[1].trim() !== `$${dflt.price}`) fail(`store/index.html: ${what} starts at ${m[1].trim()} but config.js says $${dflt.price} for Pair`);
+  }
 }
 
 if (problems.length) {

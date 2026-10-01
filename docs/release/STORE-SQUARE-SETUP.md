@@ -8,9 +8,9 @@ You make **three links**, one per pack, then paste them into `store/config.js`.
 
 | Pack | Price | Bands |
 | --- | --- | --- |
-| Single Band | $34 | 1 |
-| Pair | $59 | 2 |
-| Family Pack | $109 | 4 |
+| Single Band | $40 | 1 |
+| Pair | $65 | 2 |
+| Family Pack | $70 | 3 |
 
 The price on each Square link must match the price in `store/config.js`. Square charges its own price, not ours.
 
@@ -19,7 +19,7 @@ The price on each Square link must match the price in `store/config.js`. Square 
 1. Sign in at https://squareup.com/dashboard.
 2. Go to **Payments** > **Payment links** > **Create link** (menu names can change; look for "Payment links" or "Checkout links").
 3. Choose **Sell an item** (this is the only type that shows a **quantity selector**, per Square's help).
-4. Item name: `RedMed Band, Single Band` (or Pair / Family Pack). Price: 34 / 59 / 109 USD.
+4. Item name: `RedMed Band, Single Band` (or Pair / Family Pack). Price: 40 / 65 / 70 USD.
 5. Turn **on**: shipping (set your rate or free shipping), collect the buyer's **email**, quantity selector.
 6. Payment methods: leave **card** on. Turn **on** Apple Pay and Google Pay if Square shows a toggle. Square's help says the buyer's browser then shows the best button for their device.
 7. Save. Square gives you a link that looks like `https://square.link/u/AbC123`.
@@ -40,8 +40,8 @@ Then commit, and redeploy the Store container (ask Claude: "redeploy the store")
 ## Step 3. Test one real order
 
 1. Open `https://redmed.live/store/` on your iPhone.
-2. Tap **Buy Single Band**, tick the box, tap **Continue to Square**.
-3. Check: the price is $34, shipping and email are asked for, Apple Pay shows.
+2. Tap **Buy now** on Single Band, tick the box, tap **Continue to Square**.
+3. Check: the price is $40, shipping and email are asked for, Apple Pay shows.
 4. Place a real order with your own card, then **refund it** in the Square Dashboard.
 
 ## Until the links exist

@@ -9,6 +9,8 @@
   var ok = /^https:\/\/(square\.link\/u\/|checkout\.square\.site\/)/;
   var $ = function (id) { return document.getElementById(id); };
   var fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: cfg.currency, maximumFractionDigits: 0 });
+  var fmtBand = new Intl.NumberFormat('en-US', { style: 'currency', currency: cfg.currency, minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  function perBand(t) { var v = t.price / t.bands; return (v % 1 ? new Intl.NumberFormat('en-US', { style: 'currency', currency: cfg.currency, minimumFractionDigits: 2, maximumFractionDigits: 2 }) : fmtBand).format(v); }
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function tier(id) { return tiers.filter(function (t) { return t.id === id; })[0]; }
@@ -38,7 +40,7 @@
       var dot = document.createElement('span'); dot.className = 'dot'; el.appendChild(dot);
       var h = document.createElement('h3'); h.textContent = t.name; el.appendChild(h);
       var p = document.createElement('p'); p.className = 'price'; p.textContent = fmt.format(t.price); el.appendChild(p);
-      var per = document.createElement('p'); per.className = 'per'; per.textContent = t.bands > 1 ? fmt.format(Math.round(t.price / t.bands)) + ' per band' : 'One band'; el.appendChild(per);
+      var per = document.createElement('p'); per.className = 'per'; per.textContent = t.bands > 1 ? perBand(t) + ' per band' : 'One band'; el.appendChild(per);
       var d = document.createElement('p'); d.className = 'blurb'; d.textContent = t.blurb; el.appendChild(d);
       var btn = document.createElement('button');
       btn.type = 'button'; btn.className = 'button'; btn.textContent = 'Buy now'; btn.setAttribute('aria-label', 'Buy now: ' + t.name);
