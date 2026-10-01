@@ -55,19 +55,22 @@ trap 'rm -rf "$STAGE"' EXIT
 
 if [ "$MODE" = "home" ]; then
   # Home page file is index.html. Never stage the store page here.
-  for f in home/index.html home/legacy.js; do
+  for f in home/index.html home/legacy.js home/hero.js assets/herovideo.MP4; do
     [ -f "$f" ] || { echo "MISSING $f" >&2; exit 3; }
   done
   [ -d home/assets ] || { echo "MISSING home/assets/" >&2; exit 3; }
   cp home/index.html "$STAGE/index.html"
   cp home/red-white.css "$STAGE/red-white.css"
   cp home/legacy.js "$STAGE/legacy.js"
+  cp home/hero.js "$STAGE/hero.js"
   [ -f home/favicon.svg ] && cp home/favicon.svg "$STAGE/"
   [ -f home/band-hero.webp ] && cp home/band-hero.webp "$STAGE/"
   [ -f home/nfc-detail.webp ] && cp home/nfc-detail.webp "$STAGE/"
   mkdir -p "$STAGE/assets"
   cp -a home/assets/. "$STAGE/assets/"
+  cp assets/herovideo.MP4 "$STAGE/assets/herovideo.MP4"
   grep -q 'id="auth-form"' "$STAGE/index.html" || { echo "home/index.html missing auth-form" >&2; exit 3; }
+  grep -q 'herovideo.MP4' "$STAGE/index.html" || { echo "home/index.html missing herovideo.MP4" >&2; exit 3; }
   if [ -e "$STAGE/init.html" ]; then
     echo "REFUSING: home deploy must not write init.html (that file is the store)" >&2
     exit 3

@@ -14,7 +14,17 @@
   <script type="module" crossorigin src="./assets/index-persist-admin.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-B1ncWDwK.css">
   <link rel="stylesheet" href="./red-white.css">
-  <style>@media(max-width:900px){.hero-actions{flex-wrap:wrap}}</style>
+  <link rel="preload" as="image" href="./band-hero.webp" fetchpriority="high">
+  <style>
+    @media(max-width:900px){.hero-actions{flex-wrap:wrap}}
+    .hero-product>video{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:65% center;pointer-events:none;transition:transform .35s ease-out}
+    .hero-product>video[hidden]{display:none}
+    .hero-product .product-tag,.hero-product figcaption{z-index:1}
+    .hero-motion{border:0;background:transparent;color:#b8bfbb;font:inherit;font-size:.75rem;font-weight:700;letter-spacing:.04em;min-height:44px;padding:0 .25rem;cursor:pointer}
+    .hero-motion:hover,.hero-motion:focus-visible{color:#fff}
+    @media(max-width:820px){.hero-product>video{object-position:60% center}.hero-bottom{flex-wrap:wrap;row-gap:.5rem}}
+    @media(prefers-reduced-motion:reduce){.hero-product>video{transition:none}}
+  </style>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -36,11 +46,14 @@
         <p class="hero-note">NFC medical ID · In development</p>
       </div>
       <figure class="hero-product">
-        <img src="./band-hero.webp" alt="Concept rendering of a red RedMed medical ID wristband with a dark metal face" width="1429" height="804" fetchpriority="high">
+        <img src="./band-hero.webp" alt="" aria-hidden="true" width="1429" height="804">
+        <video id="hero-video" muted loop playsinline preload="none" poster="./band-hero.webp" width="1264" height="720" aria-label="RedMed band, product concept">
+          <source src="/assets/herovideo.MP4" type="video/mp4">
+        </video>
         <div class="product-tag"><i data-lucide="nfc"></i><span>PASSIVE NFC<br><strong>No battery. Deliberate tap.</strong></span></div>
         <figcaption>REDMED BAND / PRODUCT CONCEPT</figcaption>
       </figure>
-      <div class="hero-bottom"><span>Designed around people.<br>Not just technology.</span><a href="#how">Discover RedMed <i data-lucide="arrow-down"></i></a><span class="hero-index">01 / CONNECTED CARE</span></div>
+      <div class="hero-bottom"><span>Designed around people.<br>Not just technology.</span><a href="#how">Discover RedMed <i data-lucide="arrow-down"></i></a><button type="button" class="hero-motion" id="hero-motion" aria-pressed="false"><span id="hero-motion-label">Pause video</span></button><span class="hero-index">01 / CONNECTED CARE</span></div>
     </section>
     <div class="principles"><span><i data-lucide="radio"></i> Tap or scan</span><span><i data-lucide="user-round-check"></i> No responder account</span><span><i data-lucide="shield-check"></i> Medical data stays off our servers</span><span><i data-lucide="battery"></i> Passive chip technology</span></div>
     <section class="story section" id="how">
@@ -103,6 +116,7 @@
   </dialog>
   <dialog id="demo-dialog" aria-labelledby="demo-title"><button class="icon-button dialog-close" aria-label="Close demonstration"><i data-lucide="x"></i></button><p class="eyebrow">INTERACTIVE WALKTHROUGH / NO REAL MEDICAL DATA</p><h2 id="demo-title">A tap starts the connection.</h2><div class="demo-device"><div class="demo-top">REDMED ASSIST <i data-lucide="nfc"></i></div><div id="demo-content"></div></div><div class="demo-controls"><button class="button secondary" id="demo-back">Back</button><span id="demo-count"></span><button class="button" id="demo-next">Next <i data-lucide="arrow-right"></i></button></div><p class="fineprint">Illustrative workflow only. This does not scan, write, or activate a band.</p></dialog>
   <dialog id="privacy-dialog" aria-labelledby="privacy-title"><button class="icon-button dialog-close" aria-label="Close privacy details"><i data-lucide="x"></i></button><p class="eyebrow">DATA BOUNDARIES / SEPTEMBER 2026</p><h2 id="privacy-title">What your account holds.</h2><div class="privacy-detail"><h3>Account data</h3><p>Supabase Auth processes your email and password for authentication. The band registry stores your account ID, chip serial, color, inventory status and registration date. Database policies restrict these records to your authenticated account.</p><h3>What stays out</h3><p>Do not enter diagnoses, emergency contacts, care instructions, medical-card URLs or band payloads here. This portal does not collect them. NFC reading uses only the tag serial number and never reads or uploads NDEF record content.</p><h3>Important limits</h3><p>A chip UID is not proof of ownership and is not an authentication secret. Changing a band’s inventory status does not revoke its payload. Anyone with that payload can read its wearer-selected information.</p><h3>Session and infrastructure</h3><p>Sign-in stays in this browser until you sign out. Supabase processes account requests; hosting infrastructure may process request metadata such as IP addresses. There are no advertising or analytics SDKs on this portal.</p><h3>Administrator access</h3><p>Authorized administrators can view account emails, verification status, band counts and account dates, invite members, and suspend or restore account access. Administrative actions are audited. The admin panel does not expose medical information or band payloads.</p><h3>Your controls</h3><p>You can remove band records, change your password, and request an email recovery link. Email delivery depends on provider configuration. Full account deletion is not yet self-service; do not use this development portal for a medical-care dependency.</p></div></dialog>
+  <script src="./hero.js"></script>
   <script type="module">
     const params = new URLSearchParams(location.search);
     const mode = params.get("auth") || params.get("account");
