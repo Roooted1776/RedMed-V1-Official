@@ -263,3 +263,48 @@ h1,h2,h3{text-transform:capitalize}
 /* phone header: keep Create account on one line */
 .header .button{white-space:nowrap}
 @media(max-width:480px){.header .text-button{display:none}.tt-track{width:68px}:root[data-theme=dark] .tt-thumb{transform:translateX(24px)}}
+
+/* pay row: every chip is one height, every icon sits in the same 26px box */
+.pay{gap:var(--s3)}
+.pay .paylabel{font-size:var(--text-sm);font-weight:500;color:var(--muted);padding-right:var(--s1,.25rem)}
+.mark{gap:10px;padding:0 var(--s4);font-size:var(--text-sm);font-weight:600;white-space:nowrap}
+.mark .ic,.mark.card .ic{width:26px;height:26px}
+.mark.square svg{width:24px;height:24px}
+.mark[title="Apple Pay"]{padding:0;border:0;background:transparent;color:var(--ink)}
+.mark[title="Apple Pay"] svg{width:auto;height:44px}
+
+/* checkout: one even card under the band and packs, not a narrow column with a hole beside it */
+@media(min-width:1001px){
+  .shop{align-items:stretch}
+  .band-showcase{grid-row:1}
+  .tiers{align-items:stretch}
+  .shop .checkout{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);column-gap:var(--s8);align-items:start;padding:var(--s8)}
+  .checkout>.eyebrow,.checkout>.summary,.checkout>.sumnote{grid-column:1}
+  .checkout>.button{grid-column:2;grid-row:1/span 2;align-self:center}
+  .checkout>.pay{grid-column:2;grid-row:3;margin:var(--s3) 0 0}
+  .checkout>.fineprint{grid-column:2;grid-row:4}
+}
+
+/* tech section: same left edge as every other section; heading left, specs right (like the FAQ) */
+.tech-layout{margin:0;max-width:none;width:100%;display:block}
+.tech-layout .tech-copy dl{max-width:none}
+@media(min-width:1001px){
+  .tech-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);column-gap:var(--s16);row-gap:0;grid-template-rows:min-content min-content 1fr;align-items:start;margin-top:var(--s16)}
+  .tech-layout .tech-copy{display:contents}
+  .tech-layout .tech-copy .eyebrow{grid-column:1;grid-row:1;margin-bottom:var(--s4)}
+  .tech-layout .tech-copy h2{grid-column:1;grid-row:2}
+  .tech-layout .tech-copy dl{grid-column:2;grid-row:1/span 3;margin-top:0}
+}
+
+/* the band film lives in the FAQ section's left column */
+.faq-video{position:relative;margin-top:var(--s8);border-radius:28px;overflow:hidden;aspect-ratio:16/10;background:#111;box-shadow:var(--lift);max-width:520px}
+.faq-video video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
+.faq-video .film-toggle{top:12px;right:12px}
+@media(max-width:1000px){.faq-video{max-width:none}}
+@media(max-width:560px){
+  .pay{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)}
+  .pay .paylabel{grid-column:1/-1}
+  .pay .mark{justify-content:center;width:100%}
+  .pay .mark.card{grid-column:1/-1}
+  .pay .mark[title="Apple Pay"]{justify-content:center}
+}
