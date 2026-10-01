@@ -17,6 +17,7 @@
   <link rel="preload" as="image" href="./band-hero.webp" fetchpriority="high">
   <style>
     @media(max-width:900px){.hero-actions{flex-wrap:wrap}}
+    .hero-product{cursor:pointer}
     .hero-product>video{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:65% center;pointer-events:none;transition:transform .35s ease-out}
     .hero-product>video[hidden]{display:none}
     .hero-product .product-tag,.hero-product figcaption{z-index:1}
@@ -47,13 +48,13 @@
       </div>
       <figure class="hero-product">
         <img src="./band-hero.webp" alt="" aria-hidden="true" width="1429" height="804">
-        <video id="hero-video" muted loop playsinline preload="none" poster="./band-hero.webp" width="1264" height="720" aria-label="RedMed band, product concept">
+        <video id="hero-video" autoplay muted loop playsinline preload="auto" poster="./band-hero.webp" width="1264" height="720" aria-label="RedMed band, product concept">
           <source src="/assets/herovideo.MP4" type="video/mp4">
         </video>
         <div class="product-tag"><i data-lucide="nfc"></i><span>PASSIVE NFC<br><strong>No battery. Deliberate tap.</strong></span></div>
         <figcaption>REDMED BAND / PRODUCT CONCEPT</figcaption>
       </figure>
-      <div class="hero-bottom"><span>Designed around people.<br>Not just technology.</span><a href="#how">Discover RedMed <i data-lucide="arrow-down"></i></a><button type="button" class="hero-motion" id="hero-motion" aria-pressed="false"><span id="hero-motion-label">Pause video</span></button><span class="hero-index">01 / CONNECTED CARE</span></div>
+      <div class="hero-bottom"><span>Designed around people.<br>Not just technology.</span><a href="#how">Discover RedMed <i data-lucide="arrow-down"></i></a><button type="button" class="hero-motion" id="hero-motion" data-film="hero-video" aria-pressed="false"><span id="hero-motion-label" data-film-label>Pause video</span></button><span class="hero-index">01 / CONNECTED CARE</span></div>
     </section>
     <div class="principles"><span><i data-lucide="radio"></i> Tap or scan</span><span><i data-lucide="user-round-check"></i> No responder account</span><span><i data-lucide="shield-check"></i> Medical data stays off our servers</span><span><i data-lucide="battery"></i> Passive chip technology</span></div>
     <section class="story section" id="how">

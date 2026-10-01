@@ -71,6 +71,7 @@ if [ "$MODE" = "home" ]; then
   cp assets/herovideo.MP4 "$STAGE/assets/herovideo.MP4"
   grep -q 'id="auth-form"' "$STAGE/index.html" || { echo "home/index.html missing auth-form" >&2; exit 3; }
   grep -q 'herovideo.MP4' "$STAGE/index.html" || { echo "home/index.html missing herovideo.MP4" >&2; exit 3; }
+  grep -q 'autoplay' "$STAGE/index.html" || { echo "home/index.html hero video is not set to autoplay" >&2; exit 3; }
   if [ -e "$STAGE/init.html" ]; then
     echo "REFUSING: home deploy must not write init.html (that file is the store)" >&2
     exit 3
