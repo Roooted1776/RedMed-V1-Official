@@ -63,6 +63,11 @@ STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 cp store.css store.js theme.js config.js "$STAGE/"
 cp init.html "$STAGE/index.html"
+# Preview copies must not compete with the live page in search: drop canonical/og:url, add noindex.
+if [ -n "${SUBDIR:-}" ]; then
+  sed -E -i.bak -e '/<link rel="canonical"/d' -e '/property="og:url"/d' -e 's|<title>|<meta name="robots" content="noindex, nofollow">\n<title>|' "$STAGE/index.html"
+  rm -f "$STAGE/index.html.bak"
+fi
 mkdir -p "$STAGE/assets"
 grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u | while read -r a; do cp "$a" "$STAGE/assets/"; done
 
