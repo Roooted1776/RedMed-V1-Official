@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'self' https://api.fontshare.com; font-src https://cdn.fontshare.com; script-src 'self'; connect-src 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#171819">
+<meta name="theme-color" content="#f7f7f3">
 <meta name="color-scheme" content="light dark">
 <title>RedMed Band | Store</title>
 <meta name="description" content="The RedMed NFC medical ID band. A deliberate tap opens the card. No app or account needed to read it.">
@@ -15,15 +15,15 @@
 <meta property="og:url" content="https://redmed.live/store/">
 <meta property="og:title" content="RedMed Band | Store">
 <meta property="og:description" content="The RedMed NFC medical ID band. A deliberate tap opens the card. No app or account needed to read it.">
-<meta property="og:image" content="https://redmed.live/store/assets/hero-poster.jpg">
-<meta property="og:image:width" content="1264">
-<meta property="og:image:height" content="720">
+<meta property="og:image" content="https://redmed.live/store/assets/Band.png">
+<meta property="og:image:width" content="1872">
+<meta property="og:image:height" content="999">
 <meta property="og:image:alt" content="The RedMed NFC medical ID band">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://api.fontshare.com">
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
-<link rel="preload" as="image" href="assets/hero-poster.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="assets/Band.png" fetchpriority="high">
 <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=cabinet-grotesk@500,700,800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="store.css">
 <script src="theme.js"></script>
@@ -44,12 +44,6 @@
   <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
 </svg>
 
-<div class="page-bg" aria-hidden="true">
-      <video id="bgvideo" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg">
-        <source src="assets/hero.webm" type="video/webm">
-        <source src="assets/hero.mp4" type="video/mp4">
-      </video>
-</div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="header">
   <a class="brand" href="https://redmed.live/" aria-label="RedMed home">
@@ -69,25 +63,6 @@
 </header>
 
 <main id="main">
-  <section class="hero">
-    <div class="hero-shade" aria-hidden="true"></div>
-    <div class="hero-copy">
-      <p class="eyebrow"><span class="signal-dot"></span> THE BAND STORE</p>
-      <h1>A small band.<br>A vital <span>connection.</span></h1>
-      <p class="hero-description">When you can't explain, let your wristband speak. A deliberate tap opens your emergency card on any phone.</p>
-      <div class="hero-actions">
-        <a class="button" href="#buy">Get your band <svg class="ic"><use href="#i-arrow"/></svg></a>
-      </div>
-      <p class="hero-note">NFC medical ID &middot; One size fits all &middot; Ships when ready</p>
-    </div>
-    <div class="product-tag"><svg class="ic"><use href="#i-nfc"/></svg><span>PASSIVE NFC<br><strong>No battery. Deliberate tap.</strong></span></div>
-    <div class="hero-bottom">
-      <span>Designed around people.<br>Not just technology.</span>
-      <a href="#buy">Choose a pack <svg class="ic"><use href="#i-down"/></svg></a>
-      <button type="button" class="vbtn" id="motionBtn" aria-pressed="false"><svg class="ic"><use id="motionIcon" href="#i-pause"/></svg><span id="motionText">Pause video</span></button>
-    </div>
-  </section>
-
   <div class="principles">
     <span><svg class="ic"><use href="#i-nfc"/></svg> Tap or scan</span>
     <span><svg class="ic"><use href="#i-user"/></svg> No responder account</span>
@@ -98,9 +73,10 @@
   <section class="section buy" id="buy" aria-labelledby="buyhead">
     <div class="section-heading">
       <p class="eyebrow">01 / CHOOSE YOUR PACK</p>
-      <h2 id="buyhead">One band.<br>Or one for everyone.</h2>
+      <h1 id="buyhead">One band.<br>Or one for everyone.</h1>
       <p>Pick a pack, review it, then check out with Square.</p>
     </div>
+    <figure class="band-showcase"><img src="assets/Band.png" width="1872" height="999" fetchpriority="high" decoding="async" alt="The RedMed NFC band"></figure>
     <div class="shop">
       <div class="tiers" id="tiers" role="radiogroup" aria-label="Pack size"></div>
       <aside class="checkout" aria-label="Order summary">
@@ -161,7 +137,10 @@
         <div><dt>Lock</dt><dd>Never permanently locked</dd></div>
       </dl>
     </div>
+    <div class="tech-side">
     <figure class="tech-media"><div class="tech-frame"><img src="assets/NFC.JPG" width="1280" height="720" loading="lazy" decoding="async" alt="Copper NFC antenna coil and chip beside a black RedMed band"></div><figcaption><span class="dot"></span>NFC antenna &middot; concept image</figcaption></figure>
+    <figure class="tech-media"><div class="tech-frame"><video muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg" width="1280" height="720" aria-label="Animated RedMed band"><source src="assets/AnimatedBand.webm" type="video/webm"><source src="assets/hero.mp4" type="video/mp4"></video></div><figcaption><span class="dot"></span>The RedMed band</figcaption></figure>
+    </div>
     </div>
   </section>
 
