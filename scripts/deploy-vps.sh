@@ -6,6 +6,8 @@
 #   scripts/deploy-vps.sh discover                 # read-only: find the docroot
 #   DOCROOT=/path scripts/deploy-vps.sh dry-run    # show what would change
 #   DOCROOT=/path scripts/deploy-vps.sh deploy     # back up, then copy to <docroot>/store/
+#   DOCROOT=/opt/redmed-store/site MODE=exact SUBDIR=preview scripts/deploy-vps.sh deploy
+#                                                  # additive: serves at /store/preview/, live /store untouched
 #   DOCROOT=/path MODE=home CONFIRM_HOMEPAGE=yes scripts/deploy-vps.sh deploy
 #                                                  # replaces the live homepage at /
 #
@@ -38,7 +40,11 @@ if [ "$MODE" = "home" ] && [ "${CONFIRM_HOMEPAGE:-}" != "yes" ]; then
 fi
 
 TARGET="$DOCROOT"
-[ "$MODE" = "store" ] && TARGET="$DOCROOT/store"
+case "$MODE" in
+  store) TARGET="$DOCROOT/store" ;;
+  exact) # DOCROOT is already the folder served at /store/ (e.g. /opt/redmed-store/site)
+    [ -n "${SUBDIR:-}" ] && TARGET="$DOCROOT/$SUBDIR" ;;
+esac
 
 # Preflight: every file the page needs must exist locally.
 FILES=(init.html store.css store.js theme.js config.js)
@@ -70,7 +76,9 @@ echo "Backup: /root/redmed-backup-$STAMP.tgz (if target existed)"
 rsync -av -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
 
 # Smoke test
-URL="$SITE/"; [ "$MODE" = "store" ] && URL="$SITE/store/"
+URL="$SITE/"
+[ "$MODE" = "store" ] && URL="$SITE/store/"
+[ "$MODE" = "exact" ] && URL="$SITE/store/${SUBDIR:+$SUBDIR/}"
 code="$(curl -s -o /dev/null -w '%{http_code}' "$URL")"
 echo "GET $URL -> $code"
 [ "$code" = "200" ] || { echo "Smoke test failed. Roll back: ssh $REMOTE 'tar xzf /root/redmed-backup-$STAMP.tgz -C $TARGET'" >&2; exit 4; }
