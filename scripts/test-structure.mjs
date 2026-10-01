@@ -33,6 +33,14 @@ for (const dir of ['store', 'tapper', 'owner']) {
   if (!isDir(dir)) problems.push(`repo root: product folder ${dir}/ is missing`);
 }
 
+// Website source is init.html only — root index.html must stay parked.
+checked++;
+if (!exists('init.html')) problems.push('repo root: website source init.html is missing');
+checked++;
+if (exists('index.html')) problems.push('repo root: index.html must stay parked/ (website is init.html only)');
+checked++;
+if (!exists('parked/index.html')) problems.push('parked/index.html: old root stub missing');
+
 // 1. stage-site.sh copy lines
 for (const m of read('scripts/stage-site.sh').matchAll(/^copy\s+(\S+)\s*$/gm)) {
   need('scripts/stage-site.sh', m[1], 'copies');
@@ -57,7 +65,10 @@ for (const [src, dest] of redirectLines) {
   const clean = dest.split('#')[0].split('?')[0];
   const rel = clean.replace(/^\//, '').replace(/\/$/, '');
   checked++;
-  const ok = rel === '' ? exists('index.html') : exists(rel) || (isDir(rel) && exists(`${rel}/index.html`)) || redirectSources.has('/' + rel);
+  // Root / is served from init.html (staged as index.html). Parked stub is not live.
+  const ok = rel === ''
+    ? exists('init.html')
+    : exists(rel) || (isDir(rel) && exists(`${rel}/index.html`)) || redirectSources.has('/' + rel);
   if (!ok) problems.push(`_redirects: ${src} -> ${dest} points at nothing`);
 }
 

@@ -2,7 +2,7 @@
 # Hash fragments (#d=) are client-only and survive these hops.
 #
 # Canonical passerby shell stays under /tapper/ (SW + AppConfig.medicalCardBaseURL).
-# Root stays whatever index.html serves (landing page). Legacy stub URLs
+# Root landing is init.html (staged/deployed as index.html). Legacy stub URLs
 # below still redirect to the canonical passerby shell.
 # Brand PNGs live under /assets/ (and /tapper/ for shell-relative loads).
 #

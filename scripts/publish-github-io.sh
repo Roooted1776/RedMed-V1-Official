@@ -39,7 +39,15 @@ mkdir -p "$DEST/tapper" "$DEST/get" "$DEST/support" "$DEST/assets" "$DEST/.githu
 # Same public include set as scripts/stage-site.sh (stubs + tapper +
 # assets + policies). Do not invent extra excludes — omit owner / docs /
 # scripts by only copying this list.
-cp -f index.html tapper.html card.html get.html redmed-emergency.html sw.js \
+# Website = init.html (copied as index.html for /). Parked stub is not published.
+test -f init.html || { echo "missing init.html (website source)" >&2; exit 1; }
+for f in store.css store.js theme.js config.js; do
+  test -f "$f" || { echo "missing $f (required by init.html)" >&2; exit 1; }
+done
+cp -f init.html "$DEST/index.html"
+cp -f init.html "$DEST/init.html"
+cp -f store.css store.js theme.js config.js \
+  tapper.html card.html get.html redmed-emergency.html sw.js \
   _headers _redirects apple-app-site-association \
   "$DEST/"
 cp -f .well-known/apple-app-site-association "$DEST/.well-known/apple-app-site-association"

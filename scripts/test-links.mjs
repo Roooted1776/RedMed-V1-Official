@@ -18,7 +18,7 @@ import path from 'node:path';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const pages = [
-  'index.html',
+  'init.html',
   'store/index.html',
   'support/index.html',
   'privacy/index.html',
@@ -27,7 +27,7 @@ const pages = [
   'portal/index.html',
   'tapper/index.html',
 ];
-const stylesheets = ['store/store.css'];
+const stylesheets = ['store.css', 'store/store.css'];
 
 // /store -> /store/ style redirects in _redirects count as real targets.
 const redirected = new Set();
@@ -39,10 +39,14 @@ if (existsSync(path.join(root, '_redirects'))) {
 }
 
 function isReal(rel) {
+  // Site root / is init.html (staged/deployed as index.html). No root index.html in git.
+  if (rel === '' || rel === '.') return existsSync(path.join(root, 'init.html'));
   const p = path.join(root, rel);
   if (!p.startsWith(root)) return false;
   if (!existsSync(p)) return false;
-  if (statSync(p).isDirectory()) return existsSync(path.join(p, 'index.html'));
+  if (statSync(p).isDirectory()) {
+    return existsSync(path.join(p, 'index.html')) || (rel === '' && existsSync(path.join(p, 'init.html')));
+  }
   return true;
 }
 

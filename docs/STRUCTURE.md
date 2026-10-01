@@ -11,7 +11,9 @@ Only what must live at the deploy / GitHub surface:
 |------|-------------|
 | `README.md` | GitHub landing (product + run/deploy + dead-host note) |
 | `AGENTS.md` | Cursor / agent rules (must be easy to find) |
-| `tapper.html` · `index.html` · `card.html` · `get.html` · `get/` · `redmed-emergency.html` | Identical `#d=` redirect stubs → `/tapper/` (`scripts/write-tapper-redirects.sh`) |
+| `init.html` · `store.css` · `store.js` · `theme.js` · `config.js` | Website homepage source (`init.html` only — staged/deployed as `index.html` for `/`) |
+| `parked/index.html` | Old root stub — not live |
+| `tapper.html` · `card.html` · `get.html` · `get/` · `redmed-emergency.html` | Identical `#d=` redirect stubs → `/tapper/` (`scripts/write-tapper-redirects.sh`) |
 | `sw.js` · `_headers` · `_redirects` · `scripts/stage-site.sh` · `scripts/deploy-hostinger-static.mjs` · `scripts/setup-cloudflare-dns.mjs` · `scripts/verify-cf-dns-cutover.sh` | SW + legacy, non-functional Hostinger static deploy / Cloudflare DNS-SSL cutover scripts for `redmed.live` (abandoned — live path is the VPS `redmed-portal` container behind Traefik, see `docs/domain.md`) |
 | `.htaccess` | Legacy Hostinger Apache AASA Content-Type, staged into `dist/passerby` by the now-dead static-deploy path |
 | `apple-app-site-association` · `.well-known/apple-app-site-association` | Universal Links — identical, both locations required (Apple checks root, then `.well-known/`) |

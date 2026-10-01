@@ -21,7 +21,6 @@ copy() {
 
 copy _headers
 copy _redirects
-copy index.html
 copy favicon.svg
 copy card.html
 copy get.html
@@ -42,9 +41,19 @@ if [[ -f .htaccess ]]; then
   cp -a .htaccess "$OUT/.htaccess"
 fi
 
+# Website source of truth is init.html (parked/ holds the old root stub).
+# Static hosts serve / as index.html — emit it only in the stage tree.
+test -f init.html || { echo "missing init.html (website source)" >&2; exit 1; }
+for f in store.css store.js theme.js config.js; do
+  test -f "$f" || { echo "missing $f (required by init.html)" >&2; exit 1; }
+  cp -a "$f" "$OUT/$f"
+done
+cp -a init.html "$OUT/index.html"
+cp -a init.html "$OUT/init.html"
+
 # Sanity: Aid tab present, no NFC tab.
 SHELL="$OUT/tapper/index.html"
 grep -q 'id="tab-aid"' "$SHELL" || { echo "$SHELL missing tab-aid" >&2; exit 1; }
 ! grep -q 'id="tab-nfc"' "$SHELL" || { echo "$SHELL has NFC tab" >&2; exit 1; }
 
-echo "Staged $(find "$OUT" -type f | wc -l | tr -d ' ') files → $OUT"
+echo "Staged $(find "$OUT" -type f | wc -l | tr -d ' ') files → $OUT (website from init.html)"
