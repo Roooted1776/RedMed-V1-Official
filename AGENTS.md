@@ -12,7 +12,8 @@ One clone per machine. `frisky` is archived (`docs/release/FRISKY-ARCHIVE.md`).
 Since 2026-09-28, `https://redmed.live` is served by the Hostinger VPS
 (`2010795` / `2.25.249.204`) itself: a `redmed-portal` container behind
 Traefik (TLS via Traefik's Let's Encrypt resolver), DNS pointed there
-directly from Namecheap (no Cloudflare). This is a static-file / reverse-proxy
+directly from Namecheap (no Cloudflare yet: the Owner approved adding it on 2026-10-01 as a
+cache/TLS proxy only; plan and limits in `docs/cloudflare.md`). This is a static-file / reverse-proxy
 role only — the wall below is about **data**, not about which host answers
 the TCP connection.
 

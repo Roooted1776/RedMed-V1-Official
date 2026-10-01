@@ -54,6 +54,7 @@ RedMed-V1-Official/
 | `docs/SECURITY.md` | Pointer into Help → Security / `/Document/#security` (not a second threat model) |
 | `docs/STRUCTURE.md` | This map |
 | `docs/release/DUAL-MAC.md` | MacBook + Mini: Cursor ShipIt repair, prefs/colors sync, `gh` HTTPS push/pull |
+| `docs/cloudflare.md` · `scripts/verify-cloudflare.sh` | Approved Cloudflare plan (settings, rules, rollback) and its read-only checker |
 | `docs/domain.md` | `redmed.live` Namecheap DNS → Hostinger VPS + Traefik (`redmed-portal`) direct — no Cloudflare, no Hostinger static plan |
 | `docs/release/OPS.md` | VPS / Supabase / secrets — ops only, product wall |
 | `docs/release/AUDIT-V1-GOLIVE.md` | V1 go-live deployability audit |
