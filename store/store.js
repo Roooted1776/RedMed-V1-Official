@@ -133,22 +133,123 @@
       .forEach(function (el) { el.classList.add('reveal'); io.observe(el); });
   }
 
-  // how-it-works film, the band-spin background, and the band clip: muted loop, only while on screen.
-  // Poster-only (or a still first frame) with reduced motion or Save-Data.
-  var saveData = navigator.connection && navigator.connection.saveData;
-  document.querySelectorAll('.how-video video, .reel-video, .tech-frame video').forEach(function (how) {
-    if (reduce || saveData || !('IntersectionObserver' in window)) return;
-    var seen = false, held = false;
-    how.muted = true; how.loop = true;
-    how.addEventListener('play', function () { held = false; });
-    how.addEventListener('pause', function () { if (seen) held = true; }); // viewer paused it: keep it paused
-    new IntersectionObserver(function (es) {
-      seen = es[es.length - 1].isIntersecting;
-      if (seen && !held) { var r = how.play(); if (r && r.catch) r.catch(function () {}); }
-      else if (!seen) how.pause();
-    }, { threshold: 0.35 }).observe(how);
-  });
-
   if (wanted && tier(wanted[1])) selected = wanted[1];
   render();
+})();
+
+// Every <video> on the page: muted autoplay, pause/play, click-to-toggle, pointer shift.
+// No network calls. Reduced motion keeps the poster until Play is pressed.
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var videos = document.querySelectorAll('video');
+  if (!videos.length) return;
+
+  function paint(btn, paused) {
+    if (!btn) return;
+    btn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+    var label = btn.querySelector('[data-film-label]') || btn.querySelector('span');
+    if (label) label.textContent = paused ? 'Play video' : 'Pause video';
+    var icon = btn.querySelector('use');
+    if (icon) icon.setAttribute('href', paused ? '#i-play' : '#i-pause');
+  }
+
+  function ensureButton(video) {
+    if (!video.id) return null;
+    var btn = document.querySelector('[data-film="' + video.id + '"]');
+    if (btn || video.hasAttribute('controls')) return btn;
+    var host = video.closest('figure, .reel-stage, .tech-media, .how-video') || video.parentElement;
+    if (!host) return null;
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'hero-motion film-toggle';
+    btn.setAttribute('data-film', video.id);
+    var span = document.createElement('span');
+    span.setAttribute('data-film-label', '');
+    span.textContent = 'Pause video';
+    btn.appendChild(span);
+    host.appendChild(btn);
+    return btn;
+  }
+
+  videos.forEach(function (video, index) {
+    if (!video.id) video.id = 'film-' + index;
+    video.muted = true;
+    video.loop = true;
+    video.playsInline = true;
+    video.setAttribute('playsinline', '');
+    video.autoplay = true;
+    if (!video.getAttribute('preload') || video.getAttribute('preload') === 'none') video.preload = 'auto';
+
+    var userPaused = !!reduce;
+    var btn = ensureButton(video);
+
+    function play() {
+      var pending = video.play();
+      if (pending && typeof pending.catch === 'function') {
+        pending.catch(function () {
+          userPaused = true;
+          paint(btn, true);
+        });
+      }
+      paint(btn, false);
+    }
+
+    function setPaused(paused) {
+      userPaused = paused;
+      if (paused) {
+        video.pause();
+        paint(btn, true);
+      } else {
+        play();
+      }
+    }
+
+    if (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setPaused(!userPaused);
+      });
+    }
+
+    var clickFrame = video.closest('figure, .reel-stage, .how-video, .tech-frame');
+    if (clickFrame && !video.hasAttribute('controls')) {
+      clickFrame.addEventListener('click', function (e) {
+        if (e.target.closest('.steps, a, button, summary, input, select, textarea, label')) return;
+        setPaused(!userPaused);
+      });
+    }
+
+    var pointerFrame = video.closest('.page-bg') ? document.querySelector('.hero') : clickFrame;
+    if (!reduce && fine && pointerFrame) {
+      pointerFrame.addEventListener('mousemove', function (e) {
+        var box = pointerFrame.getBoundingClientRect();
+        if (!box.width || !box.height) return;
+        var x = (e.clientX - box.left) / box.width - 0.5;
+        var y = (e.clientY - box.top) / box.height - 0.5;
+        video.style.transform = 'scale(1.05) translate(' + (x * -14).toFixed(1) + 'px,' + (y * -8).toFixed(1) + 'px)';
+      });
+      pointerFrame.addEventListener('mouseleave', function () {
+        video.style.transform = '';
+      });
+    }
+
+    if (userPaused) {
+      video.pause();
+      paint(btn, true);
+    } else {
+      play();
+    }
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) video.pause();
+      else if (!userPaused) play();
+    });
+
+    video.addEventListener('error', function (e) {
+      if (e.target !== video) return;
+      video.hidden = true;
+      if (btn) btn.hidden = true;
+    }, true);
+  });
 })();
