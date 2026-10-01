@@ -1,7 +1,6 @@
-// Runs before paint. Same idea as the main page (system default, data-theme on <html>) plus remembered choice.
+// Runs before paint. The store stays red and white.
 (function () {
-  var t;
-  try { t = localStorage.getItem('redmed-theme'); } catch (e) {}
-  if (t !== 'dark' && t !== 'light') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  document.documentElement.dataset.theme = t;
+  document.documentElement.dataset.theme = 'light';
+  var m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.setAttribute('content', '#ffffff');
 })();
