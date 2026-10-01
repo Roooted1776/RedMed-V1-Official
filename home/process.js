@@ -45,5 +45,25 @@
     });
   });
 
+  // The portal's file server does not answer byte-range requests, so a streamed video cannot seek.
+  // The film is small: load it whole and play it from memory, which makes every step clickable.
+  if (window.fetch && window.URL && URL.createObjectURL) {
+    var type = v.canPlayType('video/webm; codecs="vp9"') ? 'video/webm' : 'video/mp4';
+    var source = v.querySelector('source[type="' + type + '"]');
+    if (source) {
+      fetch(source.getAttribute('src')).then(function (r) {
+        if (!r.ok) throw new Error('video ' + r.status);
+        return r.blob();
+      }).then(function (blob) {
+        var wasPaused = v.paused;
+        v.removeAttribute('src');
+        [].slice.call(v.querySelectorAll('source')).forEach(function (n) { v.removeChild(n); });
+        v.src = URL.createObjectURL(new Blob([blob], { type: type }));
+        v.load();
+        if (!wasPaused) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+      }).catch(function () { /* keep the streamed source; steps still follow the film */ });
+    }
+  }
+
   set(0);
 })();
