@@ -43,8 +43,8 @@ esac
 
 : "${DOCROOT:?Set DOCROOT (run: scripts/deploy-vps.sh discover)}"
 
-if [ "$MODE" != "home" ] && [ "$MODE" != "store" ]; then
-  echo "MODE must be home or store (got: $MODE)" >&2
+if [ "$MODE" != "home" ] && [ "$MODE" != "store" ] && [ "$MODE" != "exact" ]; then
+  echo "MODE must be home, store or exact (got: $MODE)" >&2
   exit 2
 fi
 
@@ -128,7 +128,7 @@ fi
 
 # Quote these. An unquoted tapper/** is a shell glob and rsync then
 # copies the Assist shell onto the page being deployed.
-if [ "$MODE" = "store" ]; then
+if [ "$MODE" = "store" ] || [ "$MODE" = "exact" ]; then
   RSYNC_EXCLUDE=(--exclude 'index.html' --exclude 'tapper' --exclude 'tapper/**')
 else
   RSYNC_EXCLUDE=(--exclude 'init.html' --exclude 'tapper' --exclude 'tapper/**')
