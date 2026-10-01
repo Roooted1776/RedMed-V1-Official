@@ -13,11 +13,13 @@ Square's checkout settings). Do not add card fields here: that needs a payment s
 breaks the static-only rule in `AGENTS.md`. Publishable links only. Never commit a Square
 access token.
 
-## How it works video
-The "How it works" section plays `assets/how-it-works.webm` / `.mp4` (poster `how-it-works-poster.jpg`), then shows the three
-steps as horizontal cards (a swipe row on phones). To replace the film with your own Higgsfield video:
-1. Download the video from Higgsfield (mp4).
-2. `bash scripts/encode-store-video.sh ~/Downloads/your-video.mp4 4` (the `4` is the poster frame, in seconds).
-3. Commit the three files in `store/assets/`, merge, redeploy the store container.
-The caption in `index.html` reads "How it works". Edit it if the video changes.
-It autoplays muted and looping while on screen; reduced motion and Save-Data get the poster only.
+## Pages, films and images
+- The page is `store/index.html`. `scripts/deploy-vps.sh` ships it as `init.html` (the live nginx opens that name for `/store/`).
+- Films and images are shared with the home page and load from `/assets/`: `hero-hd.mp4` / `hero-mobile.mp4`
+  (phones), `Band.webp`, `band-spin-poster.jpg`, `how-it-works-poster.jpg`. Deploy the home page first, because it ships them.
+- Films autoplay muted and loop. They start just before they scroll into view and rest when far off screen.
+  Reduced motion and Low Power Mode keep the poster until Play is pressed.
+- To replace a film: `bash scripts/encode-store-video.sh ~/Downloads/your-video.mp4 4` (the `4` is the poster frame in seconds),
+  keep the same file names in `assets/`, then deploy home, then the store.
+- The three steps live in their own "How it works" section below the films.
+- Theme: first visit is dark; the header switch saves the choice. `theme.js` runs before paint.

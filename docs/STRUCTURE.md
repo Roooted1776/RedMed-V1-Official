@@ -12,7 +12,7 @@ Only what must live at the deploy / GitHub surface:
 | `README.md` | GitHub landing (product + run/deploy + dead-host note) |
 | `AGENTS.md` | Cursor / agent rules (must be easy to find) |
 | `home/` | Landing at `/` — Sign in / Create account / Supabase email-link verify (keep) |
-| `init.html` · `store.css` · `store.js` · `theme.js` · `config.js` | Storefront (`/store/` via deploy; also `store/`) |
+| `init.html` · `store.css` · `store.js` · `theme.js` · `config.js` | Older storefront copy (GitHub Pages backup only). The live store is `store/` (deployed as `init.html`) |
 | `parked/index.html` | Old root stub — not live |
 | `tapper.html` · `card.html` · `get.html` · `get/` · `redmed-emergency.html` | Identical `#d=` redirect stubs → `/tapper/` (`scripts/write-tapper-redirects.sh`) |
 | `sw.js` · `_headers` · `_redirects` · `scripts/stage-site.sh` · `scripts/deploy-hostinger-static.mjs` · `scripts/setup-cloudflare-dns.mjs` · `scripts/verify-cf-dns-cutover.sh` | SW + legacy, non-functional Hostinger static deploy / Cloudflare DNS-SSL cutover scripts for `redmed.live` (abandoned — live path is the VPS `redmed-portal` container behind Traefik, see `docs/domain.md`) |

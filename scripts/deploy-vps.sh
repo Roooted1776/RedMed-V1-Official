@@ -3,25 +3,29 @@
 # Website only. The iOS app in this repo is not touched. tapper/ is never copied.
 #
 # File split (do not cross these):
-#   home  — home/index.html → DOCROOT/index.html   (https://redmed.live/)
+#   home  — home/index.html → DOCROOT/index.html   (https://redmed.live/, also www)
 #           Requires CONFIRM_HOMEPAGE=yes. Never writes init.html.
-#   store — store/index.html → DOCROOT/store/init.html (https://redmed.live/store/)
-#           Never writes index.html. /store/ is served from init.html.
+#           Also ships the shared media in assets/ (hero and how-it-works films, posters,
+#           Band.webp, Band.jpeg). The store page loads these from /assets/, so deploy HOME FIRST.
+#   exact — store/index.html → DOCROOT/init.html   (https://redmed.live/store/)
+#           DOCROOT is the folder nginx serves at /store/ (/opt/redmed-store/site).
+#           The live nginx opens init.html for /store/, so the page ships under that name.
+#           Never writes index.html. With SUBDIR=preview it becomes a noindex copy at /store/preview/.
+#   store — same page, but into DOCROOT/store/ (for a docroot that holds the whole site).
 #
 # Usage:
-#   scripts/deploy-vps.sh discover                 # read-only: find the docroot
+#   scripts/deploy-vps.sh discover                 # read-only: find the docroots
 #   DOCROOT=/opt/redmed-store/site MODE=exact scripts/deploy-vps.sh compare   # read-only: staged vs live
-#   DOCROOT=/path scripts/deploy-vps.sh dry-run    # show what would change
-#   DOCROOT=/path scripts/deploy-vps.sh deploy     # back up, then copy to <docroot>/store/
-#   DOCROOT=/opt/redmed-store/site MODE=exact SUBDIR=preview scripts/deploy-vps.sh deploy
+#   DOCROOT=/opt/redmed-portal/site MODE=home CONFIRM_HOMEPAGE=yes scripts/deploy-vps.sh dry-run
+#   DOCROOT=/opt/redmed-portal/site MODE=home CONFIRM_HOMEPAGE=yes scripts/deploy-vps.sh deploy
+#   DOCROOT=/opt/redmed-store/site  MODE=exact scripts/deploy-vps.sh dry-run
+#   DOCROOT=/opt/redmed-store/site  MODE=exact scripts/deploy-vps.sh deploy
+#   DOCROOT=/opt/redmed-store/site  MODE=exact SUBDIR=preview scripts/deploy-vps.sh deploy
 #                                                  # additive: serves at /store/preview/, live /store untouched
-#   DOCROOT=/path MODE=store scripts/deploy-vps.sh dry-run
-#   DOCROOT=/path MODE=store scripts/deploy-vps.sh deploy
-#   DOCROOT=/path MODE=home CONFIRM_HOMEPAGE=yes scripts/deploy-vps.sh deploy
-#   DOCROOT=/path MODE=home CONFIRM_HOMEPAGE=yes scripts/deploy-vps.sh deploy
 #
+# Needs rsync 3 (Homebrew: brew install rsync); the macOS built-in rsync lacks --chmod.
 # Env: REMOTE (default root@2.25.249.204), DOCROOT (required except discover),
-#      MODE=store|home (default store), SITE (default https://redmed.live)
+#      MODE=home|exact|store (default store), SITE (default https://redmed.live)
 set -euo pipefail
 
 REMOTE="${REMOTE:-root@2.25.249.204}"
@@ -72,7 +76,7 @@ STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 if [ "$MODE" = "home" ]; then
   # Home page file is index.html. Never stage the store page here.
-  for f in home/index.html home/legacy.js home/hero.js home/theme.js home/process.js assets/hero-hd.mp4 assets/hero-mobile.mp4 assets/how-it-works.webm assets/how-it-works.mp4 assets/how-it-works-poster.jpg assets/band-spin-poster.jpg assets/Band.webp; do
+  for f in home/index.html home/legacy.js home/hero.js home/theme.js home/process.js assets/hero-hd.mp4 assets/hero-mobile.mp4 assets/how-it-works.webm assets/how-it-works.mp4 assets/how-it-works-poster.jpg assets/band-spin-poster.jpg assets/Band.webp assets/Band.jpeg; do
     [ -f "$f" ] || { echo "MISSING $f" >&2; exit 3; }
   done
   [ -d home/assets ] || { echo "MISSING home/assets/" >&2; exit 3; }
@@ -87,7 +91,7 @@ if [ "$MODE" = "home" ]; then
   [ -f home/nfc-detail.webp ] && cp home/nfc-detail.webp "$STAGE/"
   mkdir -p "$STAGE/assets"
   cp -a home/assets/. "$STAGE/assets/"
-  cp assets/hero-hd.mp4 assets/hero-mobile.mp4 assets/how-it-works.webm assets/how-it-works.mp4 assets/how-it-works-poster.jpg assets/band-spin-poster.jpg assets/Band.webp "$STAGE/assets/"
+  cp assets/hero-hd.mp4 assets/hero-mobile.mp4 assets/how-it-works.webm assets/how-it-works.mp4 assets/how-it-works-poster.jpg assets/band-spin-poster.jpg assets/Band.webp assets/Band.jpeg "$STAGE/assets/"
   grep -q 'id="auth-form"' "$STAGE/index.html" || { echo "home/index.html missing auth-form" >&2; exit 3; }
   grep -q 'hero-hd.mp4' "$STAGE/index.html" || { echo "home/index.html missing hero-hd.mp4" >&2; exit 3; }
   grep -q 'autoplay' "$STAGE/index.html" || { echo "home/index.html hero video is not set to autoplay" >&2; exit 3; }
