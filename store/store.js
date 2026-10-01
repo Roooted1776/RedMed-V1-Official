@@ -247,6 +247,16 @@
 
     video.addEventListener('playing', function () { paint(btn, false); });
 
+    // Phones often refuse autoplay until a video is on screen: start it when visible, rest it when not.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (x) {
+          if (x.isIntersecting) { if (!userPaused && video.paused) play(); }
+          else if (!video.paused) video.pause();
+        });
+      }, { threshold: 0.25 }).observe(video);
+    }
+
     if (userPaused) {
       video.pause();
       paint(btn, true);
