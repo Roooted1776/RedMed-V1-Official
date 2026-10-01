@@ -14,6 +14,8 @@
 
 The grants and RLS design follows [Supabase's API security guidance](https://supabase.com/docs/guides/api/securing-your-api). The role bypass limitation is documented in [Supabase's RLS guide](https://supabase.com/docs/guides/database/postgres/row-level-security).
 
+`config.toml` is what the Supabase GitHub integration opens. The Data API schemas in that file stay `public` and `graphql_public`. `redmed_owner` and `redmed_ops` are not exposed there.
+
 ## Apply and verify
 
 Apply the versioned SQL through the Supabase migration tool, not an ad hoc application startup hook. Then run `tests/release-ledger.sql` with the same administrative test connection; fixture writes roll back.

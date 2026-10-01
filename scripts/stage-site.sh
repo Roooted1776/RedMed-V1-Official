@@ -86,7 +86,7 @@ grep -q 'id="tab-aid"' "$SHELL" || { echo "$SHELL missing tab-aid" >&2; exit 1; 
 grep -q 'id="auth-form"' "$OUT/index.html" || { echo "staged / missing auth-form (home/ Sign in)" >&2; exit 1; }
 grep -q 'Create account' "$OUT/index.html" || { echo "staged / missing Create account" >&2; exit 1; }
 grep -q 'id="hero-video"' "$OUT/index.html" || { echo "staged / missing hero video" >&2; exit 1; }
-grep -q 'herovideo.MP4' "$OUT/index.html" || { echo "staged / hero is not herovideo.MP4" >&2; exit 1; }
+grep -q 'hero-hd.mp4' "$OUT/index.html" || { echo "staged / hero is not hero-hd.mp4" >&2; exit 1; }
 grep -q 'autoplay' "$OUT/index.html" || { echo "staged / hero video is not set to autoplay" >&2; exit 1; }
 ! grep -q 'id="auth-form"' "$OUT/init.html" || { echo "init.html must not be the auth portal" >&2; exit 1; }
 
