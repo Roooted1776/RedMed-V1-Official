@@ -46,7 +46,8 @@ enum AppConfig {
     static let appStoreURL: String? = nil
     /// Unused in Swift (in-app Help is bundled `Document/Document.html`). Connect placeholders
     /// stay in this repo — not jsDelivr `@main` of a second tree.
-    static let supportURL = "https://github.com/Roooted1776/frisky/blob/main/support/index.html"
+    /// Live support page on the custom domain. Not the archived frisky GitHub blob.
+    static let supportURL = "https://redmed.live/support/"
     /// Owner Help → Contact Support. Same address as Document.html Contact sections.
     static let supportEmail = "help@redmed.live"
 

@@ -1,0 +1,15 @@
+---
+description: The only RedMed repo and folder. Never use the archived frisky tree.
+alwaysApply: true
+---
+
+# Only repo
+
+Max works in one place:
+
+- GitHub: `https://github.com/Roooted1776/RedMed-V1-Official`
+- This folder: `/Users/claude/RedMed Official` (origin is that repo)
+
+`Roooted1776/frisky` is archived. Do not clone it, edit it, open PRs on it, or point product URLs at it.
+
+Public site is the custom domain `https://redmed.live`. `roooted1776.github.io` is only the backup for bands already written to that host.
