@@ -46,6 +46,7 @@ for f in store.css store.js theme.js config.js home/legacy.js; do
   test -f "$f" || { echo "missing $f" >&2; exit 1; }
 done
 cp -f home/index.html "$DEST/index.html"
+cp -f home/red-white.css "$DEST/red-white.css"
 cp -f home/legacy.js "$DEST/legacy.js"
 cp -f home/favicon.svg "$DEST/favicon.svg" 2>/dev/null || true
 cp -f home/band-hero.webp home/nfc-detail.webp "$DEST/" 2>/dev/null || true

@@ -29,6 +29,7 @@ directory is the live build, saved so it is no longer only on the server.
   `AGENTS.md` matches this.
 - The Administration dialog is public markup. Access must be enforced by Supabase (RLS and role checks), not by the page.
 - The bundle cannot be edited sensibly. To change portal behavior, rebuild it from source or remove the bundle.
+- `index.html` here is the home page. `https://redmed.live/` and `/index.html` serve it, and this file may be updated as the home page. The store page is repo-root `init.html`; `/store/` opens that file. Do not copy this home page over `init.html`, and do not copy `init.html` over this file.
 - Deploy: `MODE=home CONFIRM_HOMEPAGE=yes scripts/deploy-vps.sh deploy` (after `discover`).
   `scripts/stage-site.sh` also stages this directory as `/`. Find the docroot first
   (`docker inspect redmed-portal-live --format '{{json .Mounts}}'`).

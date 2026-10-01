@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Deploy RedMed static surfaces to the Hostinger VPS.
-# Website only. The iOS app in this repo is not touched.
+# Website only. The iOS app in this repo is not touched. tapper/ is never copied.
 #
-# Modes:
-#   home  — home/ → DOCROOT /   (Sign in / Create account / Supabase email links)
-#           Requires CONFIRM_HOMEPAGE=yes (replaces live landing).
-#   store — init.html → DOCROOT/store/  (storefront; default)
+# File split (do not cross these):
+#   home  — home/index.html → DOCROOT/index.html   (https://redmed.live/)
+#           Requires CONFIRM_HOMEPAGE=yes. Never writes init.html.
+#   store — init.html → DOCROOT/store/init.html    (https://redmed.live/store/)
+#           Never writes index.html. /store/ is served from init.html.
 #
 # Usage:
 #   scripts/deploy-vps.sh discover
@@ -53,12 +54,13 @@ STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 
 if [ "$MODE" = "home" ]; then
-  # Keep the Supabase-synced member portal at /.
+  # Home page file is index.html. Never stage the store page here.
   for f in home/index.html home/legacy.js home/hero.js assets/herovideo.MP4; do
     [ -f "$f" ] || { echo "MISSING $f" >&2; exit 3; }
   done
   [ -d home/assets ] || { echo "MISSING home/assets/" >&2; exit 3; }
   cp home/index.html "$STAGE/index.html"
+  cp home/red-white.css "$STAGE/red-white.css"
   cp home/legacy.js "$STAGE/legacy.js"
   cp home/hero.js "$STAGE/hero.js"
   [ -f home/favicon.svg ] && cp home/favicon.svg "$STAGE/"
@@ -69,8 +71,12 @@ if [ "$MODE" = "home" ]; then
   cp assets/herovideo.MP4 "$STAGE/assets/herovideo.MP4"
   grep -q 'id="auth-form"' "$STAGE/index.html" || { echo "home/index.html missing auth-form" >&2; exit 3; }
   grep -q 'herovideo.MP4' "$STAGE/index.html" || { echo "home/index.html missing herovideo.MP4" >&2; exit 3; }
+  if [ -e "$STAGE/init.html" ]; then
+    echo "REFUSING: home deploy must not write init.html (that file is the store)" >&2
+    exit 3
+  fi
 else
-  # Storefront from init.html.
+  # Store page file is init.html. Never stage the home page here.
   FILES=(init.html store.css store.js theme.js config.js)
   missing=0
   for f in "${FILES[@]}"; do
@@ -81,33 +87,54 @@ else
   done < <(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u)
   [ "$missing" -eq 0 ] || { echo "Fix missing files, then rerun." >&2; exit 3; }
   cp store.css store.js theme.js config.js "$STAGE/"
-  cp init.html "$STAGE/index.html"
   cp init.html "$STAGE/init.html"
   mkdir -p "$STAGE/assets"
   grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u | while read -r a; do cp "$a" "$STAGE/assets/"; done
+  if [ -e "$STAGE/index.html" ]; then
+    echo "REFUSING: store deploy must not write index.html (that file is the home page)" >&2
+    exit 3
+  fi
+fi
+
+# Quote these. An unquoted tapper/** is a shell glob and rsync then
+# copies the Assist shell onto the page being deployed.
+if [ "$MODE" = "store" ]; then
+  RSYNC_EXCLUDE=(--exclude 'index.html' --exclude 'tapper' --exclude 'tapper/**')
+else
+  RSYNC_EXCLUDE=(--exclude 'init.html' --exclude 'tapper' --exclude 'tapper/**')
 fi
 
 if [ "$CMD" = "dry-run" ]; then
-  rsync -avn -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
+  rsync -avn --chmod=D755,F644 "${RSYNC_EXCLUDE[@]}" -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
   exit 0
 fi
 
 STAMP="$(date +%Y%m%d%H%M%S)"
 "${SSH[@]}" "test -d '$TARGET' && tar czf /root/redmed-backup-$STAMP.tgz -C '$TARGET' . || mkdir -p '$TARGET'"
 echo "Backup: /root/redmed-backup-$STAMP.tgz (if target existed)"
-rsync -av -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
+rsync -av --chmod=D755,F644 "${RSYNC_EXCLUDE[@]}" -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
+# mktemp stages are mode 700; never leave the live docroot unreadable.
+"${SSH[@]}" "chmod 755 '$TARGET'"
 
-URL="$SITE/"; [ "$MODE" = "store" ] && URL="$SITE/store/"
-code="$(curl -s -o /dev/null -w '%{http_code}' "$URL")"
-echo "GET $URL -> $code"
+BASE="$SITE/"; PAGE="$BASE"
+[ "$MODE" = "store" ] && BASE="$SITE/store/" && PAGE="${BASE}init.html"
+code="$(curl -s -o /dev/null -w '%{http_code}' "$PAGE")"
+echo "GET $PAGE -> $code"
 [ "$code" = "200" ] || { echo "Smoke test failed. Roll back: ssh $REMOTE 'tar xzf /root/redmed-backup-$STAMP.tgz -C $TARGET'" >&2; exit 4; }
 if [ "$MODE" = "home" ]; then
-  body="$(curl -sL "$URL")"
+  body="$(curl -sL "$PAGE")"
   echo "$body" | grep -q 'Create account' || { echo "Smoke: homepage missing Create account" >&2; exit 4; }
   echo "$body" | grep -q 'Sign in' || { echo "Smoke: homepage missing Sign in" >&2; exit 4; }
-  echo "OK homepage auth chrome present"
+  echo "$body" | grep -q 'RedMed Band | Store' && { echo "Smoke: homepage is the store page" >&2; exit 4; }
+  echo "OK homepage index.html"
 else
+  # /store/ must open init.html. Do not rewrite index.html to get there.
+  "${SSH[@]}" 'docker exec redmed-store sh -c "grep -q \"index init.html\" /etc/nginx/conf.d/default.conf || sed -i \"s|location /store/ { try_files|location /store/ { index init.html; try_files|\" /etc/nginx/conf.d/default.conf; nginx -t && nginx -s reload"'
+  store_open="$(curl -sL "${BASE}")"
+  echo "$store_open" | grep -q 'RedMed Band | Store' || { echo "Smoke: /store/ did not open init.html" >&2; exit 4; }
+  echo "$store_open" | grep -q 'id="auth-form"' && { echo "Smoke: /store/ is the home page" >&2; exit 4; }
+  echo "OK /store/ opens init.html"
   for a in $(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u); do
-    c="$(curl -s -o /dev/null -w '%{http_code}' "$URL$a")"; echo "  $a -> $c"
+    c="$(curl -s -o /dev/null -w '%{http_code}' "$BASE$a")"; echo "  $a -> $c"
   done
 fi
