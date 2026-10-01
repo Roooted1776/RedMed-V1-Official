@@ -42,6 +42,17 @@ checked++;
 if (exists('index.html')) problems.push('repo root: index.html must stay parked/ (landing is home/, store is init.html)');
 checked++;
 if (!exists('parked/index.html')) problems.push('parked/index.html: old root stub missing');
+checked++;
+if (!exists('assets/herovideo.MP4')) problems.push('assets/herovideo.MP4 (homepage hero film) is missing');
+checked++;
+if (!exists('home/hero.js')) problems.push('home/hero.js (homepage hero controls) is missing');
+checked++;
+{
+  const home = read('home/index.html');
+  if (!home.includes('id="hero-video"') || !home.includes('/assets/herovideo.MP4')) {
+    problems.push('home/index.html hero block must play /assets/herovideo.MP4');
+  }
+}
 
 // 1. stage-site.sh copy lines
 for (const m of read('scripts/stage-site.sh').matchAll(/^copy\s+(\S+)\s*$/gm)) {
