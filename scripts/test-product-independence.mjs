@@ -72,13 +72,13 @@ for (const path of hits) {
   }
   const rel = path.slice(root.length);
   const historicalLedger = rel.endsWith('supabase/migrations/20260926064135_redmed_ops_release_ledger.sql')
-    || rel.endsWith('supabase/migrations/20260926155000_drop_mcp_from_release_ledger.sql');
+    || rel.endsWith('supabase/migrations/20260926155408_drop_mcp_from_release_ledger.sql');
   if (path.includes(`${join('supabase', '')}`) && text.includes("'mcp'") && !historicalLedger) {
     fail(`${rel} still names mcp in the database contract`);
   }
 }
 
-const drop = readFileSync(join(root, 'supabase/migrations/20260926155000_drop_mcp_from_release_ledger.sql'), 'utf8');
+const drop = readFileSync(join(root, 'supabase/migrations/20260926155408_drop_mcp_from_release_ledger.sql'), 'utf8');
 if (!drop.includes("check (component in ('assist', 'owner', 'ops'))")) {
   fail('release ledger still allows an mcp component');
 }
