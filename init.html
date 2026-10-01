@@ -1,18 +1,9 @@
 <!doctype html>
-<!--
-  This file is NOT served at https://redmed.live/ (root there hits the
-  redmed-portal container via Traefik on the VPS). It IS live, verbatim,
-  at https://roooted1776.github.io/ (backup host for already-written
-  bands) via scripts/publish-github-io.sh. Edit it for that host, not
-  for redmed.live's root, and don't delete it as "dead" without checking
-  publish-github-io.sh first.
--->
 <html lang="en-US">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#fff7f7">
-<meta name="color-scheme" content="light">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; object-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'self' https://api.fontshare.com; font-src https://cdn.fontshare.com; script-src 'self'; connect-src 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light dark">
@@ -157,7 +148,5 @@
 <noscript><p class="ns">JavaScript is needed to pick a pack. Email <a href="mailto:help@redmed.live">help@redmed.live</a> to order.</p></noscript>
 <script src="config.js" defer></script>
 <script src="store.js" defer></script>
-</body>
-</html>
 </body>
 </html>
