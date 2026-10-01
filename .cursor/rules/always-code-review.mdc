@@ -13,12 +13,15 @@ review the diff with a code-review mindset and report the findings.
 - Cite file and line for each finding and say what the user-visible effect is.
 - RedMed specifics to check every time:
   - Assist (`tapper/`): no Supabase, MCP, VPS, sign-in, Accept, or NFC; `#d=`
-    codec and SOS invariants intact (see `AGENTS.md`).
+    codec and SOS invariants intact (see `AGENTS.md` product wall + crisis/SOS).
+  - Crisis / SOS: full sound + full light; arms only on SOS toggle or US Crash
+    Detection timing — never on band tap alone (detail in `AGENTS.md`).
   - Anything a stranger reads on the band card must not state a medical fact
     the band doesn't actually carry (e.g. "No" for an unset field).
   - Shell layout change → `CACHE` bumped in both `sw.js` and `tapper/sw.js`.
   - Gates: `bash scripts/sync-tapper.sh`, `node scripts/test-d-codec.mjs`,
-    `node scripts/test-product-independence.mjs`.
+    `node scripts/test-product-independence.mjs`,
+    `node scripts/test-nfc-hardware.mjs` (Owner/NFC paths).
 - When the user asks only for a review, do not change code. Otherwise, fix
   what's clearly in scope and list the rest in the PR body under
   "Known issues".

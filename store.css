@@ -1,6 +1,6 @@
 @layer base,layout,components,responsive;
 @layer base{
-:root,:root[data-theme=dark]{--bg:#fff;--surface:#fff;--ink:#1a1214;--muted:#6d5558;--border:#f0d4d7;--accent:#c8273c;--accent-hover:#ad2032;--hero:#fff;--hero-ink:#1a1214;--hero-muted:#6d5558;--soft:#fff5f6;--veil:#ffffffe8;--veil2:#fff5f6e8;--font-body:"Satoshi",system-ui,sans-serif;--font-display:"Cabinet Grotesk","Satoshi",system-ui,sans-serif;--text-xs:.75rem;--text-sm:.875rem;--text-base:1rem;--text-lg:1.25rem;--text-2xl:clamp(2rem,4.4vw,3.5rem);--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;--s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;--s20:5rem;--s24:6rem;color-scheme:light}
+:root{--bg:#fff;--surface:#fff;--ink:#1a1214;--muted:#6d5558;--border:#f0d4d7;--accent:#c8273c;--accent-hover:#ad2032;--hero:#fff;--hero-ink:#1a1214;--hero-muted:#6d5558;--soft:#fff5f6;--veil:#ffffffe8;--veil2:#fff5f6e8;--font-body:"Satoshi",system-ui,sans-serif;--font-display:"Cabinet Grotesk","Satoshi",system-ui,sans-serif;--text-xs:.75rem;--text-sm:.875rem;--text-base:1rem;--text-lg:1.25rem;--text-2xl:clamp(2rem,4.4vw,3.5rem);--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;--s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;--s20:5rem;--s24:6rem;color-scheme:light}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:6rem}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
@@ -158,3 +158,10 @@ dialog h2{font-size:2rem;margin-top:var(--s2)}
 }
 
 @media(max-width:400px){.brand{font-size:1.1rem}.brand>svg{width:24px;height:24px}.header{padding:0 var(--s3)}}
+
+:root[data-theme=dark]{--bg:#141011;--surface:#1d1718;--ink:#f6eeee;--muted:#c2adb0;--border:#3a2b2e;--accent:#d12f45;--accent-hover:#e0394e;--hero:#141011;--hero-ink:#f6eeee;--hero-muted:#c2adb0;--soft:#1d1718;--veil:#141011e8;--veil2:#1d1718e8;color-scheme:dark}
+.hero{position:relative;isolation:isolate;overflow:hidden}
+.page-bg{position:fixed;inset:0;z-index:-1;background:var(--hero)}
+.page-bg video{position:absolute;top:0;left:16%;width:84%;height:100%;object-fit:cover;object-position:center;-webkit-mask-image:linear-gradient(90deg,transparent,#000 22%);mask-image:linear-gradient(90deg,transparent,#000 22%)}
+.hero-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,var(--hero) 0%,color-mix(in srgb,var(--hero) 72%,transparent) 32%,transparent 66%)}
+@media(max-width:820px){.page-bg video{left:0;width:100%;opacity:.5}}
