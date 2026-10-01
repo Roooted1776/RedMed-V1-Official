@@ -23,7 +23,7 @@
       <svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M6 18h6l3-8 6 16 3-8h6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 33C9 27 2 22 2 13 2 3 13 0 18 7 23 0 34 3 34 13c0 9-7 14-16 20Z" stroke="currentColor" stroke-width="2"/></svg>
       <span>RedMed<span class="brand-dot">.</span></span>
     </a>
-    <nav aria-label="Main navigation"><a href="#how">How it works</a><a href="#technology">The technology</a><a href="/store/">Store</a><a href="https://redmed.live/tapper/" rel="noreferrer">Open tap page</a></nav>
+    <nav aria-label="Main navigation"><a href="#how">How it works</a><a href="#technology">The technology</a><a href="https://redmed.live/store/">Store</a><a href="https://redmed.live/tapper/" rel="noreferrer">Open tap page</a></nav>
     <div class="header-actions"><button class="icon-button" id="theme-toggle" aria-label="Switch color theme" title="Switch color theme"><i data-lucide="sun-moon"></i></button><button class="text-button account-trigger" data-mode="signin">Sign in</button><button class="button small account-trigger" data-mode="signup">Create account</button></div>
   </header>
   <main id="main">
@@ -32,7 +32,7 @@
         <p class="eyebrow"><span class="signal-dot"></span> BUILT FOR THE MOMENTS THAT MATTER</p>
         <h1>A small band.<br>A vital <span>connection.</span></h1>
         <p class="hero-description">When you can’t explain, let your wristband speak. Emergency information, connected by a tap.</p>
-        <div class="hero-actions"><a class="button" href="/store/">Shop the band <i data-lucide="arrow-up-right"></i></a><button class="button account-trigger" data-mode="signup">Get connected <i data-lucide="arrow-up-right"></i></button><button class="text-button" id="demo-open"><span class="play"><i data-lucide="play"></i></span> See how it works</button></div>
+        <div class="hero-actions"><a class="button" href="https://redmed.live/store/">Shop the band <i data-lucide="arrow-up-right"></i></a><button class="button account-trigger" data-mode="signup">Get connected <i data-lucide="arrow-up-right"></i></button><button class="text-button" id="demo-open"><span class="play"><i data-lucide="play"></i></span> See how it works</button></div>
         <p class="hero-note">NFC medical ID · In development</p>
       </div>
       <figure class="hero-product">
@@ -104,7 +104,8 @@
   <dialog id="demo-dialog" aria-labelledby="demo-title"><button class="icon-button dialog-close" aria-label="Close demonstration"><i data-lucide="x"></i></button><p class="eyebrow">INTERACTIVE WALKTHROUGH / NO REAL MEDICAL DATA</p><h2 id="demo-title">A tap starts the connection.</h2><div class="demo-device"><div class="demo-top">REDMED ASSIST <i data-lucide="nfc"></i></div><div id="demo-content"></div></div><div class="demo-controls"><button class="button secondary" id="demo-back">Back</button><span id="demo-count"></span><button class="button" id="demo-next">Next <i data-lucide="arrow-right"></i></button></div><p class="fineprint">Illustrative workflow only. This does not scan, write, or activate a band.</p></dialog>
   <dialog id="privacy-dialog" aria-labelledby="privacy-title"><button class="icon-button dialog-close" aria-label="Close privacy details"><i data-lucide="x"></i></button><p class="eyebrow">DATA BOUNDARIES / SEPTEMBER 2026</p><h2 id="privacy-title">What your account holds.</h2><div class="privacy-detail"><h3>Account data</h3><p>Supabase Auth processes your email and password for authentication. The band registry stores your account ID, chip serial, color, inventory status and registration date. Database policies restrict these records to your authenticated account.</p><h3>What stays out</h3><p>Do not enter diagnoses, emergency contacts, care instructions, medical-card URLs or band payloads here. This portal does not collect them. NFC reading uses only the tag serial number and never reads or uploads NDEF record content.</p><h3>Important limits</h3><p>A chip UID is not proof of ownership and is not an authentication secret. Changing a band’s inventory status does not revoke its payload. Anyone with that payload can read its wearer-selected information.</p><h3>Session and infrastructure</h3><p>Sign-in stays in this browser until you sign out. Supabase processes account requests; hosting infrastructure may process request metadata such as IP addresses. There are no advertising or analytics SDKs on this portal.</p><h3>Administrator access</h3><p>Authorized administrators can view account emails, verification status, band counts and account dates, invite members, and suspend or restore account access. Administrative actions are audited. The admin panel does not expose medical information or band payloads.</p><h3>Your controls</h3><p>You can remove band records, change your password, and request an email recovery link. Email delivery depends on provider configuration. Full account deletion is not yet self-service; do not use this development portal for a medical-care dependency.</p></div></dialog>
   <script type="module">
-    const mode = new URLSearchParams(location.search).get("account");
+    const params = new URLSearchParams(location.search);
+    const mode = params.get("auth") || params.get("account");
     if (mode === "signin" || mode === "signup") {
       const started = Date.now();
       const timer = setInterval(() => {
