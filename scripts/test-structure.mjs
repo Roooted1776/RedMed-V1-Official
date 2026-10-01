@@ -33,6 +33,16 @@ for (const dir of ['store', 'tapper', 'owner']) {
   if (!isDir(dir)) problems.push(`repo root: product folder ${dir}/ is missing`);
 }
 
+// Landing auth portal is home/; storefront is init.html; old stub stays parked.
+checked++;
+if (!exists('home/index.html')) problems.push('home/index.html (landing Sign in / Create account) is missing');
+checked++;
+if (!exists('init.html')) problems.push('repo root: storefront init.html is missing');
+checked++;
+if (exists('index.html')) problems.push('repo root: index.html must stay parked/ (landing is home/, store is init.html)');
+checked++;
+if (!exists('parked/index.html')) problems.push('parked/index.html: old root stub missing');
+
 // 1. stage-site.sh copy lines
 for (const m of read('scripts/stage-site.sh').matchAll(/^copy\s+(\S+)\s*$/gm)) {
   need('scripts/stage-site.sh', m[1], 'copies');
@@ -57,7 +67,10 @@ for (const [src, dest] of redirectLines) {
   const clean = dest.split('#')[0].split('?')[0];
   const rel = clean.replace(/^\//, '').replace(/\/$/, '');
   checked++;
-  const ok = rel === '' ? exists('index.html') : exists(rel) || (isDir(rel) && exists(`${rel}/index.html`)) || redirectSources.has('/' + rel);
+  // Root / is home/ (Sign in / Create account). Parked stub is not live.
+  const ok = rel === ''
+    ? exists('home/index.html')
+    : exists(rel) || (isDir(rel) && exists(`${rel}/index.html`)) || redirectSources.has('/' + rel);
   if (!ok) problems.push(`_redirects: ${src} -> ${dest} points at nothing`);
 }
 

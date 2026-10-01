@@ -26,7 +26,7 @@ property as any other static host.
 |------|--------|
 | Product HTML app | Served by container `redmed-portal-live` on the Hostinger VPS, port 8090 internally, fronted by Traefik. Traefik router `redmed-live`: `` Host(`redmed.live`) || Host(`www.redmed.live`) `` → service `redmed-portal`, TLS via Let's Encrypt. |
 | DNS | Namecheap BasicDNS. `@` → `2.25.249.204`, `www` → `2.25.249.204`. NS: `dns1/dns2.registrar-servers.com`. |
-| Hostinger shared static-hosting plan (`u666300215`) | **Does not exist on this account's API token** — the token only sees the VPS subscription, zero websites. `scripts/deploy-hostinger-static.mjs` also **refuses** `redmed.live` / `www.redmed.live` unless `REDMED_ALLOW_HOMEPAGE_REPLACE=1`, because a full archive replace would swap the live marketing homepage for the repo stub `index.html` and drop marketing files under `/assets/`. |
+| Hostinger shared static-hosting plan (`u666300215`) | **Does not exist on this account's API token** — the token only sees the VPS subscription, zero websites. `scripts/deploy-hostinger-static.mjs` also **refuses** `redmed.live` / `www.redmed.live` unless `REDMED_ALLOW_HOMEPAGE_REPLACE=1`. Live homepage is `init.html` via `scripts/deploy-vps.sh` on the VPS — not this shared-static path. |
 | Cloudflare | **Not used.** Was planned for a DNS/SSL cutover (see historical section below) but abandoned in favor of DNS → VPS direct + Traefik's own TLS. |
 | Public GitHub Pages `Roooted1776.github.io/tapper/` | **Backup only.** Its `Publish tapper` workflow now syncs from `Roooted1776/RedMed-V1-Official` (fixed 2026-09-28 — it previously pointed at the archived `frisky` repo, so backup deploys were silently stale). Keep publishing so already-written bands still resolve if the VPS is ever down. |
 

@@ -21,10 +21,11 @@ directory is the live build, saved so it is no longer only on the server.
 - This page is a member portal, not only a landing page. The bundle carries the Supabase client (project
   `mohxobgyjkcmkqxijgeg`, publishable key only, no service-role key): Sign in / Create account, a band registry,
   password change, an email-link verify panel, and an Administration dialog (account list, search, invite).
-- That conflicts with `AGENTS.md` ("Account sign-in is the Owner app only ... the public site does not collect an
-  email, a password, or a code"). Kept as is on the owner's decision (2026-10-01). Change `AGENTS.md` or the page
-  so the two agree.
+- Owner rule (2026-10-01): keep Sign in on redmed.live. Creating an account stores that account identity
+  (email / auth) — plus optional non-medical band inventory metadata later — never medical `#d=` profiles.
+  `AGENTS.md` matches this.
 - The Administration dialog is public markup. Access must be enforced by Supabase (RLS and role checks), not by the page.
 - The bundle cannot be edited sensibly. To change portal behavior, rebuild it from source or remove the bundle.
-- Not wired to any deploy. The container that serves `/` is not a Compose project on the VPS; find it first
+- Deploy: `MODE=home CONFIRM_HOMEPAGE=yes scripts/deploy-vps.sh deploy` (after `discover`).
+  `scripts/stage-site.sh` also stages this directory as `/`. Find the docroot first
   (`docker inspect redmed-portal-live --format '{{json .Mounts}}'`).

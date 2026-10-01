@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # Stage the public Assist site into dist/passerby for Hostinger static deploy.
 # Keeps owner / docs / scripts out of the upload.
+#
+# /          ← home/ (Sign in / Create account / Supabase email links — keep)
+# /store/    ← store/ (+ init.html storefront assets at root for that page)
+# /tapper/   ← Assist shell
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
@@ -21,7 +25,6 @@ copy() {
 
 copy _headers
 copy _redirects
-copy index.html
 copy favicon.svg
 copy card.html
 copy get.html
@@ -42,9 +45,33 @@ if [[ -f .htaccess ]]; then
   cp -a .htaccess "$OUT/.htaccess"
 fi
 
+# Landing / = home/ (member portal: Supabase sign-in, signup, email-link verify).
+# Do not replace this with init.html — init is the storefront only.
+test -f home/index.html || { echo "missing home/index.html (landing + auth)" >&2; exit 1; }
+test -f home/legacy.js || { echo "missing home/legacy.js" >&2; exit 1; }
+test -d home/assets || { echo "missing home/assets/" >&2; exit 1; }
+cp -a home/index.html "$OUT/index.html"
+cp -a home/legacy.js "$OUT/legacy.js"
+cp -a home/favicon.svg "$OUT/favicon.svg" 2>/dev/null || true
+cp -a home/band-hero.webp home/nfc-detail.webp "$OUT/" 2>/dev/null || true
+mkdir -p "$OUT/assets"
+cp -a home/assets/. "$OUT/assets/"
+
+# Storefront source init.html (also under /store/ via store/). Parked stub stays out.
+test -f init.html || { echo "missing init.html (storefront)" >&2; exit 1; }
+for f in store.css store.js theme.js config.js; do
+  test -f "$f" || { echo "missing $f (required by init.html)" >&2; exit 1; }
+  cp -a "$f" "$OUT/$f"
+done
+cp -a init.html "$OUT/init.html"
+
 # Sanity: Aid tab present, no NFC tab.
 SHELL="$OUT/tapper/index.html"
 grep -q 'id="tab-aid"' "$SHELL" || { echo "$SHELL missing tab-aid" >&2; exit 1; }
 ! grep -q 'id="tab-nfc"' "$SHELL" || { echo "$SHELL has NFC tab" >&2; exit 1; }
+# Sanity: landing kept the Supabase auth UI
+grep -q 'id="auth-form"' "$OUT/index.html" || { echo "staged / missing auth-form (home/ Sign in)" >&2; exit 1; }
+grep -q 'Create account' "$OUT/index.html" || { echo "staged / missing Create account" >&2; exit 1; }
+! grep -q 'id="auth-form"' "$OUT/init.html" || { echo "init.html must not be the auth portal" >&2; exit 1; }
 
-echo "Staged $(find "$OUT" -type f | wc -l | tr -d ' ') files → $OUT"
+echo "Staged $(find "$OUT" -type f | wc -l | tr -d ' ') files → $OUT (/ from home/, storefront init.html)"

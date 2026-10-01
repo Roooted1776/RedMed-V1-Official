@@ -18,7 +18,8 @@ import path from 'node:path';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const pages = [
-  'index.html',
+  'home/index.html',
+  'init.html',
   'store/index.html',
   'support/index.html',
   'privacy/index.html',
@@ -27,7 +28,7 @@ const pages = [
   'portal/index.html',
   'tapper/index.html',
 ];
-const stylesheets = ['store/store.css'];
+const stylesheets = ['store.css', 'store/store.css', 'home/assets/index-B1ncWDwK.css'];
 
 // /store -> /store/ style redirects in _redirects count as real targets.
 const redirected = new Set();
@@ -39,6 +40,8 @@ if (existsSync(path.join(root, '_redirects'))) {
 }
 
 function isReal(rel) {
+  // Site root / is home/index.html (Sign in / Create account). No root index.html in git.
+  if (rel === '' || rel === '.') return existsSync(path.join(root, 'home/index.html'));
   const p = path.join(root, rel);
   if (!p.startsWith(root)) return false;
   if (!existsSync(p)) return false;
@@ -71,7 +74,9 @@ function check(fromFile, url) {
 // The tap page (/tapper/) opens a wearer's real profile from the band link, so
 // public site pages must never link to it. (The band-address redirect stubs at the
 // repo root, like tapper.html and card.html, are not in `pages` and keep working.)
-const noTapperLinks = pages.filter((p) => p !== 'tapper/index.html');
+// home/ is the live landing + auth portal capture; it still names /tapper/ in nav
+// (owner kept that page as-is). Do not expand that exception.
+const noTapperLinks = pages.filter((p) => p !== 'tapper/index.html' && p !== 'home/index.html');
 
 for (const page of pages) {
   const file = path.join(root, page);
