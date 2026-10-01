@@ -23,7 +23,7 @@ CMD="${1:-}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO"
 
-SSH=(ssh -o BatchMode=yes -o ConnectTimeout=10 "$REMOTE")
+SSH=(ssh -n -o BatchMode=yes -o ConnectTimeout=10 "$REMOTE")
 
 case "$CMD" in
   discover)
@@ -47,6 +47,14 @@ case "$MODE" in
     [ -n "${SUBDIR:-}" ] && TARGET="$DOCROOT/$SUBDIR" ;;
 esac
 
+if [ "$CMD" = "deploy" ] && [ "${ALLOW_BEHIND:-}" != "yes" ]; then
+  behind="$(git rev-list --count HEAD..origin/main 2>/dev/null || echo 0)"
+  if [ "$behind" -gt 0 ]; then
+    echo "REFUSING: local tree is $behind commit(s) behind origin/main. Run: git pull --rebase origin main" >&2
+    exit 5
+  fi
+fi
+
 # Preflight: every file the page needs must exist locally.
 FILES=(init.html store.css store.js theme.js config.js)
 missing=0
@@ -62,11 +70,13 @@ done < <(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u)
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 cp store.css store.js theme.js config.js "$STAGE/"
-cp init.html "$STAGE/index.html"
+PAGE=index.html
+[ "$MODE" = "exact" ] && PAGE=init.html   # live store serves init.html; its index.html is a different page
+cp init.html "$STAGE/$PAGE"
 # Preview copies must not compete with the live page in search: drop canonical/og:url, add noindex.
 if [ -n "${SUBDIR:-}" ]; then
-  sed -E -i.bak -e '/<link rel="canonical"/d' -e '/property="og:url"/d' -e 's|<title>|<meta name="robots" content="noindex, nofollow">\n<title>|' "$STAGE/index.html"
-  rm -f "$STAGE/index.html.bak"
+  sed -E -i.bak -e '/<link rel="canonical"/d' -e '/property="og:url"/d' -e 's|<title>|<meta name="robots" content="noindex, nofollow">\n<title>|' "$STAGE/$PAGE"
+  rm -f "$STAGE/$PAGE.bak"
 fi
 mkdir -p "$STAGE/assets"
 grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u | while read -r a; do cp "$a" "$STAGE/assets/"; done
@@ -102,7 +112,7 @@ rsync -av -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
 # Smoke test
 URL="$SITE/"
 [ "$MODE" = "store" ] && URL="$SITE/store/"
-[ "$MODE" = "exact" ] && URL="$SITE/store/${SUBDIR:+$SUBDIR/}"
+[ "$MODE" = "exact" ] && URL="$SITE/store/${SUBDIR:+$SUBDIR/}init.html"
 code="$(curl -s -o /dev/null -w '%{http_code}' "$URL")"
 echo "GET $URL -> $code"
 [ "$code" = "200" ] || { echo "Smoke test failed. Roll back: ssh $REMOTE 'tar xzf /root/redmed-backup-$STAMP.tgz -C $TARGET'" >&2; exit 4; }
