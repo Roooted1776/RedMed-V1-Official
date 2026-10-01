@@ -52,6 +52,13 @@ checked++;
   if (!home.includes('id="hero-video"') || !home.includes('/assets/herovideo.MP4')) {
     problems.push('home/index.html hero block must play /assets/herovideo.MP4');
   }
+  if (!home.includes('autoplay') || !home.includes('preload="auto"') || !home.includes('data-film="hero-video"')) {
+    problems.push('home/index.html hero video must autoplay and stay pause/play interactive');
+  }
+  const heroJs = read('home/hero.js');
+  if (!heroJs.includes("querySelectorAll('video')") || heroJs.includes('saveData')) {
+    problems.push('home/hero.js must arm every video and must not block autoplay on Save-Data');
+  }
 }
 
 // 1. stage-site.sh copy lines

@@ -10,14 +10,14 @@ directory is the live build, saved so it is no longer only on the server.
 | `assets/index-B1ncWDwK.css` | Live, unchanged |
 | `assets/index-persist-admin.js` | Live, unchanged. Minified Vite bundle (no source map, no source) |
 | `legacy.js` | Live, unchanged. Forwards a `#d=` band link to `/tapper/` |
-| `hero.js` | Play / pause and pointer shift for the hero film. No network calls. |
+| `hero.js` | Autoplay, pause / play, click-to-toggle, and pointer shift for every film on the page. No network calls. |
 | `band-hero.webp`, `nfc-detail.webp`, `favicon.svg` | Poster and stills. `band-hero.webp` is the hero poster. |
 | `../assets/herovideo.MP4` | Hero film (muted loop) in the hero block. |
 
 ## Changes from live (HTML only)
 - Header nav: new `Store` link to `/store/`.
 - Hero: new `Shop the band` button to `/store/`.
-- Hero block plays `assets/herovideo.MP4` (muted, looping) with pause / play. Reduced motion and data-saver keep the poster still.
+- Hero block plays `assets/herovideo.MP4` (muted, looping, autoplay). Pause / play, click the frame, and a pointer shift. Reduced motion keeps the poster until Play.
 - `<style>`: lets the hero buttons wrap on screens 900px wide or less (the extra button pushed the third one off a phone screen).
 
 ## Read before deploying
