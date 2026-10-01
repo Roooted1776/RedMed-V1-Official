@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
-# Deploy the RedMed website (init.html + assets) to the Hostinger VPS.
+# Deploy RedMed static surfaces to the Hostinger VPS.
 # Website only. The iOS app in this repo is not touched.
 #
-# Source of truth: init.html (parked/index.html is the old stub — do not deploy it).
-# Static hosts need the filename index.html for /, so this script stages
-# init.html → index.html in the target.
+# Modes:
+#   home  — home/ → DOCROOT /   (Sign in / Create account / Supabase email links)
+#           Requires CONFIRM_HOMEPAGE=yes (replaces live landing).
+#   store — init.html → DOCROOT/store/  (storefront; default)
 #
 # Usage:
-#   scripts/deploy-vps.sh discover                 # read-only: find the docroot
-#   DOCROOT=/path scripts/deploy-vps.sh dry-run    # show what would change
-#   DOCROOT=/path scripts/deploy-vps.sh deploy     # back up, then copy to DOCROOT (/)
+#   scripts/deploy-vps.sh discover
+#   DOCROOT=/path MODE=store scripts/deploy-vps.sh dry-run
 #   DOCROOT=/path MODE=store scripts/deploy-vps.sh deploy
-#                                                  # copy to <docroot>/store/ instead
+#   DOCROOT=/path MODE=home CONFIRM_HOMEPAGE=yes scripts/deploy-vps.sh deploy
 #
 # Env: REMOTE (default root@2.25.249.204), DOCROOT (required except discover),
-#      MODE=home|store (default home), SITE (default https://redmed.live)
+#      MODE=store|home (default store), SITE (default https://redmed.live)
 set -euo pipefail
 
 REMOTE="${REMOTE:-root@2.25.249.204}"
-MODE="${MODE:-home}"
+MODE="${MODE:-store}"
 SITE="${SITE:-https://redmed.live}"
 CMD="${1:-}"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -41,28 +41,48 @@ if [ "$MODE" != "home" ] && [ "$MODE" != "store" ]; then
   exit 2
 fi
 
+if [ "$MODE" = "home" ] && [ "${CONFIRM_HOMEPAGE:-}" != "yes" ]; then
+  echo "REFUSING: MODE=home replaces the live homepage (Sign in / Create account). Set CONFIRM_HOMEPAGE=yes to proceed." >&2
+  exit 2
+fi
+
 TARGET="$DOCROOT"
 [ "$MODE" = "store" ] && TARGET="$DOCROOT/store"
 
-# Preflight: every file the page needs must exist locally.
-FILES=(init.html store.css store.js theme.js config.js)
-missing=0
-for f in "${FILES[@]}"; do
-  [ -f "$f" ] || { echo "MISSING $f" >&2; missing=1; }
-done
-while read -r a; do
-  [ -f "$a" ] || { echo "MISSING $a (referenced by init.html)" >&2; missing=1; }
-done < <(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u)
-[ "$missing" -eq 0 ] || { echo "Fix missing files, then rerun." >&2; exit 3; }
-
-# Stage: init.html becomes index.html. Also keep init.html. No --delete anywhere.
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
-cp store.css store.js theme.js config.js "$STAGE/"
-cp init.html "$STAGE/index.html"
-cp init.html "$STAGE/init.html"
-mkdir -p "$STAGE/assets"
-grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u | while read -r a; do cp "$a" "$STAGE/assets/"; done
+
+if [ "$MODE" = "home" ]; then
+  # Keep the Supabase-synced member portal at /.
+  for f in home/index.html home/legacy.js; do
+    [ -f "$f" ] || { echo "MISSING $f" >&2; exit 3; }
+  done
+  [ -d home/assets ] || { echo "MISSING home/assets/" >&2; exit 3; }
+  cp home/index.html "$STAGE/index.html"
+  cp home/legacy.js "$STAGE/legacy.js"
+  [ -f home/favicon.svg ] && cp home/favicon.svg "$STAGE/"
+  [ -f home/band-hero.webp ] && cp home/band-hero.webp "$STAGE/"
+  [ -f home/nfc-detail.webp ] && cp home/nfc-detail.webp "$STAGE/"
+  mkdir -p "$STAGE/assets"
+  cp -a home/assets/. "$STAGE/assets/"
+  grep -q 'id="auth-form"' "$STAGE/index.html" || { echo "home/index.html missing auth-form" >&2; exit 3; }
+else
+  # Storefront from init.html.
+  FILES=(init.html store.css store.js theme.js config.js)
+  missing=0
+  for f in "${FILES[@]}"; do
+    [ -f "$f" ] || { echo "MISSING $f" >&2; missing=1; }
+  done
+  while read -r a; do
+    [ -f "$a" ] || { echo "MISSING $a (referenced by init.html)" >&2; missing=1; }
+  done < <(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u)
+  [ "$missing" -eq 0 ] || { echo "Fix missing files, then rerun." >&2; exit 3; }
+  cp store.css store.js theme.js config.js "$STAGE/"
+  cp init.html "$STAGE/index.html"
+  cp init.html "$STAGE/init.html"
+  mkdir -p "$STAGE/assets"
+  grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u | while read -r a; do cp "$a" "$STAGE/assets/"; done
+fi
 
 if [ "$CMD" = "dry-run" ]; then
   rsync -avn -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
@@ -74,14 +94,17 @@ STAMP="$(date +%Y%m%d%H%M%S)"
 echo "Backup: /root/redmed-backup-$STAMP.tgz (if target existed)"
 rsync -av -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
 
-# Smoke test
 URL="$SITE/"; [ "$MODE" = "store" ] && URL="$SITE/store/"
 code="$(curl -s -o /dev/null -w '%{http_code}' "$URL")"
 echo "GET $URL -> $code"
 [ "$code" = "200" ] || { echo "Smoke test failed. Roll back: ssh $REMOTE 'tar xzf /root/redmed-backup-$STAMP.tgz -C $TARGET'" >&2; exit 4; }
-# Prefer /init.html when deployed; / always serves index.html (from init).
-init_code="$(curl -s -o /dev/null -w '%{http_code}' "${URL%/}/init.html")"
-echo "GET ${URL%/}/init.html -> $init_code"
-for a in $(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u); do
-  c="$(curl -s -o /dev/null -w '%{http_code}' "$URL$a")"; echo "  $a -> $c"
-done
+if [ "$MODE" = "home" ]; then
+  body="$(curl -sL "$URL")"
+  echo "$body" | grep -q 'Create account' || { echo "Smoke: homepage missing Create account" >&2; exit 4; }
+  echo "$body" | grep -q 'Sign in' || { echo "Smoke: homepage missing Sign in" >&2; exit 4; }
+  echo "OK homepage auth chrome present"
+else
+  for a in $(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u); do
+    c="$(curl -s -o /dev/null -w '%{http_code}' "$URL$a")"; echo "  $a -> $c"
+  done
+fi

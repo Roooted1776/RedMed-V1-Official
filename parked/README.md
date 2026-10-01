@@ -1,8 +1,11 @@
 # Parked — not the live website
 
-`index.html` here is the old root marketing stub. It is **not** served at
+`index.html` here is an old root marketing stub. It is **not** served at
 `https://redmed.live/`.
 
-The website source of truth is repo-root **`init.html`**. Stage, publish, and
-VPS deploy copy `init.html` to `index.html` in the upload/docroot only.
+| Surface | Source |
+| --- | --- |
+| `/` landing + Sign in / Create account | `home/` (Supabase email links) |
+| `/store/` storefront | `init.html` |
+
 Do not resurrect this parked file as the homepage.

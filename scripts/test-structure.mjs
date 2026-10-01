@@ -33,11 +33,13 @@ for (const dir of ['store', 'tapper', 'owner']) {
   if (!isDir(dir)) problems.push(`repo root: product folder ${dir}/ is missing`);
 }
 
-// Website source is init.html only — root index.html must stay parked.
+// Landing auth portal is home/; storefront is init.html; old stub stays parked.
 checked++;
-if (!exists('init.html')) problems.push('repo root: website source init.html is missing');
+if (!exists('home/index.html')) problems.push('home/index.html (landing Sign in / Create account) is missing');
 checked++;
-if (exists('index.html')) problems.push('repo root: index.html must stay parked/ (website is init.html only)');
+if (!exists('init.html')) problems.push('repo root: storefront init.html is missing');
+checked++;
+if (exists('index.html')) problems.push('repo root: index.html must stay parked/ (landing is home/, store is init.html)');
 checked++;
 if (!exists('parked/index.html')) problems.push('parked/index.html: old root stub missing');
 
@@ -65,9 +67,9 @@ for (const [src, dest] of redirectLines) {
   const clean = dest.split('#')[0].split('?')[0];
   const rel = clean.replace(/^\//, '').replace(/\/$/, '');
   checked++;
-  // Root / is served from init.html (staged as index.html). Parked stub is not live.
+  // Root / is home/ (Sign in / Create account). Parked stub is not live.
   const ok = rel === ''
-    ? exists('init.html')
+    ? exists('home/index.html')
     : exists(rel) || (isDir(rel) && exists(`${rel}/index.html`)) || redirectSources.has('/' + rel);
   if (!ok) problems.push(`_redirects: ${src} -> ${dest} points at nothing`);
 }

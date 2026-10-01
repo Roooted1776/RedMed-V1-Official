@@ -39,12 +39,18 @@ mkdir -p "$DEST/tapper" "$DEST/get" "$DEST/support" "$DEST/assets" "$DEST/.githu
 # Same public include set as scripts/stage-site.sh (stubs + tapper +
 # assets + policies). Do not invent extra excludes — omit owner / docs /
 # scripts by only copying this list.
-# Website = init.html (copied as index.html for /). Parked stub is not published.
-test -f init.html || { echo "missing init.html (website source)" >&2; exit 1; }
-for f in store.css store.js theme.js config.js; do
-  test -f "$f" || { echo "missing $f (required by init.html)" >&2; exit 1; }
+# Landing / = home/ (Sign in / Create account / Supabase). Storefront = init.html.
+test -f home/index.html || { echo "missing home/index.html (landing + auth)" >&2; exit 1; }
+test -f init.html || { echo "missing init.html (storefront)" >&2; exit 1; }
+for f in store.css store.js theme.js config.js home/legacy.js; do
+  test -f "$f" || { echo "missing $f" >&2; exit 1; }
 done
-cp -f init.html "$DEST/index.html"
+cp -f home/index.html "$DEST/index.html"
+cp -f home/legacy.js "$DEST/legacy.js"
+cp -f home/favicon.svg "$DEST/favicon.svg" 2>/dev/null || true
+cp -f home/band-hero.webp home/nfc-detail.webp "$DEST/" 2>/dev/null || true
+mkdir -p "$DEST/assets"
+cp -a home/assets/. "$DEST/assets/"
 cp -f init.html "$DEST/init.html"
 cp -f store.css store.js theme.js config.js \
   tapper.html card.html get.html redmed-emergency.html sw.js \

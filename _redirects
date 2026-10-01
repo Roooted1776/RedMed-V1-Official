@@ -2,8 +2,8 @@
 # Hash fragments (#d=) are client-only and survive these hops.
 #
 # Canonical passerby shell stays under /tapper/ (SW + AppConfig.medicalCardBaseURL).
-# Root landing is init.html (staged/deployed as index.html). Legacy stub URLs
-# below still redirect to the canonical passerby shell.
+# Root landing is home/ (Sign in / Create account / Supabase). Store is init.html
+# under /store/. Legacy stub URLs below still redirect to the passerby shell.
 # Brand PNGs live under /assets/ (and /tapper/ for shell-relative loads).
 #
 # Fix #6: changed canonical shell redirects from 302 -> 301 (permanent).
