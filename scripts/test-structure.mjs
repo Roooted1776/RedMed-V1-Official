@@ -43,14 +43,14 @@ if (exists('index.html')) problems.push('repo root: index.html must stay parked/
 checked++;
 if (!exists('parked/index.html')) problems.push('parked/index.html: old root stub missing');
 checked++;
-if (!exists('assets/herovideo.MP4')) problems.push('assets/herovideo.MP4 (homepage hero film) is missing');
+for (const f of ['assets/hero-hd.mp4', 'assets/hero-mobile.mp4']) if (!exists(f)) problems.push(`${f} (homepage hero film) is missing`);
 checked++;
 if (!exists('home/hero.js')) problems.push('home/hero.js (homepage hero controls) is missing');
 checked++;
 {
   const home = read('home/index.html');
-  if (!home.includes('id="hero-video"') || !home.includes('/assets/herovideo.MP4')) {
-    problems.push('home/index.html hero block must play /assets/herovideo.MP4');
+  if (!home.includes('id="hero-video"') || !home.includes('/assets/hero-hd.mp4') || !home.includes('/assets/hero-mobile.mp4')) {
+    problems.push('home/index.html hero block must play /assets/hero-hd.mp4 (and hero-mobile.mp4 on phones)');
   }
   if (!home.includes('autoplay') || !home.includes('preload="auto"') || !home.includes('data-film="hero-video"')) {
     problems.push('home/index.html hero video must autoplay and stay pause/play interactive');

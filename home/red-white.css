@@ -1,6 +1,6 @@
 /* Home stays red and white. This file is unlayered so it wins over the bundled layers. */
 :root,
-:root[data-theme="dark"] {
+:root[data-theme="light"] {
   --bg: #fff;
   --surface: #fff;
   --ink: #1a1214;
@@ -15,26 +15,54 @@
   color-scheme: light;
 }
 
-#theme-toggle { display: none; }
+:root[data-theme="dark"] {
+  --bg: #141011;
+  --surface: #1d1718;
+  --ink: #f6eeee;
+  --muted: #c2adb0;
+  --border: #3a2b2e;
+  --accent: #d12f45;
+  --accent-hover: #e0394e;
+  --hero: #141011;
+  --hero-ink: #f6eeee;
+  --hero-muted: #c2adb0;
+  --soft: #241b1d;
+  color-scheme: dark;
+}
 
-.header { background: #fff; border-bottom-color: #f0d4d7; }
+html { background: var(--bg); }
+
+/* theme switch: same control as the store, centered with the header text */
+.theme-switch { display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 .5rem; border: 0; background: none; flex: none; cursor: pointer; border-radius: 999px; }
+.tt-track { position: relative; display: block; width: 84px; height: 44px; border-radius: 999px; background: var(--soft); border: 1px solid var(--border); transition: background .25s, border-color .25s; }
+.theme-switch:hover .tt-track { border-color: var(--accent); }
+.tt-track svg { position: absolute; top: 13px; z-index: 1; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: color .25s; }
+.tt-sun { left: 12px; color: #fff; }
+.tt-moon { right: 12px; color: var(--muted); }
+.tt-thumb { position: absolute; top: 3px; left: 3px; width: 36px; height: 36px; border-radius: 50%; background: var(--accent); box-shadow: 0 2px 8px #c8273c66; transition: transform .3s cubic-bezier(.3, .8, .3, 1.15); }
+:root[data-theme="dark"] .tt-thumb { transform: translateX(40px); }
+:root[data-theme="dark"] .tt-sun { color: var(--muted); }
+:root[data-theme="dark"] .tt-moon { color: #fff; }
+@media (max-width: 820px) { .theme-switch { padding: 0; } .tt-track { width: 76px; } :root[data-theme="dark"] .tt-thumb { transform: translateX(32px); } }
+
+.header { background: var(--bg); border-bottom-color: var(--border); }
 
 .hero {
-  background: #fff;
-  color: #1a1214;
+  background: var(--bg);
+  color: var(--ink);
   min-height: 0;
   align-items: center;
   padding-top: 3rem;
   padding-bottom: 2rem;
 }
 
-.hero .eyebrow { color: #c8273c; }
-.hero h1 { color: #1a1214; }
-.hero h1 span { color: #c8273c; }
+.hero .eyebrow { color: var(--accent); }
+.hero h1 { color: var(--ink); }
+.hero h1 span { color: var(--accent); }
 .hero-description,
-.hero-note { color: #6d5558; }
-.hero .text-button { color: #1a1214; }
-.hero .text-button:hover { color: #c8273c; }
+.hero-note { color: var(--muted); }
+.hero .text-button { color: var(--ink); }
+.hero .text-button:hover { color: var(--accent); }
 
 .hero-product {
   position: relative;
@@ -64,12 +92,12 @@
 
 .hero-bottom {
   margin-top: 2rem;
-  color: #6d5558;
-  border-top-color: #f0d4d7;
+  color: var(--muted);
+  border-top-color: var(--border);
 }
 
-.principles { background: #fff5f6; }
-.closing { background: #c8273c; }
+.principles { background: var(--soft); }
+.closing { background: var(--accent); }
 
 @media (max-width: 820px) {
   .hero {
@@ -95,3 +123,94 @@
   .hero-product { top: auto; left: auto; right: auto; height: auto; margin-top: 1.25rem; }
   .hero-bottom { margin-top: 1.25rem; }
 }
+
+/* one button size everywhere; headings start every word with a capital */
+.button,
+.button.small { min-height: 44px; height: 44px; padding: 0 1.5rem; font-size: .875rem; line-height: 1; gap: .75rem; }
+h1,
+h2,
+h3 { text-transform: capitalize; }
+.header .text-button { height: 44px; min-height: 44px; padding-block: 0; }
+.text-button { height: 44px; min-height: 44px; padding-block: 0; white-space: nowrap; }
+.hero-actions { flex-wrap: wrap; row-gap: .75rem; }
+
+/* the demo opener stays in the DOM (the page script binds to it) but is not shown */
+#demo-open { display: none !important; }
+
+/* hero: the film covers the whole hero, copy sits on top */
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: space-between;
+  min-height: min(92vh, 860px);
+  padding: 4rem clamp(1.25rem, 6vw, 6rem) 1.5rem;
+  background: #0a0607;
+  color: #f6eeee;
+}
+.hero .hero-product {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  aspect-ratio: auto;
+  margin: 0;
+  border-radius: 0;
+}
+.hero .hero-product > img,
+.hero .hero-product > video { object-fit: cover; object-position: 72% center; }
+.hero .hero-product::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(10, 6, 7, .9) 0%, rgba(10, 6, 7, .62) 42%, rgba(10, 6, 7, .08) 80%),
+    linear-gradient(0deg, rgba(10, 6, 7, .75), transparent 32%);
+}
+.hero .hero-product .product-tag { z-index: 2; }
+.hero .hero-product figcaption { z-index: 2; color: #f3e8e8; }
+.hero-copy { max-width: 620px; align-self: center; padding-top: 0; }
+.hero .eyebrow { color: #ff7a89; }
+.hero h1 { color: #fff; font-size: clamp(2.8rem, 6.4vw, 5.2rem); line-height: 1; letter-spacing: -.045em; }
+.hero h1 span { color: #ff5468; }
+.hero-description { color: #eadcde; font-size: 1.125rem; max-width: 36ch; }
+.hero-note { color: #cdbabd; }
+.hero-bottom { color: #d9c6c9; border-top-color: rgba(255, 255, 255, .18); }
+.hero-bottom a, .hero-motion { color: #f6eeee; }
+@media (max-width: 820px) {
+  .hero { min-height: 640px; padding: 2.5rem 1.25rem 1.25rem; }
+  .hero .hero-product { max-width: none; margin: 0; }
+  .hero .hero-product::after { background: linear-gradient(0deg, rgba(10, 6, 7, .85) 15%, rgba(10, 6, 7, .35) 70%, rgba(10, 6, 7, .55)); }
+  .hero .hero-product .product-tag { display: none; }
+}
+.hero .hero-product figcaption { display: none; }
+.hero-copy { max-width: 760px; }
+.header .button { white-space: nowrap; }
+
+/* hero picture at the size the original home used: right two-thirds, bleeding off the edge,
+   fading in behind the headline */
+.hero { min-height: min(86vh, 720px); background: #0e0a0b; }
+.hero .hero-product {
+  inset: 0 0 0 30%;
+  width: auto;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+}
+.hero .hero-product::after {
+  background:
+    linear-gradient(90deg, rgba(14, 10, 11, .55) 0%, transparent 45%),
+    linear-gradient(0deg, rgba(14, 10, 11, .7), transparent 30%);
+}
+.hero .hero-product > img,
+.hero .hero-product > video { object-position: 60% center; }
+@media (max-width: 820px) {
+  .hero { min-height: 620px; }
+  .hero .hero-product { inset: 0; -webkit-mask-image: none; mask-image: none; }
+  .hero .hero-product::after { background: linear-gradient(0deg, rgba(14, 10, 11, .9) 20%, rgba(14, 10, 11, .4) 70%, rgba(14, 10, 11, .6)); }
+}
+.hero h1 { font-size: clamp(2.5rem, 5vw, 4.4rem); }

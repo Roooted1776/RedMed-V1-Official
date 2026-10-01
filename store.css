@@ -54,7 +54,7 @@ nav a{font-size:var(--text-sm);color:var(--muted);font-weight:500}nav a:hover{co
 .band-showcase video{position:absolute;inset:0;z-index:0;pointer-events:none}
 .band-showcase video[hidden]{display:none}
 .film-toggle{position:absolute;z-index:4;top:12px;right:12px;min-height:44px;padding:0 12px;border:0;border-radius:999px;background:rgba(20,22,22,.62);color:#f4f5f2;cursor:pointer}
-.shop{display:grid;grid-template-columns:minmax(220px,340px) minmax(0,1fr);gap:var(--s6);margin-top:var(--s6);align-items:start}
+.shop{display:grid;grid-template-columns:minmax(220px,265px) minmax(0,1fr);gap:var(--s6);margin-top:var(--s6);align-items:start}
 .band-showcase{grid-row:1/span 2}
 .shop .checkout{position:static}
 .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}

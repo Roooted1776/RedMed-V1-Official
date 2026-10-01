@@ -11,9 +11,11 @@
   <link rel="preconnect" href="https://api.fontshare.com">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=cabinet-grotesk@500,700,800&display=swap" rel="stylesheet">
   <script src="./legacy.js"></script>
+  <script src="./theme.js"></script>
   <script type="module" crossorigin src="./assets/index-persist-admin.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-B1ncWDwK.css">
   <link rel="stylesheet" href="./red-white.css">
+  <script type="module" src="./theme.js"></script>
   <link rel="preload" as="image" href="./band-hero.webp" fetchpriority="high">
   <style>
     @media(max-width:900px){.hero-actions{flex-wrap:wrap}}
@@ -35,7 +37,7 @@
       <span>RedMed<span class="brand-dot">.</span></span>
     </a>
     <nav aria-label="Main navigation"><a href="#how">How it works</a><a href="#technology">The technology</a><a href="https://redmed.live/store/" rel="noreferrer">Store</a></nav>
-    <div class="header-actions"><button class="icon-button" id="theme-toggle" aria-label="Switch color theme" title="Switch color theme"><i data-lucide="sun-moon"></i></button><button class="text-button account-trigger" data-mode="signin">Sign in</button><button class="button small account-trigger" data-mode="signup">Create account</button></div>
+    <div class="header-actions"><button class="theme-switch" id="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Dark mode" title="Switch between light and dark"><span class="tt-track"><svg class="tt-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="tt-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg><span class="tt-thumb"></span></span></button><button class="text-button account-trigger" data-mode="signin">Sign in</button><button class="button small account-trigger" data-mode="signup">Create account</button></div>
   </header>
   <main id="main">
     <section class="hero">
@@ -43,16 +45,17 @@
         <p class="eyebrow"><span class="signal-dot"></span> BUILT FOR THE MOMENTS THAT MATTER</p>
         <h1>A small band.<br>A vital <span>connection.</span></h1>
         <p class="hero-description">When you can’t explain, let your wristband speak. Emergency information, connected by a tap.</p>
-        <div class="hero-actions"><a class="button" href="https://redmed.live/store/">Shop the band <i data-lucide="arrow-up-right"></i></a><button class="button account-trigger" data-mode="signup">Get connected <i data-lucide="arrow-up-right"></i></button><button class="text-button" id="demo-open"><span class="play"><i data-lucide="play"></i></span> See how it works</button></div>
-        <p class="hero-note">NFC medical ID · In development</p>
+        <div class="hero-actions"><a class="button" href="https://redmed.live/store/">Shop the band <i data-lucide="arrow-up-right"></i></a><button class="button account-trigger" data-mode="signup">Get connected <i data-lucide="arrow-up-right"></i></button><button class="text-button" id="demo-open" hidden><span class="play"><i data-lucide="play"></i></span> See how it works</button></div>
+        <p class="hero-note">NFC medical ID</p>
       </div>
       <figure class="hero-product">
         <img src="./band-hero.webp" alt="" aria-hidden="true" width="1429" height="804">
-        <video id="hero-video" autoplay muted loop playsinline preload="auto" poster="./band-hero.webp" width="1264" height="720" aria-label="RedMed band, product concept">
-          <source src="/assets/herovideo.MP4" type="video/mp4">
+        <video id="hero-video" autoplay muted loop playsinline preload="auto" poster="./band-hero.webp" width="1264" height="720" aria-label="RedMed band">
+          <source src="/assets/hero-mobile.mp4" type="video/mp4" media="(max-width: 820px)">
+          <source src="/assets/hero-hd.mp4" type="video/mp4">
         </video>
         <div class="product-tag"><i data-lucide="nfc"></i><span>PASSIVE NFC<br><strong>No battery. Deliberate tap.</strong></span></div>
-        <figcaption>REDMED BAND / PRODUCT CONCEPT</figcaption>
+        <figcaption>REDMED BAND</figcaption>
       </figure>
       <div class="hero-bottom"><span>Designed around people.<br>Not just technology.</span><a href="#how">Discover RedMed <i data-lucide="arrow-down"></i></a><button type="button" class="hero-motion" id="hero-motion" data-film="hero-video" aria-pressed="false"><span id="hero-motion-label" data-film-label>Pause video</span></button><span class="hero-index">01 / CONNECTED CARE</span></div>
     </section>
@@ -66,8 +69,8 @@
       </div>
     </section>
     <section class="technology section" id="technology">
-      <div class="tech-image"><img src="./nfc-detail.webp" alt="Concept visualization of a copper NFC antenna beside a silicone band" width="1429" height="804" loading="lazy"><span class="image-label">NFC ANTENNA / CONCEPT DETAIL</span></div>
-      <div class="tech-copy"><p class="eyebrow">02 / SMALL TECH. HUMAN PURPOSE.</p><h2>A connection.<br>Not another screen.</h2><dl><div><dt>Chip specification</dt><dd>NXP NTAG216</dd></div><div><dt>Connection</dt><dd>NFC · 13.56 MHz</dd></div><div><dt>Responder experience</dt><dd>No account required</dd></div></dl><p class="fineprint">Target hardware specification. Product imagery is conceptual. Physical read/write validation is a release requirement, not a completed certification.</p></div>
+      <div class="tech-image"><img src="./nfc-detail.webp" alt="Copper NFC antenna beside a silicone band" width="1429" height="804" loading="lazy"><span class="image-label">NFC ANTENNA / DETAIL</span></div>
+      <div class="tech-copy"><p class="eyebrow">02 / SMALL TECH. HUMAN PURPOSE.</p><h2>A connection.<br>Not another screen.</h2><dl><div><dt>Chip specification</dt><dd>NXP NTAG216</dd></div><div><dt>Connection</dt><dd>NFC · 13.56 MHz</dd></div><div><dt>Responder experience</dt><dd>No account required</dd></div></dl><p class="fineprint">Target hardware specification. Physical read/write validation is a release requirement, not a completed certification.</p></div>
     </section>
     <section class="privacy-section section" id="privacy">
       <div><p class="eyebrow">03 / YOUR INFORMATION. YOUR CHOICE.</p><h2>Connected doesn’t<br>have to mean collected.</h2></div>
@@ -85,7 +88,7 @@
     </section>
     <section class="closing"><p class="eyebrow">BUILT FOR PEOPLE. READY FOR POSSIBILITY.</p><h2>Start with a connection.</h2><p>Create your RedMed account and organize your band records.</p><button class="button light account-trigger" data-mode="signup">Create your account <i data-lucide="arrow-up-right"></i></button></section>
   </main>
-  <footer><a class="brand" href="#"><span>RedMed<span class="brand-dot">.</span></span></a><p>Information when words aren’t possible.</p><div><button class="text-button" id="footer-privacy">Privacy</button><a href="#questions">Questions</a><span>© 2026 RedMed</span></div><p class="footer-disclaimer">In an emergency, call your local emergency number. RedMed is an information tool in development, not an emergency-response service.</p></footer>
+  <footer><a class="brand" href="#"><span>RedMed<span class="brand-dot">.</span></span></a><p>Information when words aren’t possible.</p><div><button class="text-button" id="footer-privacy">Privacy</button><a href="#questions">FAQ</a><span>© 2026 RedMed</span></div><p class="footer-disclaimer">In an emergency, call your local emergency number. RedMed is an information tool in development, not an emergency-response service.</p></footer>
 
   <dialog id="account-dialog" aria-labelledby="account-title">
     <button class="icon-button dialog-close" aria-label="Close account"><i data-lucide="x"></i></button>

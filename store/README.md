@@ -19,5 +19,5 @@ steps as horizontal cards (a swipe row on phones). To replace the film with your
 1. Download the video from Higgsfield (mp4).
 2. `bash scripts/encode-store-video.sh ~/Downloads/your-video.mp4 4` (the `4` is the poster frame, in seconds).
 3. Commit the three files in `store/assets/`, merge, redeploy the store container.
-The caption in `index.html` says "concept film". Change it if the new video shows real product footage.
+The caption in `index.html` reads "How it works". Edit it if the video changes.
 It autoplays muted and looping while on screen; reduced motion and Save-Data get the poster only.

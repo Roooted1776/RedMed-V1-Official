@@ -17,13 +17,9 @@
   function live(t) { return ok.test(t.link || ''); }
   function checkoutUrl(t) { return new URL(t.link).toString(); }
 
-  // ---- theme toggle (initial value set in theme.js) ----
+  // ---- theme toggle (state, saving and meta color live in theme.js) ----
   $('theme-toggle').addEventListener('click', function () {
-    var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', next === 'dark' ? '#1d2020' : '#f7f7f3');
-    try { localStorage.setItem('redmed-theme', next); } catch (e) {}
+    document.documentElement.dataset.theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   });
 
   // ---- pack picker ----
@@ -184,12 +180,27 @@
     var userPaused = !!reduce;
     var btn = ensureButton(video);
 
+    // Phones may block autoplay (Low Power Mode, data saver). Try again on the first touch or scroll.
+    var retrying = false;
+    function retryOnGesture() {
+      if (retrying) return;
+      retrying = true;
+      var evs = ['touchstart', 'pointerdown', 'scroll', 'keydown'];
+      function go() {
+        if (userPaused) return;
+        evs.forEach(function (t) { window.removeEventListener(t, go, true); });
+        retrying = false;
+        play();
+      }
+      evs.forEach(function (t) { window.addEventListener(t, go, { capture: true, passive: true }); });
+    }
+
     function play() {
       var pending = video.play();
       if (pending && typeof pending.catch === 'function') {
         pending.catch(function () {
-          userPaused = true;
           paint(btn, true);
+          retryOnGesture();
         });
       }
       paint(btn, false);
@@ -208,7 +219,7 @@
     if (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        setPaused(!userPaused);
+        setPaused(!video.paused);
       });
     }
 
@@ -216,7 +227,7 @@
     if (clickFrame && !video.hasAttribute('controls')) {
       clickFrame.addEventListener('click', function (e) {
         if (e.target.closest('.steps, a, button, summary, input, select, textarea, label')) return;
-        setPaused(!userPaused);
+        setPaused(!video.paused);
       });
     }
 
@@ -233,6 +244,8 @@
         video.style.transform = '';
       });
     }
+
+    video.addEventListener('playing', function () { paint(btn, false); });
 
     if (userPaused) {
       video.pause();
