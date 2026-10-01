@@ -112,14 +112,15 @@ elif [ "$MODE" = "store" ] || [ "$MODE" = "exact" ]; then
   cp store/store.css store/store.js store/theme.js store/config.js "$STAGE/"
   PAGE=init.html
   cp store/index.html "$STAGE/$PAGE"
-  if [ "$MODE" = "exact" ] || [ -n "${SUBDIR:-}" ]; then
+  # Only a preview copy (SUBDIR) is hidden from search. The live /store/ keeps its canonical and og:url.
+  if [ -n "${SUBDIR:-}" ]; then
     sed -E -i.bak -e '/<link rel="canonical"/d' -e '/property="og:url"/d' -e 's|<title>|<meta name="robots" content="noindex, nofollow">\n<title>|' "$STAGE/$PAGE"
     rm -f "$STAGE/$PAGE.bak"
   fi
   mkdir -p "$STAGE/assets"
   # Only files under store/assets are copied; /assets/hero-*.mp4 come from the home deploy.
-  grep -o '[^/]assets/[A-Za-z0-9_.@-]*' store/index.html | sed 's/^.//' | sort -u | while read -r a; do
-    [ -f "store/$a" ] && cp "store/$a" "$STAGE/assets/"
+  { grep -o '[^/]assets/[A-Za-z0-9_.@-]*' store/index.html || true; } | sed 's/^.//' | sort -u | while read -r a; do
+    if [ -f "store/$a" ]; then cp "store/$a" "$STAGE/assets/"; fi
   done
   if [ -e "$STAGE/index.html" ]; then
     echo "REFUSING: store deploy must not write index.html (that file is the home page)" >&2
