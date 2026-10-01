@@ -56,18 +56,15 @@ struct RedMedApp: App {
                 }
             }
             // Associated Domains (applinks:) — the only band-tap path into the app.
-            // Wrist-band proximity must not Safari-hijack an iPhone that already
-            // has RedMed. BTR / NFC opens this app instead of Safari.
-            // Own matching `#d=` → foreground only (no card sheet).
-            // Any other decodable `#d=` → ungated in-app tap card (no Face ID,
-            // no Before You Continue, no Keychain write, no SOS). Empty owner
-            // funnel and restore-in-flight still show the card once settle says
-            // it is not own-match — helpers who installed RedMed must not lose
-            // the patient card to a start screen.
+            // The band URL stays https://redmed.live/tapper/#d= on the VPS.
+            // Owner account sync stays in Supabase. This callback only opens
+            // the bundled tapper.html. It does not fetch or store the fragment.
+            // Any decodable `#d=` — including the wearer's own band — opens
+            // the ungated tap card (no Face ID, no Before You Continue, no
+            // Keychain write, no SOS). A missing or undecodable fragment stays
+            // quiet. Phones without RedMed keep Safari on the VPS page.
             // One UL callback often drops `#d=`. Prefer whichever candidate
-            // still decodes. No fragment on every path stays quiet (owner phone
-            // must not scream). Phones without RedMed keep Safari Assist; band
-            // tap never arms SOS.
+            // still decodes. Band tap never arms SOS.
             .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
                 guard let urlString = TapperWebLink.cardURLString(from: activity) else { return }
                 bandTap.ingest(urlString, profile: profile)
@@ -177,18 +174,13 @@ final class BandTapIngress: ObservableObject {
         decide(url, profile: profile)
     }
 
-    private func decide(_ urlString: String, profile: ProfileData) {
-        guard let chip = ProfileNFCCodec.decodeProfile(fromURLString: urlString) else {
+    private func decide(_ urlString: String, profile _: ProfileData) {
+        guard ProfileNFCCodec.decodeProfile(fromURLString: urlString) != nil else {
             return
         }
-        // Own matching band → quiet (wrist proximity must not present the
-        // passerby sheet on the wearer's phone).
-        if profile.hasSensitiveProfileData,
-           profile.matchesBand(chip) || profile.isSameWearer(as: chip) {
-            return
-        }
-        // Foreign chip, or empty owner funnel (helper who installed RedMed) →
-        // ungated tap card. No Face ID, no ConsentGate, no Keychain write.
+        // Bundled tapper.html. The NDEF URL is still the VPS page, and the
+        // owner database is not read or written here. No Face ID, no
+        // ConsentGate, no Keychain write, no SOS.
         open(urlString)
     }
 
