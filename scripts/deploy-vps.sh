@@ -4,6 +4,7 @@
 #
 # Usage:
 #   scripts/deploy-vps.sh discover                 # read-only: find the docroot
+#   DOCROOT=/opt/redmed-store/site MODE=exact scripts/deploy-vps.sh compare   # read-only: staged vs live
 #   DOCROOT=/path scripts/deploy-vps.sh dry-run    # show what would change
 #   DOCROOT=/path scripts/deploy-vps.sh deploy     # back up, then copy to <docroot>/store/
 #   DOCROOT=/opt/redmed-store/site MODE=exact SUBDIR=preview scripts/deploy-vps.sh deploy
@@ -28,7 +29,7 @@ case "$CMD" in
   discover)
     "${SSH[@]}" 'hostname; echo "--- containers ---"; docker ps --format "{{.Names}}  {{.Image}}  {{.Ports}}"; echo "--- mounts ---"; docker ps -q | xargs -r docker inspect -f "{{.Name}}: {{range .Mounts}}{{.Source}} -> {{.Destination}}; {{end}}"; echo "--- traefik host rules ---"; docker ps -q | xargs -r docker inspect -f "{{.Name}}: {{json .Config.Labels}}" | grep -o "Host([^)]*)"'
     exit 0 ;;
-  dry-run|deploy) ;;
+  dry-run|deploy|compare) ;;
   *) sed -n '2,15p' "$0"; exit 1 ;;
 esac
 
@@ -64,6 +65,24 @@ cp store.css store.js theme.js config.js "$STAGE/"
 cp init.html "$STAGE/index.html"
 mkdir -p "$STAGE/assets"
 grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u | while read -r a; do cp "$a" "$STAGE/assets/"; done
+
+if [ "$CMD" = "compare" ]; then
+  # Read-only: is the live store already this page? Compare staged files to what is served now.
+  echo "Remote contents of $DOCROOT:"
+  "${SSH[@]}" "ls -la '$DOCROOT' | head -40; echo; echo 'has init.html:'; test -f '$DOCROOT/init.html' && echo yes || echo no; echo 'has index.html:'; test -f '$DOCROOT/index.html' && echo yes || echo no"
+  echo; echo "Staged vs live (SAME / DIFFERENT / ABSENT):"
+  ( cd "$STAGE" && find . -type f | sed 's|^\./||' | sort ) | while read -r f; do
+    l="$(shasum -a 256 "$STAGE/$f" | cut -d' ' -f1)"
+    r="$("${SSH[@]}" "sha256sum '$DOCROOT/$f' 2>/dev/null | cut -d' ' -f1")"
+    if [ -z "$r" ]; then st=ABSENT; elif [ "$r" = "$l" ]; then st=SAME; else st=DIFFERENT; fi
+    printf '  %-10s %s\n' "$st" "$f"
+  done
+  echo; echo "Also compare live index.html to staged init.html:"
+  r="$("${SSH[@]}" "sha256sum '$DOCROOT/init.html' 2>/dev/null | cut -d' ' -f1")"
+  l="$(shasum -a 256 init.html | cut -d' ' -f1)"
+  if [ -z "$r" ]; then echo "  live init.html: ABSENT"; elif [ "$r" = "$l" ]; then echo "  live init.html: SAME"; else echo "  live init.html: DIFFERENT"; fi
+  exit 0
+fi
 
 if [ "$CMD" = "dry-run" ]; then
   rsync -avn -e "ssh -o BatchMode=yes" "$STAGE/" "$REMOTE:$TARGET/"
