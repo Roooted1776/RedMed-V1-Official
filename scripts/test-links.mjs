@@ -74,9 +74,9 @@ function check(fromFile, url) {
 // The tap page (/tapper/) opens a wearer's real profile from the band link, so
 // public site pages must never link to it. (The band-address redirect stubs at the
 // repo root, like tapper.html and card.html, are not in `pages` and keep working.)
-// home/ is the live landing + auth portal capture; it still names /tapper/ in nav
-// (owner kept that page as-is). Do not expand that exception.
-const noTapperLinks = pages.filter((p) => p !== 'tapper/index.html' && p !== 'home/index.html');
+// home/ (the live landing page) has no tap-page links either. legacy.js there only
+// forwards old #d= band links in a script, not a visible link, so it is not checked here.
+const noTapperLinks = pages.filter((p) => p !== 'tapper/index.html');
 
 for (const page of pages) {
   const file = path.join(root, page);

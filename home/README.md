@@ -15,7 +15,8 @@ directory is the live build, saved so it is no longer only on the server.
 | `../assets/herovideo.MP4` | Hero film (muted loop) in the hero block. |
 
 ## Changes from live (HTML only)
-- Header nav: new `Store` link to `/store/`.
+- Header nav: new `Store` link to `/store/`. The `Open tap page` link is removed.
+- Member area: the `Open the no-login tap page` button is removed. `legacy.js` still forwards old `#d=` band links.
 - Hero: new `Shop the band` button to `/store/`.
 - Hero block plays `assets/herovideo.MP4` (muted, looping, autoplay). Pause / play, click the frame, and a pointer shift. Reduced motion keeps the poster until Play.
 - `<style>`: lets the hero buttons wrap on screens 900px wide or less (the extra button pushed the third one off a phone screen).
