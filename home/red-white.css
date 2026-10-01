@@ -235,3 +235,4 @@ h3 { text-transform: capitalize; }
   .process-section { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); column-gap: 3rem; align-items: center; }
   .process-heading { grid-column: 1 / -1; }
 }
+.process-step.follow-only { cursor: default; }

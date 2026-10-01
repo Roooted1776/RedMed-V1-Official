@@ -34,9 +34,20 @@
     v.addEventListener(e, function () { set(v.currentTime); });
   });
 
+  // Jumping to a step needs a seekable video (a server that answers byte-range requests).
+  // Where the video is not seekable the list simply follows the film.
+  function seekable(to) { return v.seekable.length > 0 && v.seekable.end(v.seekable.length - 1) >= to; }
+  function mark() {
+    var ok = seekable(times[times.length - 1][0]);
+    steps.forEach(function (s) { s.classList.toggle('follow-only', !ok); });
+  }
+  ['progress', 'loadedmetadata', 'canplaythrough'].forEach(function (e) { v.addEventListener(e, mark); });
+
   steps.forEach(function (s) {
     s.addEventListener('click', function () {
-      v.currentTime = parseFloat(s.dataset.start) + 0.01;
+      var to = parseFloat(s.dataset.start) + 0.01;
+      if (!seekable(to)) return;
+      v.currentTime = to;
       set(v.currentTime);
       if (v.paused) {
         var toggle = document.querySelector('[data-film="process-film"]');
@@ -44,26 +55,6 @@
       }
     });
   });
-
-  // The portal's file server does not answer byte-range requests, so a streamed video cannot seek.
-  // The film is small: load it whole and play it from memory, which makes every step clickable.
-  if (window.fetch && window.URL && URL.createObjectURL) {
-    var type = v.canPlayType('video/webm; codecs="vp9"') ? 'video/webm' : 'video/mp4';
-    var source = v.querySelector('source[type="' + type + '"]');
-    if (source) {
-      fetch(source.getAttribute('src')).then(function (r) {
-        if (!r.ok) throw new Error('video ' + r.status);
-        return r.blob();
-      }).then(function (blob) {
-        var wasPaused = v.paused;
-        v.removeAttribute('src');
-        [].slice.call(v.querySelectorAll('source')).forEach(function (n) { v.removeChild(n); });
-        v.src = URL.createObjectURL(new Blob([blob], { type: type }));
-        v.load();
-        if (!wasPaused) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
-      }).catch(function () { /* keep the streamed source; steps still follow the film */ });
-    }
-  }
 
   set(0);
 })();

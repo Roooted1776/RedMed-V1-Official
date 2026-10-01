@@ -254,7 +254,7 @@
           if (x.isIntersecting) { if (!userPaused && video.paused) play(); }
           else if (!video.paused) video.pause();
         });
-      }, { threshold: 0.25 }).observe(video);
+      }, { threshold: 0.01, rootMargin: '300px 0px' }).observe(video);
     }
 
     if (userPaused) {
