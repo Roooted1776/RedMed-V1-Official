@@ -1,10 +1,10 @@
-// Saved choice wins; otherwise follow the device setting. Safe to load twice (home re-applies after its bundle).
+// Saved choice wins; first visit starts in dark mode. Safe to load twice (home re-applies after its bundle).
 (function () {
   var root = document.documentElement;
   var meta = document.querySelector('meta[name="theme-color"]');
   var saved = null;
   try { saved = localStorage.getItem('redmed-theme'); } catch (e) {}
-  var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var dark = saved ? saved === 'dark' : true;
   function paint() {
     var on = root.dataset.theme === 'dark';
     if (meta) meta.setAttribute('content', on ? '#141011' : '#ffffff');
