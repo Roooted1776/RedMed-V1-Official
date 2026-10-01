@@ -58,3 +58,5 @@ tapper/index.preview.html
 
 # Superdesign scratch templates (not product output)
 .superdesign/tmp/
+
+.claude/
