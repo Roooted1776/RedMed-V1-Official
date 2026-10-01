@@ -33,7 +33,7 @@
       <svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M6 18h6l3-8 6 16 3-8h6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 33C9 27 2 22 2 13 2 3 13 0 18 7 23 0 34 3 34 13c0 9-7 14-16 20Z" stroke="currentColor" stroke-width="2"/></svg>
       <span>RedMed<span class="brand-dot">.</span></span>
     </a>
-    <nav aria-label="Main navigation"><a href="#how">How it works</a><a href="#technology">The technology</a><a href="https://redmed.live/store/">Store</a><a href="https://redmed.live/tapper/" rel="noreferrer">Open tap page</a></nav>
+    <nav aria-label="Main navigation"><a href="#how">How it works</a><a href="#technology">The technology</a><a href="https://redmed.live/store/">Store</a></nav>
     <div class="header-actions"><button class="icon-button" id="theme-toggle" aria-label="Switch color theme" title="Switch color theme"><i data-lucide="sun-moon"></i></button><button class="text-button account-trigger" data-mode="signin">Sign in</button><button class="button small account-trigger" data-mode="signup">Create account</button></div>
   </header>
   <main id="main">
@@ -95,7 +95,7 @@
       <p id="auth-status" class="status" role="status" aria-live="polite"></p><p class="fineprint">This sign-in stays on this browser until you sign out. Never enter medical information here.</p>
     </div>
     <div id="dashboard" hidden>
-      <p class="eyebrow">MEMBER WORKSPACE</p><h2>Your connection hub.</h2><p id="member-email" class="member-email"></p><a class="button secondary full" href="https://redmed.live/tapper/" rel="noreferrer">Open the no-login tap page <i data-lucide="arrow-up-right"></i></a><button class="button secondary full" id="admin-open" hidden>Administration <i data-lucide="shield-check"></i></button>
+      <p class="eyebrow">MEMBER WORKSPACE</p><h2>Your connection hub.</h2><p id="member-email" class="member-email"></p><button class="button secondary full" id="admin-open" hidden>Administration <i data-lucide="shield-check"></i></button>
       <div class="dashboard-heading"><div><h3>Your bands</h3><p class="fineprint">Private inventory. Not activation or proof of ownership.</p></div><button id="refresh-bands" class="icon-button" aria-label="Refresh bands"><i data-lucide="refresh-cw"></i></button></div>
       <div id="bands-list" aria-live="polite"></div>
       <details class="register-panel"><summary>Register a band record <i data-lucide="plus"></i></summary><p class="fineprint">Use only a hardware UID. Do not paste a link, emergency card, or medical details.</p><button class="button secondary full" id="scan-nfc"><i data-lucide="nfc"></i> Read chip serial</button><p id="nfc-status" class="fineprint" role="status"></p><form id="band-form"><label>Chip serial / UID<input id="band-serial" required pattern="[0-9A-Fa-f]{8,32}" minlength="8" maxlength="32" autocomplete="off" placeholder="8–32 hexadecimal characters"></label><div class="form-row"><label>Band color<select id="band-color"><option value="red">Red</option><option value="black">Black</option><option value="white">White</option><option value="other">Other</option></select></label><label>Record status<select id="band-status"><option value="registered">Registered</option><option value="in_use">In use</option><option value="lost">Lost</option><option value="retired">Retired</option></select></label></div><button class="button full">Save band record <i data-lucide="plus"></i></button></form></details>
