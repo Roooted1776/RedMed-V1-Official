@@ -59,6 +59,7 @@ if [ "$MODE" = "home" ]; then
   done
   [ -d home/assets ] || { echo "MISSING home/assets/" >&2; exit 3; }
   cp home/index.html "$STAGE/index.html"
+  cp home/red-white.css "$STAGE/red-white.css"
   cp home/legacy.js "$STAGE/legacy.js"
   [ -f home/favicon.svg ] && cp home/favicon.svg "$STAGE/"
   [ -f home/band-hero.webp ] && cp home/band-hero.webp "$STAGE/"
