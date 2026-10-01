@@ -5,7 +5,7 @@
 # File split (do not cross these):
 #   home  — home/index.html → DOCROOT/index.html   (https://redmed.live/)
 #           Requires CONFIRM_HOMEPAGE=yes. Never writes init.html.
-#   store — init.html → DOCROOT/store/init.html    (https://redmed.live/store/)
+#   store — store/index.html → DOCROOT/store/init.html (https://redmed.live/store/)
 #           Never writes index.html. /store/ is served from init.html.
 #
 # Usage:
@@ -95,27 +95,32 @@ if [ "$MODE" = "home" ]; then
     exit 3
   fi
 elif [ "$MODE" = "store" ] || [ "$MODE" = "exact" ]; then
-  # Store page file is init.html. Never stage the home page here.
-  FILES=(init.html store.css store.js theme.js config.js)
+  # Store page source is store/index.html. It ships as init.html because the live
+  # nginx opens init.html for /store/. Never stage the home page here.
+  FILES=(store/index.html store/store.css store/store.js store/theme.js store/config.js)
   missing=0
   for f in "${FILES[@]}"; do
     [ -f "$f" ] || { echo "MISSING $f" >&2; missing=1; }
   done
+  # Relative assets live in store/assets/. Absolute /assets/ files (the hero films) are
+  # served by the home site, so MODE=home must be deployed first; they are only checked here.
   while read -r a; do
-    [ -f "$a" ] || { echo "MISSING $a (referenced by init.html)" >&2; missing=1; }
-  done < <(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u)
+    [ -f "store/$a" ] || [ -f "$a" ] || { echo "MISSING $a (referenced by store/index.html)" >&2; missing=1; }
+  done < <(grep -o 'assets/[A-Za-z0-9_.@-]*' store/index.html | sort -u)
   [ "$missing" -eq 0 ] || { echo "Fix missing files, then rerun." >&2; exit 3; }
-  cp store.css store.js theme.js config.js "$STAGE/"
-  PAGE=index.html
-  [ "$MODE" = "exact" ] && PAGE=init.html
-  cp init.html "$STAGE/$PAGE"
+  cp store/store.css store/store.js store/theme.js store/config.js "$STAGE/"
+  PAGE=init.html
+  cp store/index.html "$STAGE/$PAGE"
   if [ "$MODE" = "exact" ] || [ -n "${SUBDIR:-}" ]; then
     sed -E -i.bak -e '/<link rel="canonical"/d' -e '/property="og:url"/d' -e 's|<title>|<meta name="robots" content="noindex, nofollow">\n<title>|' "$STAGE/$PAGE"
     rm -f "$STAGE/$PAGE.bak"
   fi
   mkdir -p "$STAGE/assets"
-  grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u | while read -r a; do cp "$a" "$STAGE/assets/"; done
-  if [ -e "$STAGE/index.html" ] && [ "$MODE" != "exact" ]; then
+  # Only files under store/assets are copied; /assets/hero-*.mp4 come from the home deploy.
+  grep -o '[^/]assets/[A-Za-z0-9_.@-]*' store/index.html | sed 's/^.//' | sort -u | while read -r a; do
+    [ -f "store/$a" ] && cp "store/$a" "$STAGE/assets/"
+  done
+  if [ -e "$STAGE/index.html" ]; then
     echo "REFUSING: store deploy must not write index.html (that file is the home page)" >&2
     exit 3
   fi
@@ -142,7 +147,7 @@ if [ "$CMD" = "compare" ]; then
   done
   echo; echo "Also compare live index.html to staged init.html:"
   r="$("${SSH[@]}" "sha256sum '$DOCROOT/init.html' 2>/dev/null | cut -d' ' -f1")"
-  l="$(shasum -a 256 init.html | cut -d' ' -f1)"
+  l="$(shasum -a 256 store/index.html | cut -d' ' -f1)"
   if [ -z "$r" ]; then echo "  live init.html: ABSENT"; elif [ "$r" = "$l" ]; then echo "  live init.html: SAME"; else echo "  live init.html: DIFFERENT"; fi
   exit 0
 fi
@@ -181,7 +186,7 @@ else
   echo "$store_open" | grep -q 'RedMed Band | Store' || { echo "Smoke: /store/ did not open init.html" >&2; exit 4; }
   echo "$store_open" | grep -q 'id="auth-form"' && { echo "Smoke: /store/ is the home page" >&2; exit 4; }
   echo "OK /store/ opens init.html"
-  for a in $(grep -o 'assets/[A-Za-z0-9_.@-]*' init.html | sort -u); do
+  for a in $(grep -o '[^/]assets/[A-Za-z0-9_.@-]*' store/index.html | sed 's/^.//' | sort -u); do
     c="$(curl -s -o /dev/null -w '%{http_code}' "$BASE$a")"; echo "  $a -> $c"
   done
 fi
