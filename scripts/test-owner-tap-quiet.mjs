@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Owner tap stays quiet (static, no Xcode): a band tap must never arm SOS,
- * and the wearer's own band (exact or older, same name + birth date) must not
- * open the passerby card on their own phone.
+ * Owner tap (static, no Xcode): a band tap must never arm SOS.
+ * A decodable `#d=` opens bundled tapper.html, including the wearer's own band.
+ * The VPS write URL and the owner database are not touched by this ingress.
  *
  *   node scripts/test-owner-tap-quiet.mjs
  */
@@ -22,9 +22,13 @@ const app = src('RedMedApp.swift');
 const ingress = app.slice(app.indexOf('final class BandTapIngress'));
 assert('band tap ingress never calls armSOS', !/armSOS|CrashMotionGuard|survival/i.test(ingress));
 assert('band tap ingress never dials', !/PublicEmergencyAid|tel:/i.test(ingress));
-assert('own exact band is quiet', /matchesBand\(chip\)/.test(ingress));
-assert('own older band (same wearer) is quiet', /isSameWearer\(as: chip\)/.test(ingress));
-assert('URL-scheme path never ingests #d=', !/scheme == "redmed"[\s\S]{0,200}ingest/.test(app));
+assert('decoded band opens tapper.html',
+  /decodeProfile\(fromURLString: urlString\)[\s\S]{0,500}open\(urlString\)/.test(ingress));
+assert('own band is not returned before the card opens',
+  !/matchesBand\(chip\)[\s\S]{0,120}return/.test(ingress));
+assert('URL-scheme path never ingests #d=',
+  /if scheme == "redmed", host == "nfc" \{[\s\S]{0,180}return\s*\}/.test(app)
+  && !/if scheme == "redmed"[\s\S]{0,180}ingest\(/.test(app));
 
 const profile = src('ProfileData.swift');
 assert('isSameWearer needs non-empty name and birth date',

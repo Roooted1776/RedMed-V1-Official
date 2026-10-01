@@ -29,8 +29,8 @@ Ingress is `RedMedApp.onContinueUserActivity(NSUserActivityTypeBrowsingWeb)` in 
 
 `BandTapIngress` then:
 
-- Own matching band (Keychain profile matches the chip) → foreground only. No Safari, no card sheet, no SOS.
-- Someone else's chip, or an empty owner funnel → ungated in-app tap card above ConsentGate. No Face ID, no Before You Continue, no Keychain write, no SOS.
+- A decodable `#d=` (the wearer's own band or someone else's) opens bundled tapper.html above ConsentGate. No Face ID, no Before You Continue, no Keychain write, no SOS. The NDEF URL stays `https://redmed.live/tapper/#d=` on the VPS. This path does not read or write the owner database.
+- A missing or undecodable fragment stays quiet. No card sheet, no SOS.
 
 `onOpenURL` may ingest the same `https` card URL when the fragment is still attached. `redmed://nfc` only switches to the NFC tab. `redmed://` is never a band-profile handoff.
 

@@ -21,6 +21,8 @@ if [[ -e owner/RedMed/tapper.html ]]; then
   echo "stale owner/RedMed/tapper.html — Xcode copies tapper/index.html at build" >&2
   exit 1
 fi
+# Write the redirect stub before checking it, so a missing tapper.html is repaired.
+bash "$ROOT/scripts/write-tapper-redirects.sh"
 if grep -q 'data-tab="medical"' tapper.html; then
   echo "tapper.html is a full shell copy again — keep it a redirect to /tapper/" >&2
   exit 1
@@ -43,7 +45,5 @@ grep -q "redmed-tapper-v" sw.js
 
 # Hosted policies must stay lockstep with in-app Help Document.
 bash "$ROOT/scripts/sync-document.sh"
-# Keep every legacy Pages URL on the same #d=-preserving stub.
-bash "$ROOT/scripts/write-tapper-redirects.sh"
 
 echo "OK single tapper shell at tapper/index.html"

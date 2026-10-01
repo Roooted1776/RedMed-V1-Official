@@ -3,17 +3,18 @@
 ## Problem this solves
 
 The wearer's band on their wrist must not **Safari-hijack their own iPhone**
-when the phone is nearby (pocket / clasp / Background Tag Reading). That is
-not only the SOS siren — opening the full passerby card on the owner's phone
-is the interference.
+when the phone is nearby (pocket / clasp / Background Tag Reading), and it
+must not arm SOS. The tap still opens tapper.html inside the app.
 
 **Fix:** Associated Domains. Hosted `/tapper/` is a Universal Link. With
-RedMed installed, iOS opens the **app** instead of Safari.
+RedMed installed, iOS opens the **app** (bundled tapper.html) instead of
+Safari. The band URL stays on the VPS. The owner database is not part of
+this open.
 
 | Phone | Band tap |
 | --- | --- |
-| RedMed installed, `#d=` matches owner Keychain | App foreground only — no Safari, no SOS, no card sheet |
-| RedMed installed, other person's `#d=` (or empty owner funnel) | Ungated in-app tap card above ConsentGate — no Face ID, no Before You Continue, no Keychain write, no SOS |
+| RedMed installed, decodable `#d=` (own band or someone else's) | Ungated in-app tapper.html above ConsentGate — no Face ID, no Before You Continue, no Keychain write, no SOS. Band URL stays on the VPS. Owner database is not read here. |
+| RedMed installed, missing or undecodable `#d=` | App foreground only — no card sheet, no SOS |
 | RedMed **not** installed | Safari Assist medical card only — band tap does **not** arm SOS (SOS is toggle or US Crash Detection collision) |
 
 AASA is live (`apple-app-site-association` + `.well-known/`, paths

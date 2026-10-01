@@ -1,0 +1,51 @@
+# GitHub integration reads this file. Dashboard working directory is `.`
+# because supabase/ is at the repo root.
+# Hosted branching rejects [local_smtp]; this file uses [inbucket].
+# No email template content_path (a missing template fails the preview check).
+#
+# Data API schemas stay public and graphql_public.
+# redmed_owner and redmed_ops are not exposed. Assist does not call this project.
+
+project_id = "redmed"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[realtime]
+enabled = false
+
+[studio]
+enabled = false
+port = 54323
+
+[inbucket]
+enabled = false
+port = 54324
+
+[storage]
+enabled = false
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+site_url = "https://redmed.live"
+additional_redirect_urls = ["https://redmed.live"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[db.seed]
+enabled = false
