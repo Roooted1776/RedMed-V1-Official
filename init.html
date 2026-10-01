@@ -14,55 +14,150 @@
 <meta name="theme-color" content="#fff7f7">
 <meta name="color-scheme" content="light">
 <meta name="referrer" content="no-referrer">
-<link rel="canonical" href="https://redmed.live/">
-<title>RedMed</title>
-<meta name="description" content="RedMed puts a person's emergency medical information on a small NFC band. Tap it with any modern phone to open the card. No app, no account, no sign-in.">
-<meta property="og:title" content="RedMed: emergency info, one tap away">
-<meta property="og:description" content="Emergency medical info on an NFC band. No app, no account, no sign-in.">
-<meta property="og:url" content="https://redmed.live/">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light dark">
+<title>RedMed Band | Store</title>
+<meta name="description" content="The RedMed NFC medical ID band. A deliberate tap opens the card. No app or account needed to read it.">
+<link rel="canonical" href="https://redmed.live/store/">
+<meta property="og:site_name" content="RedMed">
 <meta property="og:type" content="website">
-<style>html,body{background:#fff7f7!important;margin:0}</style>
-<!-- Main page for https://redmed.live. This file does not redirect to /tapper/. -->
-<style>
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
-    background: #fff7f7;
-    color: #1c1917;
-    text-align: center;
-    padding: 48px 24px;
-  }
-  main { max-width: 480px; }
-  img.wordmark { height: 32px; margin-bottom: 28px; }
-  h1 { font-size: 1.5rem; margin: 0 0 12px; }
-  p { line-height: 1.5; margin: 0 0 16px; }
-  .lede { font-size: 1.05rem; color: #1c1917; }
-  .fine { font-size: 0.9rem; color: #6b6462; }
-  a { color: #e11d48; font-weight: 600; text-decoration: none; }
-  a:focus-visible { outline: 2px solid #e11d48; outline-offset: 3px; }
-  a.cta { display: inline-block; background: #e11d48; color: #fff; padding: 12px 22px; border-radius: 999px; }
-  a.cta:hover, a.cta:focus-visible { background: #be123c; outline-offset: 3px; }
-  footer { margin-top: 32px; font-size: 0.8rem; color: #6b6462; }
-  footer a { color: #6b6462; font-weight: 500; }
-  footer a:hover, footer a:focus-visible { color: #e11d48; }
-</style>
+<meta property="og:url" content="https://redmed.live/store/">
+<meta property="og:title" content="RedMed Band | Store">
+<meta property="og:description" content="The RedMed NFC medical ID band. A deliberate tap opens the card. No app or account needed to read it.">
+<meta property="og:image" content="https://redmed.live/store/assets/Band.png">
+<meta property="og:image:width" content="1872">
+<meta property="og:image:height" content="999">
+<meta property="og:image:alt" content="The RedMed NFC medical ID band">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="preload" as="image" href="assets/Band.png" fetchpriority="high">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=cabinet-grotesk@500,700,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="store.css">
+<script src="theme.js"></script>
 </head>
 <body>
-  <main>
-    <img class="wordmark" src="/assets/BrandWordmark.png" alt="RedMed" width="160" height="32">
-    <h1>Emergency info, one tap away.</h1>
-    <p class="lede">RedMed puts a person's medical information on a small NFC band. Tapping it with any modern
-      phone opens their emergency card instantly &mdash; no app, no account, no sign-in.</p>
-    <p><a class="cta" href="/store/">Shop the RedMed band</a></p>
-    <p class="fine">Main page: <a href="https://redmed.live/">https://redmed.live</a></p>
-  </main>
-  <footer>
-    <a href="/store/">Store</a> &middot; <a href="/privacy/">Privacy</a> &middot; <a href="/support/">Support</a>
-  </footer>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-theme" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+  <symbol id="i-nfc" viewBox="0 0 24 24"><path d="M6 8.3a6.5 6.5 0 0 1 0 7.4M10 6.5a10 10 0 0 1 0 11M14 4.7a13.5 13.5 0 0 1 0 14.6M18 3a17 17 0 0 1 0 18"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21v-1a6 6 0 0 1 12 0v1M16 11l2 2 4-4"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20M6 15h4"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+</svg>
+
+<a class="skip" href="#main">Skip to content</a>
+<header class="header">
+  <a class="brand" href="https://redmed.live/" aria-label="RedMed home">
+    <svg viewBox="0 0 36 36" aria-hidden="true"><rect width="36" height="36" rx="9" fill="currentColor"/><path d="M5 18h7l3-8 6 16 3-8h7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>RedMed<span class="brand-dot">.</span></span>
+  </a>
+  <nav aria-label="Main navigation">
+    <a href="https://redmed.live/">Home</a>
+    <a href="#questions">Questions</a>
+  </nav>
+  <div class="header-actions">
+    <button class="icon-button" id="theme-toggle" type="button" aria-label="Switch color theme" title="Switch color theme"><svg class="ic"><use href="#i-theme"/></svg></button>
+    <a class="text-button" href="https://redmed.live/?auth=signin">Sign in</a>
+    <a class="button small" href="https://redmed.live/?auth=signup">Create account</a>
+  </div>
+</header>
+
+<main id="main">
+  <div class="principles">
+    <span><svg class="ic"><use href="#i-nfc"/></svg> Tap or scan</span>
+    <span><svg class="ic"><use href="#i-user"/></svg> No responder account</span>
+    <span><svg class="ic"><use href="#i-shield"/></svg> Medical data stays in the link</span>
+    <span><svg class="ic"><use href="#i-lock"/></svg> Secure Square checkout</span>
+  </div>
+
+  <section class="section buy" id="buy" aria-labelledby="buyhead">
+    <div class="section-heading">
+      <p class="eyebrow">BUY A BAND</p>
+      <h1 id="buyhead">One band.<br>Or one for everyone.</h1>
+      <p>Pick a pack, then check out with Square.</p>
+    </div>
+    <div class="shop">
+    <figure class="band-showcase"><img src="assets/Band.png" width="1872" height="999" fetchpriority="high" decoding="async" alt="The RedMed NFC band"></figure>
+      <div class="tiers" id="tiers" role="radiogroup" aria-label="Pack size"></div>
+      <aside class="checkout" aria-label="Order summary">
+        <p class="eyebrow">YOUR ORDER</p>
+        <div class="summary"><span id="sumName">Pair</span><strong id="sumPrice">$65</strong></div>
+        <p class="sumnote" id="sumNote"></p>
+        <button class="button full" id="checkoutBtn" type="button">Review and checkout <svg class="ic"><use href="#i-arrow"/></svg></button>
+        <div class="pay" aria-label="Payment methods">
+          <span class="paylabel">Pay with</span>
+          <span class="mark card" title="Debit or credit card"><svg class="ic"><use href="#i-card"/></svg><span>Debit or credit card</span></span>
+          <span class="mark" title="Apple Pay"><svg viewBox="0 3.8 24 16.4" width="56" height="38" role="img" aria-label="Apple Pay"><path fill="currentColor" d="M2.15 4.318a42.16 42.16 0 0 0-.454.003c-.15.005-.303.013-.452.04a1.44 1.44 0 0 0-1.06.772c-.07.138-.114.278-.14.43-.028.148-.037.3-.04.45A10.2 10.2 0 0 0 0 6.222v11.557c0 .07.002.138.003.207.004.15.013.303.04.452.027.15.072.291.142.429a1.436 1.436 0 0 0 .63.63c.138.07.278.115.43.142.148.027.3.036.45.04l.208.003h20.194l.207-.003c.15-.004.303-.013.452-.04.15-.027.291-.071.428-.141a1.432 1.432 0 0 0 .631-.631c.07-.138.115-.278.141-.43.027-.148.036-.3.04-.45.002-.07.003-.138.003-.208l.001-.246V6.221c0-.07-.002-.138-.004-.207a2.995 2.995 0 0 0-.04-.452 1.446 1.446 0 0 0-1.2-1.201 3.022 3.022 0 0 0-.452-.04 10.448 10.448 0 0 0-.453-.003zm0 .512h19.942c.066 0 .131.002.197.003.115.004.25.01.375.032.109.02.2.05.287.094a.927.927 0 0 1 .407.407.997.997 0 0 1 .094.288c.022.123.028.258.031.374.002.065.003.13.003.197v11.552c0 .065 0 .13-.003.196-.003.115-.009.25-.032.375a.927.927 0 0 1-.5.693 1.002 1.002 0 0 1-.286.094 2.598 2.598 0 0 1-.373.032l-.2.003H1.906c-.066 0-.133-.002-.196-.003a2.61 2.61 0 0 1-.375-.032c-.109-.02-.2-.05-.288-.094a.918.918 0 0 1-.406-.407 1.006 1.006 0 0 1-.094-.288 2.531 2.531 0 0 1-.032-.373 9.588 9.588 0 0 1-.002-.197V6.224c0-.065 0-.131.002-.197.004-.114.01-.248.032-.375.02-.108.05-.199.094-.287a.925.925 0 0 1 .407-.406 1.03 1.03 0 0 1 .287-.094c.125-.022.26-.029.375-.032.065-.002.131-.002.196-.003zm4.71 3.7c-.3.016-.668.199-.88.456-.191.22-.36.58-.316.918.338.03.675-.169.888-.418.205-.258.345-.603.308-.955zm2.207.42v5.493h.852v-1.877h1.18c1.078 0 1.835-.739 1.835-1.812 0-1.07-.742-1.805-1.808-1.805zm.852.719h.982c.739 0 1.161.396 1.161 1.089 0 .692-.422 1.092-1.164 1.092h-.979zm-3.154.3c-.45.01-.83.28-1.05.28-.235 0-.593-.264-.981-.257a1.446 1.446 0 0 0-1.23.747c-.527.908-.139 2.255.374 2.995.249.366.549.769.944.754.373-.014.52-.242.973-.242.454 0 .586.242.98.235.41-.007.667-.366.915-.733.286-.417.403-.82.41-.841-.007-.008-.79-.308-.797-1.209-.008-.754.615-1.113.644-1.135-.352-.52-.9-.578-1.09-.593a1.123 1.123 0 0 0-.092-.002zm8.204.397c-.99 0-1.606.533-1.652 1.256h.777c.072-.358.369-.586.845-.586.502 0 .803.266.803.711v.309l-1.097.064c-.951.054-1.488.484-1.488 1.184 0 .72.548 1.207 1.332 1.207.526 0 1.032-.281 1.264-.727h.019v.659h.788v-2.76c0-.803-.62-1.317-1.591-1.317zm1.94.072l1.446 4.009c0 .003-.073.24-.073.247-.125.41-.33.571-.711.571-.069 0-.206 0-.267-.015v.666c.06.011.267.019.335.019.83 0 1.226-.312 1.568-1.283l1.5-4.214h-.868l-1.012 3.259h-.015l-1.013-3.26zm-1.167 2.189v.316c0 .521-.45.917-1.024.917-.442 0-.731-.228-.731-.579 0-.342.278-.56.769-.593z"/></svg></span>
+          <span class="mark square" title="Powered by Square"><svg viewBox="0 0 24 24" width="18" height="18" role="img" aria-hidden="true"><path fill="currentColor" d="M4.01 0A4.01 4.01 0 000 4.01v15.98c0 2.21 1.8 4 4.01 4.01h15.98C22.2 24 24 22.2 24 19.99V4A4.01 4.01 0 0019.99 0H4zm1.62 4.36h12.74c.7 0 1.26.57 1.26 1.27v12.74c0 .7-.56 1.27-1.26 1.27H5.63c-.7 0-1.26-.57-1.26-1.27V5.63a1.27 1.27 0 011.26-1.27zm3.83 4.35a.73.73 0 00-.73.73v5.09c0 .4.32.72.72.72h5.1a.73.73 0 00.73-.72V9.44a.73.73 0 00-.73-.73h-5.1Z"/></svg><span>Powered by Square</span></span>
+        </div>
+        <p class="fineprint">On the next screen you can enter a debit or credit card (Visa, Mastercard, Amex, Discover), or use Apple Pay when your device supports it. The card form is Square's. RedMed never sees your card.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section faq" id="questions">
+    <div class="section-heading">
+      <p class="eyebrow">BEFORE YOU PAY</p>
+      <h2>The order, in short.</h2>
+    </div>
+    <div class="faq-list">
+      <details><summary>When does it ship?<svg class="ic"><use href="#i-plus"/></svg></summary><p>Ships when ready. There is no date promise. Your Square receipt is your order record.</p></details>
+      <details><summary>What am I buying today?<svg class="ic"><use href="#i-plus"/></svg></summary><p>Blank NTAG216 bands. Writing a band from inside the app is not live yet, so this page does not sell it.</p></details>
+      <details><summary>Is it a medical device or HIPAA certified?<svg class="ic"><use href="#i-plus"/></svg></summary><p>No. It is an ID card on a band, not a medical device and not HIPAA certified.</p></details>
+      <details><summary>Is my payment safe?<svg class="ic"><use href="#i-plus"/></svg></summary><p>Checkout is hosted by Square. This page loads no payment scripts and stores no card data.</p></details>
+      <details><summary>Something is wrong with my order<svg class="ic"><use href="#i-plus"/></svg></summary><p>Email <a class="inline" id="supportLink" href="mailto:help@redmed.live">help@redmed.live</a>. Do not send medical details.</p></details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <a class="brand" href="https://redmed.live/"><span>RedMed<span class="brand-dot">.</span></span></a>
+  <p>Information when words aren't possible.</p>
+  <div><a href="https://redmed.live/privacy/">Privacy</a> <a href="https://redmed.live/support/">Support</a> <a href="https://redmed.live/">redmed.live</a></div>
+</footer>
+
+<div class="sticky" id="sticky" hidden>
+  <span id="stickyText">Pair &middot; $65</span>
+  <button class="button small" id="stickyBtn" type="button">Checkout</button>
+</div>
+
+<dialog id="review" aria-labelledby="reviewTitle">
+  <button class="icon-button dialog-close" type="button" aria-label="Close" id="reviewClose"><svg class="ic"><use href="#i-x"/></svg></button>
+  <p class="eyebrow">STEP 2 OF 3 &middot; YOUR ORDER</p>
+  <h2 id="reviewTitle">Pair</h2>
+  <p class="review-price" id="reviewPrice">$65</p>
+  <div class="qty" id="qtyRow">
+    <span id="qtyLabel">Quantity</span>
+    <div class="stepper" role="group" aria-labelledby="qtyLabel">
+      <button type="button" id="qtyMinus" aria-label="One fewer">&minus;</button>
+      <output id="qtyVal" aria-live="polite">1</output>
+      <button type="button" id="qtyPlus" aria-label="One more">+</button>
+    </div>
+  </div>
+  <ul class="review-list">
+    <li>Blank NXP NTAG216 bands, unlocked. One size fits all.</li>
+    <li id="payLine">Step 3: pay on Square's secure page with a debit or credit card, or Apple Pay and Google Pay on phones that support them. You can change the quantity there.</li>
+    <li>Ships when ready. No date promise.</li>
+    <li>Not a medical device. Not HIPAA certified.</li>
+  </ul>
+  <label class="ack"><input type="checkbox" id="ack"> <span>I understand these are blank bands and shipping has no date promise.</span></label>
+  <a class="button full" id="goBtn" href="#buy" rel="noopener" aria-disabled="true"><span id="goLabel">Continue to Square</span> <svg class="ic"><use href="#i-arrow"/></svg></a>
+  <p class="notice" id="notice" role="status" hidden></p>
+  <div class="pay small"><span class="mark card" title="Debit or credit card"><svg class="ic"><use href="#i-card"/></svg><span>Debit or credit card</span></span><span class="mark"><svg viewBox="0 3.8 24 16.4" width="56" height="38" role="img" aria-label="Apple Pay"><path fill="currentColor" d="M2.15 4.318a42.16 42.16 0 0 0-.454.003c-.15.005-.303.013-.452.04a1.44 1.44 0 0 0-1.06.772c-.07.138-.114.278-.14.43-.028.148-.037.3-.04.45A10.2 10.2 0 0 0 0 6.222v11.557c0 .07.002.138.003.207.004.15.013.303.04.452.027.15.072.291.142.429a1.436 1.436 0 0 0 .63.63c.138.07.278.115.43.142.148.027.3.036.45.04l.208.003h20.194l.207-.003c.15-.004.303-.013.452-.04.15-.027.291-.071.428-.141a1.432 1.432 0 0 0 .631-.631c.07-.138.115-.278.141-.43.027-.148.036-.3.04-.45.002-.07.003-.138.003-.208l.001-.246V6.221c0-.07-.002-.138-.004-.207a2.995 2.995 0 0 0-.04-.452 1.446 1.446 0 0 0-1.2-1.201 3.022 3.022 0 0 0-.452-.04 10.448 10.448 0 0 0-.453-.003zm0 .512h19.942c.066 0 .131.002.197.003.115.004.25.01.375.032.109.02.2.05.287.094a.927.927 0 0 1 .407.407.997.997 0 0 1 .094.288c.022.123.028.258.031.374.002.065.003.13.003.197v11.552c0 .065 0 .13-.003.196-.003.115-.009.25-.032.375a.927.927 0 0 1-.5.693 1.002 1.002 0 0 1-.286.094 2.598 2.598 0 0 1-.373.032l-.2.003H1.906c-.066 0-.133-.002-.196-.003a2.61 2.61 0 0 1-.375-.032c-.109-.02-.2-.05-.288-.094a.918.918 0 0 1-.406-.407 1.006 1.006 0 0 1-.094-.288 2.531 2.531 0 0 1-.032-.373 9.588 9.588 0 0 1-.002-.197V6.224c0-.065 0-.131.002-.197.004-.114.01-.248.032-.375.02-.108.05-.199.094-.287a.925.925 0 0 1 .407-.406 1.03 1.03 0 0 1 .287-.094c.125-.022.26-.029.375-.032.065-.002.131-.002.196-.003zm4.71 3.7c-.3.016-.668.199-.88.456-.191.22-.36.58-.316.918.338.03.675-.169.888-.418.205-.258.345-.603.308-.955zm2.207.42v5.493h.852v-1.877h1.18c1.078 0 1.835-.739 1.835-1.812 0-1.07-.742-1.805-1.808-1.805zm.852.719h.982c.739 0 1.161.396 1.161 1.089 0 .692-.422 1.092-1.164 1.092h-.979zm-3.154.3c-.45.01-.83.28-1.05.28-.235 0-.593-.264-.981-.257a1.446 1.446 0 0 0-1.23.747c-.527.908-.139 2.255.374 2.995.249.366.549.769.944.754.373-.014.52-.242.973-.242.454 0 .586.242.98.235.41-.007.667-.366.915-.733.286-.417.403-.82.41-.841-.007-.008-.79-.308-.797-1.209-.008-.754.615-1.113.644-1.135-.352-.52-.9-.578-1.09-.593a1.123 1.123 0 0 0-.092-.002zm8.204.397c-.99 0-1.606.533-1.652 1.256h.777c.072-.358.369-.586.845-.586.502 0 .803.266.803.711v.309l-1.097.064c-.951.054-1.488.484-1.488 1.184 0 .72.548 1.207 1.332 1.207.526 0 1.032-.281 1.264-.727h.019v.659h.788v-2.76c0-.803-.62-1.317-1.591-1.317zm1.94.072l1.446 4.009c0 .003-.073.24-.073.247-.125.41-.33.571-.711.571-.069 0-.206 0-.267-.015v.666c.06.011.267.019.335.019.83 0 1.226-.312 1.568-1.283l1.5-4.214h-.868l-1.012 3.259h-.015l-1.013-3.26zm-1.167 2.189v.316c0 .521-.45.917-1.024.917-.442 0-.731-.228-.731-.579 0-.342.278-.56.769-.593z"/></svg></span><span class="mark square"><svg viewBox="0 0 24 24" width="18" height="18" role="img" aria-hidden="true"><path fill="currentColor" d="M4.01 0A4.01 4.01 0 000 4.01v15.98c0 2.21 1.8 4 4.01 4.01h15.98C22.2 24 24 22.2 24 19.99V4A4.01 4.01 0 0019.99 0H4zm1.62 4.36h12.74c.7 0 1.26.57 1.26 1.27v12.74c0 .7-.56 1.27-1.26 1.27H5.63c-.7 0-1.26-.57-1.26-1.27V5.63a1.27 1.27 0 011.26-1.27zm3.83 4.35a.73.73 0 00-.73.73v5.09c0 .4.32.72.72.72h5.1a.73.73 0 00.73-.72V9.44a.73.73 0 00-.73-.73h-5.1Z"/></svg><span>Powered by Square</span></span></div>
+</dialog>
+
+<noscript><p class="ns">JavaScript is needed to pick a pack. Email <a href="mailto:help@redmed.live">help@redmed.live</a> to order.</p></noscript>
+<script src="config.js" defer></script>
+<script src="store.js" defer></script>
+</body>
+</html>
 </body>
 </html>

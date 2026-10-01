@@ -21,6 +21,8 @@
   $('theme-toggle').addEventListener('click', function () {
     var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', next === 'dark' ? '#1d2020' : '#f7f7f3');
     try { localStorage.setItem('redmed-theme', next); } catch (e) {}
   });
 
@@ -131,35 +133,21 @@
       .forEach(function (el) { el.classList.add('reveal'); io.observe(el); });
   }
 
-  // ---- background video ----
-  var v = $('bgvideo'), mb = $('motionBtn');
-  function pause(p) {
-    if (p) { v.pause(); } else { var r = v.play(); if (r && r.catch) r.catch(function () {}); }
-    mb.setAttribute('aria-pressed', p ? 'true' : 'false');
-    $('motionText').textContent = p ? 'Play video' : 'Pause video';
-    $('motionIcon').setAttribute('href', p ? '#i-play' : '#i-pause');
-  }
+  // how-it-works film, the band-spin background, and the band clip: muted loop, only while on screen.
+  // Poster-only (or a still first frame) with reduced motion or Save-Data.
   var saveData = navigator.connection && navigator.connection.saveData;
-  if (reduce || saveData) { pause(true); }
-  else {
-    // iOS Low Power Mode and some browsers block autoplay: keep the poster and show a Play button.
-    var first = v.play();
-    if (first && first.catch) first.catch(function () { pause(true); });
-  }
-  mb.addEventListener('click', function () { pause(!v.paused); });
-  // Hide only when the video itself or its last fallback source fails, not when the first source is skipped.
-  v.addEventListener('error', function (e) { if (e.target === v || e.target === v.lastElementChild) v.style.display = 'none'; }, true);
-
-  // gentle parallax on the hero video (desktop pointer only)
-  var hero = document.querySelector('.hero');
-  if (!reduce && matchMedia('(hover:hover)').matches) {
-    hero.addEventListener('mousemove', function (e) {
-      var r = hero.getBoundingClientRect();
-      var x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-      v.style.transform = 'scale(1.05) translate(' + (x * -14) + 'px,' + (y * -10) + 'px)';
-    });
-    hero.addEventListener('mouseleave', function () { v.style.transform = ''; });
-  }
+  document.querySelectorAll('.how-video video, .reel-video, .tech-frame video').forEach(function (how) {
+    if (reduce || saveData || !('IntersectionObserver' in window)) return;
+    var seen = false, held = false;
+    how.muted = true; how.loop = true;
+    how.addEventListener('play', function () { held = false; });
+    how.addEventListener('pause', function () { if (seen) held = true; }); // viewer paused it: keep it paused
+    new IntersectionObserver(function (es) {
+      seen = es[es.length - 1].isIntersecting;
+      if (seen && !held) { var r = how.play(); if (r && r.catch) r.catch(function () {}); }
+      else if (!seen) how.pause();
+    }, { threshold: 0.35 }).observe(how);
+  });
 
   if (wanted && tier(wanted[1])) selected = wanted[1];
   render();

@@ -10,21 +10,27 @@ directory is the live build, saved so it is no longer only on the server.
 | `assets/index-B1ncWDwK.css` | Live, unchanged |
 | `assets/index-persist-admin.js` | Live, unchanged. Minified Vite bundle (no source map, no source) |
 | `legacy.js` | Live, unchanged. Forwards a `#d=` band link to `/tapper/` |
-| `band-hero.webp`, `nfc-detail.webp`, `favicon.svg` | Live, unchanged |
+| `hero.js` | Autoplay, pause / play, click-to-toggle, and pointer shift for every film on the page. No network calls. |
+| `band-hero.webp`, `nfc-detail.webp`, `favicon.svg` | Poster and stills. `band-hero.webp` is the hero poster. |
+| `../assets/herovideo.MP4` | Hero film (muted loop) in the hero block. |
 
 ## Changes from live (HTML only)
-- Header nav: new `Store` link to `/store/`.
+- Header nav: new `Store` link to `/store/`. The `Open tap page` link is removed.
+- Member area: the `Open the no-login tap page` button is removed. `legacy.js` still forwards old `#d=` band links.
 - Hero: new `Shop the band` button to `/store/`.
+- Hero block plays `assets/herovideo.MP4` (muted, looping, autoplay). Pause / play, click the frame, and a pointer shift. Reduced motion keeps the poster until Play.
 - `<style>`: lets the hero buttons wrap on screens 900px wide or less (the extra button pushed the third one off a phone screen).
 
 ## Read before deploying
 - This page is a member portal, not only a landing page. The bundle carries the Supabase client (project
   `mohxobgyjkcmkqxijgeg`, publishable key only, no service-role key): Sign in / Create account, a band registry,
   password change, an email-link verify panel, and an Administration dialog (account list, search, invite).
-- That conflicts with `AGENTS.md` ("Account sign-in is the Owner app only ... the public site does not collect an
-  email, a password, or a code"). Kept as is on the owner's decision (2026-10-01). Change `AGENTS.md` or the page
-  so the two agree.
+- Owner rule (2026-10-01): keep Sign in on redmed.live. Creating an account stores that account identity
+  (email / auth) — plus optional non-medical band inventory metadata later — never medical `#d=` profiles.
+  `AGENTS.md` matches this.
 - The Administration dialog is public markup. Access must be enforced by Supabase (RLS and role checks), not by the page.
 - The bundle cannot be edited sensibly. To change portal behavior, rebuild it from source or remove the bundle.
-- Not wired to any deploy. The container that serves `/` is not a Compose project on the VPS; find it first
+- `index.html` here is the home page. `https://redmed.live/` and `/index.html` serve it, and this file may be updated as the home page. The store page is repo-root `init.html`; `/store/` opens that file. Do not copy this home page over `init.html`, and do not copy `init.html` over this file.
+- Deploy: `MODE=home CONFIRM_HOMEPAGE=yes scripts/deploy-vps.sh deploy` (after `discover`).
+  `scripts/stage-site.sh` also stages this directory as `/`. Find the docroot first
   (`docker inspect redmed-portal-live --format '{{json .Mounts}}'`).

@@ -55,3 +55,6 @@ mcp/.env.local
 # Local scratch previews (not product output)
 Claude outputs/
 tapper/index.preview.html
+
+# Superdesign scratch templates (not product output)
+.superdesign/tmp/
