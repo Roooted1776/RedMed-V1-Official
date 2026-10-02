@@ -10,12 +10,12 @@
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=cabinet-grotesk@500,700,800&display=swap" rel="stylesheet">
-  <script src="./legacy.js?v=20261001i"></script>
-  <script src="./theme.js?v=20261001i"></script>
+  <script src="./legacy.js?v=20261002a"></script>
+  <script src="./theme.js?v=20261002a"></script>
   <script type="module" crossorigin src="./assets/index-persist-admin.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-B1ncWDwK.css">
-  <link rel="stylesheet" href="./red-white.css?v=20261001i">
-  <script type="module" src="./theme.js?v=20261001i"></script>
+  <link rel="stylesheet" href="./red-white.css?v=20261002a">
+  <script type="module" src="./theme.js?v=20261002a"></script>
   <link rel="preload" as="image" href="./band-hero.webp" fetchpriority="high">
   <style>
     @media(max-width:900px){.hero-actions{flex-wrap:wrap}}
@@ -91,6 +91,7 @@
         <li><button type="button" class="process-step" data-start="8" data-end="10"><span class="n">4</span><span class="t"><h3>Your card opens</h3><p>It opens in their phone's browser. No app and no sign-in for the helper.</p></span></button></li>
         <li><button type="button" class="process-step" data-start="10" data-end="12.05"><span class="n">5</span><span class="t"><h3>Made to be worn and updated</h3><p>The chip is never permanently locked, so you can rewrite your card whenever it changes.</p></span></button></li>
       </ol>
+      <p class="process-detail" id="process-detail"></p>
     </section>
     <section class="faq section" id="questions">
       <div><p class="eyebrow">A FEW IMPORTANT ANSWERS</p><h2>Clear by design.</h2><p>No fine-print promises about something this important.</p></div>
@@ -136,8 +137,8 @@
   </dialog>
   <dialog id="demo-dialog" aria-labelledby="demo-title"><button class="icon-button dialog-close" aria-label="Close demonstration"><i data-lucide="x"></i></button><p class="eyebrow">INTERACTIVE WALKTHROUGH / NO REAL MEDICAL DATA</p><h2 id="demo-title">A tap starts the connection.</h2><div class="demo-device"><div class="demo-top">REDMED ASSIST <i data-lucide="nfc"></i></div><div id="demo-content"></div></div><div class="demo-controls"><button class="button secondary" id="demo-back">Back</button><span id="demo-count"></span><button class="button" id="demo-next">Next <i data-lucide="arrow-right"></i></button></div><p class="fineprint">Illustrative workflow only. This does not scan, write, or activate a band.</p></dialog>
   <dialog id="privacy-dialog" aria-labelledby="privacy-title"><button class="icon-button dialog-close" aria-label="Close privacy details"><i data-lucide="x"></i></button><p class="eyebrow">DATA BOUNDARIES / SEPTEMBER 2026</p><h2 id="privacy-title">What your account holds.</h2><div class="privacy-detail"><h3>Account data</h3><p>Supabase Auth processes your email and password for authentication. The band registry stores your account ID, chip serial, color, inventory status and registration date. Database policies restrict these records to your authenticated account.</p><h3>What stays out</h3><p>Do not enter diagnoses, emergency contacts, care instructions, medical-card URLs or band payloads here. This portal does not collect them. NFC reading uses only the tag serial number and never reads or uploads NDEF record content.</p><h3>Important limits</h3><p>A chip UID is not proof of ownership and is not an authentication secret. Changing a band’s inventory status does not revoke its payload. Anyone with that payload can read its wearer-selected information.</p><h3>Session and infrastructure</h3><p>Sign-in stays in this browser until you sign out. Supabase processes account requests; hosting infrastructure may process request metadata such as IP addresses. There are no advertising or analytics SDKs on this portal.</p><h3>Administrator access</h3><p>Authorized administrators can view account emails, verification status, band counts and account dates, invite members, and suspend or restore account access. Administrative actions are audited. The admin panel does not expose medical information or band payloads.</p><h3>Your controls</h3><p>You can remove band records, change your password, and request an email recovery link. Email delivery depends on provider configuration. Full account deletion is not yet self-service; do not use this development portal for a medical-care dependency.</p></div></dialog>
-  <script src="./hero.js?v=20261001i"></script>
-  <script src="./process.js?v=20261001i"></script>
+  <script src="./hero.js?v=20261002a"></script>
+  <script src="./process.js?v=20261002a"></script>
   <script type="module">
     const params = new URLSearchParams(location.search);
     const mode = params.get("auth") || params.get("account");

@@ -7,6 +7,9 @@
   var times = steps.map(function (s) { return [parseFloat(s.dataset.start), parseFloat(s.dataset.end)]; });
   var current = -1;
   var raf = 0;
+  var detail = document.getElementById('process-detail');
+  var section = document.getElementById('process');
+  if (section) section.classList.add('live');
 
   function set(t) {
     var i = 0;
@@ -18,6 +21,12 @@
         s.style.removeProperty('--p');
       });
       current = i;
+      if (detail) {
+        var text = steps[i].querySelector('p');
+        detail.classList.remove('show');
+        // swap the words while invisible, then fade in: opacity only, so nothing on the page moves
+        setTimeout(function () { if (current === i) { detail.textContent = text ? text.textContent : ''; detail.classList.add('show'); } }, 140);
+      }
     }
     var a = times[i];
     var p = Math.max(0, Math.min(1, (t - a[0]) / (a[1] - a[0])));
