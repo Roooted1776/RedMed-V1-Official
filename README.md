@@ -66,7 +66,7 @@ DNS cutover: [`docs/domain.md`](docs/domain.md). Production matrix: [`docs/relea
 | Flag | Default | Restore |
 |------|---------|---------|
 | `nfcHardwareEnabled` | `false` | [`docs/hardware/NFC-RESTORE.md`](docs/hardware/NFC-RESTORE.md) |
-| `associatedDomainsEnabled` | `true` (`applinks:redmed.live`) | [`docs/hardware/associated-domains-restore.md`](docs/hardware/associated-domains-restore.md) |
+| `associatedDomainsEnabled` | `false` | [`docs/hardware/associated-domains-restore.md`](docs/hardware/associated-domains-restore.md) |
 | `healthKitImportEnabled` | `false` | [`docs/hardware/healthkit-restore.md`](docs/hardware/healthkit-restore.md) |
 | App Store listing | parked | [`docs/release/APP-STORE.md`](docs/release/APP-STORE.md) |
 

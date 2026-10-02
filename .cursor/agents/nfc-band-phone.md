@@ -17,7 +17,7 @@ The band is a passive factory-blank unlocked NXP NTAG216 (13.56 MHz, ISO 14443A 
 6. Owner Scan is a separate explicit session: `NFCReader.readTag` uses `NFCNDEFReaderSession` with `invalidateAfterFirstRead: true`. That verifies a chip. It is not how a stranger's tap opens the app.
 7. While `nfcHardwareEnabled` is false, Write only packs a URL (Copy Band Link / Preview). It must not open a live session or mark the band Linked.
 
-`associatedDomainsEnabled` is true and `RedMed.entitlements` has `applinks:redmed.live`. `nfcHardwareEnabled` stays false until `docs/hardware/NFC-RESTORE.md`. Do not remove the applinks entry. `scripts/test-nfc-hardware.mjs` fails if hardware is enabled without Associated Domains and `applinks:` for the write-base host.
+Both `nfcHardwareEnabled` and `associatedDomainsEnabled` are parked false in git, and `owner/RedMed/RedMed.entitlements` has no capability keys. Do not flip either flag or add entitlements unless the owner is following `docs/hardware/NFC-RESTORE.md` and `docs/hardware/associated-domains-restore.md` together. `scripts/test-nfc-hardware.mjs` fails if hardware is enabled without Associated Domains and `applinks:` for the write-base host.
 
 ## Tap into the installed iPhone app
 
@@ -29,8 +29,8 @@ Ingress is `RedMedApp.onContinueUserActivity(NSUserActivityTypeBrowsingWeb)` in 
 
 `BandTapIngress` then:
 
-- A decodable `#d=` (the wearer's own band or someone else's) opens bundled tapper.html above ConsentGate. No Face ID, no Before You Continue, no Keychain write, no SOS. The NDEF URL stays `https://redmed.live/tapper/#d=` on the VPS. This path does not read or write the owner database.
-- A missing or undecodable fragment stays quiet. No card sheet, no SOS.
+- Own matching band (Keychain profile matches the chip) → foreground only. No Safari, no card sheet, no SOS.
+- Someone else's chip, or an empty owner funnel → ungated in-app tap card above ConsentGate. No Face ID, no Before You Continue, no Keychain write, no SOS.
 
 `onOpenURL` may ingest the same `https` card URL when the fragment is still attached. `redmed://nfc` only switches to the NFC tab. `redmed://` is never a band-profile handoff.
 

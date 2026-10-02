@@ -3,18 +3,17 @@
 ## Problem this solves
 
 The wearer's band on their wrist must not **Safari-hijack their own iPhone**
-when the phone is nearby (pocket / clasp / Background Tag Reading), and it
-must not arm SOS. The tap still opens tapper.html inside the app.
+when the phone is nearby (pocket / clasp / Background Tag Reading). That is
+not only the SOS siren — opening the full passerby card on the owner's phone
+is the interference.
 
 **Fix:** Associated Domains. Hosted `/tapper/` is a Universal Link. With
-RedMed installed, iOS opens the **app** (bundled tapper.html) instead of
-Safari. The band URL stays on the VPS. The owner database is not part of
-this open.
+RedMed installed, iOS opens the **app** instead of Safari.
 
 | Phone | Band tap |
 | --- | --- |
-| RedMed installed, decodable `#d=` (own band or someone else's) | Ungated in-app tapper.html above ConsentGate — no Face ID, no Before You Continue, no Keychain write, no SOS. Band URL stays on the VPS. Owner database is not read here. |
-| RedMed installed, missing or undecodable `#d=` | App foreground only — no card sheet, no SOS |
+| RedMed installed, `#d=` matches owner Keychain | App foreground only — no Safari, no SOS, no card sheet |
+| RedMed installed, other person's `#d=` (or empty owner funnel) | Ungated in-app tap card above ConsentGate — no Face ID, no Before You Continue, no Keychain write, no SOS |
 | RedMed **not** installed | Safari Assist medical card only — band tap does **not** arm SOS (SOS is toggle or US Crash Detection collision) |
 
 AASA is live (`apple-app-site-association` + `.well-known/`, paths
@@ -34,16 +33,20 @@ the same paid Program, so they ship together. In `owner/RedMed`,
 `scripts/test-nfc-hardware.mjs` fails if `nfcHardwareEnabled` is true without
 `associatedDomainsEnabled` + `applinks:` in the entitlements.
 
-## In git
+## Currently parked (personal team signing)
 
-`AppConfig.associatedDomainsEnabled = true` and `RedMed.entitlements` has
-`applinks:redmed.live`. NFC Tag Reading stays parked. A personal / free
-Apple Developer team cannot provision Associated Domains, so Automatic
-Signing fails while this entitlement is present. Build with a paid team
-and enable Associated Domains on App ID `com.redmed.app`.
+`AppConfig.associatedDomainsEnabled = false` and `RedMed.entitlements` has
+no `applinks:` key (NFC Tag Reading may already be present — add
+`applinks:`, do not wipe the NFC key). Personal / free Apple Developer
+teams cannot provision Associated Domains, so Automatic Signing fails
+("Cannot create a iOS App Development provisioning profile") while the
+entitlement is present — the same class of problem as CoreNFC
+(`docs/hardware/NFC-RESTORE.md`).
 
-Leave `onContinueUserActivity` in place. Without a signed build that
-includes the entitlement, a band tap still opens Safari.
+Leave `onContinueUserActivity` in place — no-op without the entitlement.
+Without the entitlement, a band tap opens Safari Assist even on a phone
+that has RedMed installed. That is acceptable only while no app-written
+bands exist (NFC write parked).
 
 ## Rejected: local-network / BLE band ranging
 
@@ -75,11 +78,10 @@ local network. HF NFC physics + Universal Links are the controls.
 
 ## Device tests
 
-1. RedMed installed + tap **own** wrist band → bundled tapper.html, **no
-   Safari**, no SOS, no Face ID, no Keychain write.
-2. RedMed installed + tap **another** RedMed band → same ungated in-app
-   tapper.html (no Face ID / Before You Continue / login), no Keychain
-   write, no SOS.
+1. RedMed installed + tap **own** wrist band → app foreground (or already
+   open stays put), **no Safari**, no SOS, no tap card.
+2. RedMed installed + tap **another** RedMed band → ungated in-app tap card
+   (no Face ID / Before You Continue / login), no Keychain write, no SOS.
 3. RedMed **not** installed + tap any band → Safari Assist medical card only
    (no login, no biometrics, no start screen). SOS arms only via SOS · Locate
    Me toggle or US Crash Detection collision — never from band tap alone.
