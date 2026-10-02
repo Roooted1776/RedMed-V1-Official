@@ -113,16 +113,13 @@ enum AppConfig {
     /// (~1–2″); it loads in their browser.
     static let nfcHardwareEnabled = false
 
-    /// `true` = `RedMed.entitlements` includes `applinks:` so a phone with RedMed
-    /// installed opens the app on `/tapper/` band taps instead of Safari (own
-    /// wrist proximity must not hijack that iPhone). Requires Associated Domains
-    /// on App ID `com.redmed.app` + paid Apple Developer — see
-    /// `docs/hardware/associated-domains-restore.md`. Keep in lockstep with the entitlement.
-    /// Parked (`false`): personal/free teams cannot provision Associated Domains
-    /// (same class of problem as CoreNFC). No custom-scheme fallback — Safari
-    /// keeps the tap. Restore after paid Program; nfcHardwareEnabled requires
-    /// this (test-nfc-hardware.mjs).
-    static let associatedDomainsEnabled = false
+    /// `true` = `RedMed.entitlements` includes `applinks:redmed.live` so a phone
+    /// with RedMed installed opens bundled tapper.html on `/tapper/` band taps
+    /// instead of Safari. The band URL stays on the VPS. Requires Associated
+    /// Domains on App ID `com.redmed.app` + a paid Apple Developer team — see
+    /// `docs/hardware/associated-domains-restore.md`. Keep in lockstep with the
+    /// entitlement. No custom-scheme fallback. NFC write stays separately parked.
+    static let associatedDomainsEnabled = true
 
     /// Product kill switch for the optional Apple Health import on the empty-profile
     /// funnel / Edit. `true` = `HealthKitProfileImport` may call HealthKit.
@@ -233,14 +230,12 @@ enum AppConfig {
         }
 
         /// What can still open the URL later (Apple OS path; phone off / locked OK).
-        /// Associated Domains (when enabled): phone with RedMed opens the app
-        /// instead of Safari (own wrist band must not hijack that iPhone).
-        /// Parked: Safari keeps the tap (no redmed:// handoff — not exclusive).
-        /// Assist SOS never auto-arms on band tap — toggle or US crash only.
-        /// No BLE / local-network band ranging.
+        /// Associated Domains: a phone with RedMed opens tapper.html instead of
+        /// Safari. The band URL stays on the VPS. Passerby phones without the
+        /// app still get Safari. Assist SOS never auto-arms on band tap.
         static var backgroundTagReadingSummary: String {
             let installPath = AppConfig.associatedDomainsEnabled
-                ? "With RedMed installed, Associated Domains opens the app instead of Safari so your own wrist band does not take over this iPhone."
+                ? "With RedMed installed, the tap opens tapper.html in the app instead of Safari."
                 : "Until Associated Domains ships with band writing, a tap opens the card in Safari even with RedMed installed."
             return "iOS Background Tag Reading can still open the card later — phone can be off or locked; a deliberate tap (phone top \(intentionalTapRangeLabel) from the band) still works. \(installPath) Passerby phones without RedMed still get Safari Assist. Wrist + pocket is usually fine; phone pressed to the clasp can still couple. Writing the chip does not change that. Band stays passive — no battery, no Bluetooth to find nearby."
         }
