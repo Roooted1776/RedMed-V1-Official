@@ -17,7 +17,7 @@ The band is a passive factory-blank unlocked NXP NTAG216 (13.56 MHz, ISO 14443A 
 6. Owner Scan is a separate explicit session: `NFCReader.readTag` uses `NFCNDEFReaderSession` with `invalidateAfterFirstRead: true`. That verifies a chip. It is not how a stranger's tap opens the app.
 7. While `nfcHardwareEnabled` is false, Write only packs a URL (Copy Band Link / Preview). It must not open a live session or mark the band Linked.
 
-Both `nfcHardwareEnabled` and `associatedDomainsEnabled` are parked false in git, and `owner/RedMed/RedMed.entitlements` has no capability keys. Do not flip either flag or add entitlements unless the owner is following `docs/hardware/NFC-RESTORE.md` and `docs/hardware/associated-domains-restore.md` together. `scripts/test-nfc-hardware.mjs` fails if hardware is enabled without Associated Domains and `applinks:` for the write-base host.
+`associatedDomainsEnabled` is true and `RedMed.entitlements` has `applinks:redmed.live`. `nfcHardwareEnabled` stays false until `docs/hardware/NFC-RESTORE.md`. Do not remove the applinks entry. `scripts/test-nfc-hardware.mjs` fails if hardware is enabled without Associated Domains and `applinks:` for the write-base host.
 
 ## Tap into the installed iPhone app
 

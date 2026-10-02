@@ -113,16 +113,13 @@ enum AppConfig {
     /// (~1–2″); it loads in their browser.
     static let nfcHardwareEnabled = false
 
-    /// `true` = `RedMed.entitlements` includes `applinks:` so a phone with RedMed
-    /// installed opens the app on `/tapper/` band taps instead of Safari (own
-    /// wrist proximity must not hijack that iPhone). Requires Associated Domains
-    /// on App ID `com.redmed.app` + paid Apple Developer — see
-    /// `docs/hardware/associated-domains-restore.md`. Keep in lockstep with the entitlement.
-    /// Parked (`false`): personal/free teams cannot provision Associated Domains
-    /// (same class of problem as CoreNFC). No custom-scheme fallback — Safari
-    /// keeps the tap. Restore after paid Program; nfcHardwareEnabled requires
-    /// this (test-nfc-hardware.mjs).
-    static let associatedDomainsEnabled = false
+    /// `true` = `RedMed.entitlements` includes `applinks:redmed.live` so a phone
+    /// with RedMed installed opens bundled tapper.html on `/tapper/` band taps
+    /// instead of Safari. The band URL stays on the VPS. Requires Associated
+    /// Domains on App ID `com.redmed.app` + a paid Apple Developer team — see
+    /// `docs/hardware/associated-domains-restore.md`. Keep in lockstep with the
+    /// entitlement. No custom-scheme fallback. NFC write stays separately parked.
+    static let associatedDomainsEnabled = true
 
     /// Product kill switch for the optional Apple Health import on the empty-profile
     /// funnel / Edit. `true` = `HealthKitProfileImport` may call HealthKit.
