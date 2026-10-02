@@ -1,16 +1,16 @@
 # Owner parked capabilities (Phase 4)
 
-Keep NFC write and HealthKit **false** until a paid Apple Developer Program team has those portal capabilities. Associated Domains is on in git (`applinks:redmed.live`). A personal / free team cannot sign that entitlement.
+Keep these **false / empty** until paid Apple Developer Program + portal capabilities exist. Do not flip flags in a Cloud Agent Linux session.
 
 The switches live in `owner/RedMed/`.
 
 | Switch | Location | Restore |
 |--------|----------|---------|
 | `nfcHardwareEnabled = false` | `owner/RedMed/AppConfig.swift` | [`NFC-RESTORE.md`](NFC-RESTORE.md) |
-| `associatedDomainsEnabled = true` | `AppConfig.swift` + `applinks:redmed.live` | [`associated-domains-restore.md`](associated-domains-restore.md) |
+| `associatedDomainsEnabled = false` | `AppConfig.swift` | [`associated-domains-restore.md`](associated-domains-restore.md) |
 | `healthKitImportEnabled = false` | `AppConfig.swift` | [`healthkit-restore.md`](healthkit-restore.md) |
 | `profileSyncEnabled = false` | `AppConfig.swift` | Publishable key on the Mac, then the flag |
-| `applinks:redmed.live` only | `owner/RedMed/RedMed.entitlements` | NFC / HealthKit keys stay out until those restores |
+| Empty entitlements dict | `owner/RedMed/RedMed.entitlements` | Flip with flags in lockstep |
 | No `NFCReaderUsageDescription` | `Info.plist` | With NFC restore |
 | `appStoreURL = nil` | `AppConfig.swift` | After Connect URL exists |
 
