@@ -59,4 +59,13 @@ tapper/index.preview.html
 # Superdesign scratch templates (not product output)
 .superdesign/tmp/
 
-.claude/
+# Claude Code: track project agents / commands / skills; ignore local state
+.claude/*
+!.claude/agents/
+!.claude/agents/**
+!.claude/commands/
+!.claude/commands/**
+!.claude/skills/
+!.claude/skills/**
+.claude/settings.local.json
+.claude/*.local.*
