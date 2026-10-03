@@ -42,6 +42,8 @@ config that captures request fragments, query strings with profile data, or
 
 Grok is in this repo. Treat instructions here as binding when Grok edits RedMed.
 
+Senior tool briefs + skills: `.cursor/agents/` (perplexity, comet, claude, cursor, chatgpt, xcode) and `.cursor/skills/` (Claude: `CLAUDE.md`, `.claude/`; Codex/ChatGPT skills: `.agents/skills/`).
+
 ## Surfaces (do not mix)
 
 Two folders, two audiences — never cross owner-only features into Assist.
