@@ -260,9 +260,29 @@ h1,h2,h3{text-transform:capitalize}
 .mark{height:44px}
 .text-button{height:44px;min-height:44px;padding-block:0;white-space:nowrap}
 
-/* phone header: keep Create account on one line */
+/* phone header: Sign in and Create account both stay on one line */
 .header .button{white-space:nowrap}
-@media(max-width:480px){.header .text-button{display:none}.tt-track{width:68px}:root[data-theme=dark] .tt-thumb{transform:translateX(24px)}}
+@media(max-width:480px){
+  .header{gap:8px;padding:0 10px}
+  .header-actions{gap:6px;flex:none}
+  .header .text-button{display:inline-flex;font-size:.8125rem;padding-inline:2px}
+  .header .button.small{padding-inline:10px;font-size:.8125rem}
+  .brand{font-size:1.05rem}
+  .tt-track{width:68px}
+  :root[data-theme=dark] .tt-thumb{transform:translateX(24px)}
+}
+@media(max-width:360px){
+  .header{gap:4px;padding:0 6px}
+  .header-actions{gap:8px}
+  .brand{font-size:.9rem;gap:4px}
+  .brand>svg{width:22px;height:22px}
+  .header .text-button,.header .button.small{font-size:.75rem}
+  .header .button.small{padding-inline:8px}
+  .tt-track{width:56px;height:36px}
+  .tt-thumb{width:28px;height:28px;top:3px}
+  :root[data-theme=dark] .tt-thumb{transform:translateX(22px)}
+  .theme-switch{height:36px}
+}
 
 /* pay row: every chip is one height, every icon sits in the same 26px box */
 .pay{gap:var(--s3)}
